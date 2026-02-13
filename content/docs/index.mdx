@@ -1,33 +1,27 @@
 ---
-title: Hello World
-description: Your first document
+title: Introduction to waves-cn
+description: A collection of audio players and waveform components built with wavesurfer.js and shadcn/ui.
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+## Overview
 
-## What is Next?
+This project provides:
 
-<Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.dev" />
-</Cards>
+- Waveform audio players with play/pause, volume, and progress
+- Ready-to-use components crafted with shadcn/ui
+- Easy integration using your React/Next.js project
 
+## Getting Started
 
-```tsx "
-import defaultComponents from 'fumadocs-ui/mdx';
-import type { MDXComponents } from 'mdx/types';
-import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
+To get started with waves-cn, please refer to the **Installation Guide**.
 
-export function getMDXComponents(components?: MDXComponents): MDXComponents {
-  return {
-    ...defaultComponents,
-    // HTML `ref` attribute conflicts with `forwardRef`
-    pre: ({ ref: _ref, ...props }) => (
-      <CodeBlock {...props}>
-        <Pre>{props.children}</Pre> {/* [!code highlight] */}
-      </CodeBlock>
-    ),
-    ...components,
-  };
-}
-```
+## Contribute
+
+Any contributions are welcome! Open an issue or a PR if you have any suggestions or improvements on GitHub.
+
+## Support
+
+I appreciate any support you can offer:
+
+- Buy me a coffee ☕  
+- Star on GitHub ⭐

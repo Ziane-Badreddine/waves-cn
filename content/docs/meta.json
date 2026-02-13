@@ -1,0 +1,19 @@
+{
+  "title": "Framework",
+  "description": "The docs framework",
+  "root": true,
+  "pages": [
+    "---Getting Started---",
+    "index",
+    "what-is-fumadocs",
+    "comparisons",
+    "manual-installation",
+    "guides",
+    "---Components---",
+    "...components",
+    "markdown",
+    "---Extensions---",
+    "...extensions"
+
+  ]
+}
