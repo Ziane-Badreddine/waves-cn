@@ -1,4 +1,6 @@
+import AudioPlayerExample from '@/registry/examples/audio-player-example';
 import Link from 'next/link';
+
 
 export default function HomePage() {
   return (
@@ -10,6 +12,8 @@ export default function HomePage() {
           /docs
         </Link>{' '}
         and see the documentation.
+
+        <AudioPlayerExample />
       </p>
     </div>
   );

@@ -16,29 +16,28 @@ export const Index: Record<string, any> = {
   },
 
 
-  // // 🎧 AUDIO PLAYER
-  // "audio-player": {
-  //   name: "audio-player",
-  //   description: "Shadcn audio player",
-  //   type: "registry:component",
-  //   files: ["src/registry/components/audio-player.tsx"],
-  //   component: React.lazy(() => import("@/registry/components/audio-player")),
-  //   category: "audio",
-  //   subcategory: "player",
-  //   chunks: []
-  // },
+  "audio-player": {
+    name: "audio-player",
+    description: "Shadcn audio player",
+    type: "registry:component",
+    files: ["src/registry/examples/audio-player-example.tsx"],
+    component: React.lazy(() => import("@/registry/examples/audio-player-example")),
+    category: "audio",
+    subcategory: "player",
+    chunks: []
+  },
 
-  // // 🎤 AUDIO RECORDER
-  // "audio-recorder": {
-  //   name: "audio-recorder",
-  //   description: "Voice message recorder",
-  //   type: "registry:component",
-  //   files: ["src/registry/components/audio-recorder.tsx"],
-  //   component: React.lazy(() => import("@/registry/components/audio-recorder")),
-  //   category: "audio",
-  //   subcategory: "recorder",
-  //   chunks: []
-  // },
+  // 🎤 AUDIO RECORDER
+  "audio-recorder": {
+    name: "audio-recorder",
+    description: "Voice message recorder",
+    type: "registry:component",
+    files: ["src/registry/components/audio-recorder.tsx"],
+    component: React.lazy(() => import("@/registry/components/audio-recorder")),
+    category: "audio",
+    subcategory: "recorder",
+    chunks: []
+  },
 
   // // 🌊 WAVEFORM
   // "audio-waveform": {
