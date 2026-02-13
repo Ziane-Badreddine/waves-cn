@@ -11,3 +11,23 @@ Welcome to the docs! You can start writing documents in `/content/docs`.
   <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
   <Card title="Learn more about Fumadocs" href="https://fumadocs.dev" />
 </Cards>
+
+
+```tsx "
+import defaultComponents from 'fumadocs-ui/mdx';
+import type { MDXComponents } from 'mdx/types';
+import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
+
+export function getMDXComponents(components?: MDXComponents): MDXComponents {
+  return {
+    ...defaultComponents,
+    // HTML `ref` attribute conflicts with `forwardRef`
+    pre: ({ ref: _ref, ...props }) => (
+      <CodeBlock {...props}>
+        <Pre>{props.children}</Pre> {/* [!code highlight] */}
+      </CodeBlock>
+    ),
+    ...components,
+  };
+}
+```
