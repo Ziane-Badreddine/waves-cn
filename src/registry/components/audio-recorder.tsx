@@ -1,120 +1,322 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import WaveSurfer from "wavesurfer.js"
+import { useWavesurfer } from "@/components/cors/wavesurfer-player";
+import {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  type CSSProperties,
+} from "react";
+import { Button } from "@/components/ui/button";
+import { Mic, Pause, Play, Square, Trash2 } from "lucide-react";
+import RecordPlugin, {
+  type RecordPluginOptions,
+  type RecordPluginDeviceOptions,
+} from "wavesurfer.js/dist/plugins/record.esm.js";
+import { cn, formatDuration } from "@/lib/utils";
+import { useCssVar } from "@/hooks/use-css-var";
 
+// Types
 
-import { Card, CardContent } from "@/components/ui/card"
+export type RecordState = "idle" | "recording" | "paused" | "done";
 
-import { Play, Pause, Volume2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Slider } from "@/components/ui/slider"
+export type AudioRecorderProps = {
+  // Callbacks
+  onRecordEnd?: (blob: Blob) => void;
+  onRecordStart?: () => void;
+  onRecordPause?: () => void;
+  onRecordResume?: () => void;
+  onDiscard?: () => void;
+  onError?: (error: Error) => void;
 
-interface AudioPlayerProps {
-  src: string
-  className?: string
-}
+  // Behaviour
+  maxDuration?: number;
+  mimeType?: RecordPluginOptions["mimeType"];
+  audioBitsPerSecond?: RecordPluginOptions["audioBitsPerSecond"];
+  deviceId?: string;
+  disabled?: boolean;
 
-export default function AudioPlayer({ src, className }: AudioPlayerProps) {
-  const containerRef = React.useRef<HTMLDivElement | null>(null)
-  const waveRef = React.useRef<WaveSurfer | null>(null)
+  // Display
+  showWaveform?: boolean; // default: true
+  showTimer?: boolean; // default: true
+  waveColor?: string;
+  progressColor?: string;
+  waveformHeight?: number; // default: 64
+  barWidth?: number; // default: 3
+  barGap?: number; // default: 2
+  barRadius?: number; // default: 30
+  barHeight?: number; // default: 0.8
 
-  const [isPlaying, setIsPlaying] = React.useState(false)
-  const [volume, setVolume] = React.useState(1)
-  const [duration, setDuration] = React.useState(0)
-  const [currentTime, setCurrentTime] = React.useState(0)
+  // Style
+  className?: string;
+  style?: CSSProperties;
+  waveformClassName?: string;
+  timerClassName?: string;
+  controlsClassName?: string;
+};
 
-  // 🎧 Init wavesurfer
-  React.useEffect(() => {
-    if (!containerRef.current) return
+export function AudioRecorder({
+  onRecordEnd,
+  onRecordStart,
+  onRecordPause,
+  onRecordResume,
+  onDiscard,
+  onError,
+  maxDuration,
+  mimeType,
+  audioBitsPerSecond = 1,
+  deviceId,
+  disabled = false,
+  showWaveform = true,
+  showTimer = true,
+  waveColor = "var(--primary)",
+  progressColor = "var(--background)",
+  waveformHeight = 64,
+  barWidth = 3,
+  barGap = 2,
+  barRadius = 2,
+  barHeight,
+  className,
+  style,
+  waveformClassName,
+  timerClassName,
+  controlsClassName,
+}: AudioRecorderProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [recordPlugin, setRecordPlugin] = useState<InstanceType<
+    typeof RecordPlugin
+  > | null>(null);
+  const [recordState, setRecordState] = useState<RecordState>("idle");
+  const [duration, setDuration] = useState(0);
 
-    const ws = WaveSurfer.create({
-      container: containerRef.current,
-      height: 64,
-      waveColor: "hsl(var(--muted-foreground))",
-      progressColor: "hsl(var(--primary))",
-      cursorColor: "hsl(var(--primary))",
-      barWidth: 2,
-      barGap: 2,
-      url: src,
-      fetchParams: {
-        mode: "cors", // ✅ CORS safe
-      },
-    })
+  const isDiscarding = useRef(false);
+  const maxDurationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    waveRef.current = ws
+  const resolvedWaveColor = useCssVar(waveColor);
+  const resolvedProgressColor = useCssVar(progressColor);
 
-    ws.on("ready", () => {
-      setDuration(ws.getDuration())
-    })
+  const { wavesurfer } = useWavesurfer({
+    container: containerRef,
+    waveColor: resolvedWaveColor,
+    progressColor: resolvedProgressColor,
+    height: waveformHeight,
+    barWidth,
+    barGap,
+    barRadius,
+    barHeight,
+  });
 
-    ws.on("audioprocess", () => {
-      setCurrentTime(ws.getCurrentTime())
-    })
+  // Plugin events
+  useEffect(() => {
+    if (!wavesurfer) return;
 
-    ws.on("finish", () => {
-      setIsPlaying(false)
-    })
+    wavesurfer.registerPlugin(
+      RecordPlugin.create({
+        renderRecordedAudio: false,
+        continuousWaveform: false,
+        scrollingWaveform: true,
+        mimeType,
+        audioBitsPerSecond,
+        mediaRecorderTimeslice: 100,
+      }),
+    );
 
-    return () => {
-      ws.destroy()
+    const record = wavesurfer
+      .getActivePlugins()
+      .find((p) => p instanceof RecordPlugin) as
+      | InstanceType<typeof RecordPlugin>
+      | undefined;
+
+    if (!record) return;
+    setRecordPlugin(record);
+
+    const unsubs = [
+      record.on("record-progress", (ms) => setDuration(ms)),
+
+      record.on("record-start", () => {
+        setRecordState("recording");
+        setDuration(0);
+        onRecordStart?.();
+      }),
+
+      record.on("record-pause", () => {
+        setRecordState("paused");
+        onRecordPause?.();
+      }),
+
+      record.on("record-resume", () => {
+        setRecordState("recording");
+        onRecordResume?.();
+      }),
+
+      record.on("record-end", (blob: Blob) => {
+        if (maxDurationTimer.current) {
+          clearTimeout(maxDurationTimer.current);
+          maxDurationTimer.current = null;
+        }
+        if (!isDiscarding.current) {
+          onRecordEnd?.(blob);
+          setRecordState("done");
+        } else {
+          onDiscard?.();
+          setRecordState("idle");
+        }
+        isDiscarding.current = false;
+        wavesurfer.empty();
+        setDuration(0);
+      }),
+    ];
+
+    return () => unsubs.forEach((fn) => fn());
+  }, [wavesurfer]);
+
+  // Actions
+
+  const start = useCallback(async () => {
+    if (!recordPlugin || disabled) return;
+    try {
+      const deviceOptions: RecordPluginDeviceOptions = deviceId
+        ? { deviceId: { exact: deviceId } }
+        : {};
+      await recordPlugin.startRecording(deviceOptions);
+      if (maxDuration && maxDuration > 0) {
+        maxDurationTimer.current = setTimeout(
+          () => recordPlugin.stopRecording(),
+          maxDuration * 1000,
+        );
+      }
+    } catch (err) {
+      onError?.(err instanceof Error ? err : new Error(String(err)));
     }
-  }, [src])
+  }, [recordPlugin, disabled, deviceId, maxDuration, onError]);
 
-  // ▶️ Play / Pause
-  const togglePlay = () => {
-    if (!waveRef.current) return
-    waveRef.current.playPause()
-    setIsPlaying(waveRef.current.isPlaying())
-  }
+  const stop = useCallback(() => {
+    if (maxDurationTimer.current) {
+      clearTimeout(maxDurationTimer.current);
+      maxDurationTimer.current = null;
+    }
+    recordPlugin?.stopRecording();
+  }, [recordPlugin]);
 
-  // 🔊 Volume
-  const handleVolume = (v: number[]) => {
-    const value = v[0]
-    setVolume(value)
-    waveRef.current?.setVolume(value)
-  }
+  const togglePause = useCallback(() => {
+    if (!recordPlugin) return;
+    recordState === "paused"
+      ? recordPlugin.resumeRecording()
+      : recordPlugin.pauseRecording();
+  }, [recordPlugin, recordState]);
 
-  // ⏱ Format time
-  const format = (t: number) => {
-    const m = Math.floor(t / 60)
-    const s = Math.floor(t % 60)
-    return `${m}:${s.toString().padStart(2, "0")}`
-  }
+  const discard = useCallback(() => {
+    if (maxDurationTimer.current) {
+      clearTimeout(maxDurationTimer.current);
+      maxDurationTimer.current = null;
+    }
+    isDiscarding.current = true;
+    recordPlugin?.stopRecording();
+    wavesurfer?.empty();
+    setRecordState("idle");
+    setDuration(0);
+  }, [recordPlugin, wavesurfer]);
+
+  // Derived
+
+  const isActive = recordState === "recording" || recordState === "paused";
+  const isPaused = recordState === "paused";
+
+  // Render
 
   return (
-    <Card className={className}>
-      <CardContent className="p-4 space-y-4">
+    <div className={cn("w-full space-y-3 ", className)} style={style}>
+      {/* Waveform — always mounted for stable DOM ref, hidden when idle */}
+      <div className="flex items-center w-full gap-2">
+        <div
+          ref={containerRef}
+          aria-hidden="true"
+          className={cn(
+            "overflow-hidden transition-all duration-300 w-full",
+            showWaveform && isActive
+              ? "opacity-100"
+              : "opacity-0 h-0 pointer-events-none",
+            waveformClassName,
+          )}
+          style={
+            showWaveform && isActive ? { height: waveformHeight } : undefined
+          }
+        />
 
-        {/* Waveform */}
-        <div ref={containerRef} className="w-full" />
+        {showTimer && isActive && (
+          <p
+            className={cn(
+              "text-base tabular-nums text-muted-foreground shrink-0",
+              timerClassName,
+            )}
+          >
+            {formatDuration(duration)}
+          </p>
+        )}
+      </div>
 
-        {/* Controls */}
-        <div className="flex items-center justify-between gap-4">
+      {/* Controls */}
+      <div
+        className={cn(
+          "flex items-center gap-2 justify-center",
+          controlsClassName,
+        )}
+      >
+        {!isActive && (
+          <Button
+            size="icon"
+            variant="secondary"
+            onClick={start}
+            disabled={disabled}
+            aria-label="Start recording"
+          >
+            <Mic className="size-4" />
+          </Button>
+        )}
 
-          <div className="flex items-center gap-2">
-            <Button size="icon" variant="secondary" onClick={togglePlay}>
-              {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+        {isActive && (
+          <>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={discard}
+              disabled={disabled}
+              aria-label="Discard recording"
+              className="hover:text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="size-4" />
             </Button>
 
-            <span className="text-xs text-muted-foreground w-[70px]">
-              {format(currentTime)} / {format(duration)}
-            </span>
-          </div>
+            <Button
+              size="icon"
+              variant="destructive"
+              onClick={stop}
+              disabled={disabled}
+              aria-label="Stop recording"
+            >
+              <Square className="size-4" />
+            </Button>
 
-          <div className="flex items-center gap-2 w-[140px]">
-            <Volume2 size={16} />
-            <Slider
-              value={[volume]}
-              min={0}
-              max={1}
-              step={0.01}
-              onValueChange={handleVolume}
-            />
-          </div>
-
-        </div>
-      </CardContent>
-    </Card>
-  )
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={togglePause}
+              disabled={disabled}
+              aria-label={isPaused ? "Resume recording" : "Pause recording"}
+            >
+              {isPaused ? (
+                <Play className="size-4" />
+              ) : (
+                <Pause className="size-4" />
+              )}
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
+
+export default AudioRecorder;

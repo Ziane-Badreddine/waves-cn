@@ -1,36 +1,45 @@
-
 import { ComponentPreview } from "./component-preview";
 import { Index } from "@/__registry__";
 import fs from "fs";
 import path from "path";
 
-export  function ComponentPreviewWrapper({
-  name,
-}: {
+interface ComponentPreviewWrapperProps {
   name: string;
-})  {
-   const file = Index[name]?.files?.[0];
+  variant?: "normal" | "preview" | "codesource";
+  hideCode?: boolean;
+}
 
-  const code = file ? getComponentCode(file) : null;
+export function ComponentPreviewWrapper({
+  name,
+  variant = "normal",
+  hideCode = false,
+}: ComponentPreviewWrapperProps) {
+  const file = Index[name]?.files?.[0];
+
+  const code = !hideCode && file ? getComponentCode(file) : null;
 
   return (
     <ComponentPreview
       name={name}
+      variant={variant}
+      hideCode={hideCode}
       codeString={code}
     />
   );
 }
 
-
-
-
-export function getComponentCode(filePath: string) {
+function getComponentCode(filePath: string) {
   try {
     const fullPath = path.join(process.cwd(), filePath);
-    const file = fs.readFileSync(fullPath, "utf-8");
-    return file;
-  } catch {
+
+    if (!fs.existsSync(fullPath)) {
+      console.warn(`File not found: ${fullPath}`);
+      return null;
+    }
+
+    return fs.readFileSync(fullPath, "utf-8");
+  } catch (error) {
+    console.error("Error reading component source:", error);
     return null;
   }
 }
-

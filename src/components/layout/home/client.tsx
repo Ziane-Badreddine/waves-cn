@@ -117,6 +117,7 @@ export function Header({
                 <MobileNavigationMenuLinkItem
                   key={i}
                   item={item}
+                  
                   className={cn(item.type === 'icon' && '-mx-1 first:ms-0')}
                 />
               ))}

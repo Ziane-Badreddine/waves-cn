@@ -1,10 +1,178 @@
 ---
 title: Audio Recorder
-description: Audio Recorder built with Wavesurfer.js and shadcn/ui
+description: A headless-friendly audio recorder with live waveform, built on wavesurfer.js.
 ---
 
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+import { Steps, Step } from "@/components/steps"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+
+<ComponentPreviewWrapper name="audio-recorder-demo"  />
 
 ## Installation
 
+<Tabs defaultValue="cli">
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
 ```bash
 npm install wavesurfer.js
+```
+
+</TabsContent>
+<TabsContent value="manual">
+
+<Steps>
+
+<Step>
+
+Install the peer dependency.
+
+```bash
+npm install wavesurfer.js
+```
+
+</Step>
+
+<Step>
+
+Add `useCssVar` to your project.
+
+```ts title="hooks/use-css-var.ts"
+import { useState, useEffect } from "react"
+
+export function useCssVar(value: string): string {
+  const [resolved, setResolved] = useState(value)
+
+  useEffect(() => {
+    const match = value.match(/^var\((--[^)]+)\)$/)
+    if (!match) { setResolved(value); return }
+    const raw = getComputedStyle(document.documentElement)
+      .getPropertyValue(match[1]).trim()
+    const isHslChannels = /^[\d.]+ [\d.]+% [\d.]+%$/.test(raw)
+    setResolved(raw ? (isHslChannels ? `hsl(${raw})` : raw) : value)
+  }, [value])
+
+  return resolved
+}
+```
+
+</Step>
+
+<Step>
+
+Add `formatDuration` utility to your project.
+
+```ts title="utils.ts"
+export function formatDuration(duration: number) {
+  const formattedTime = [
+    Math.floor((duration % 3600000) / 60000),
+    Math.floor((duration % 60000) / 1000),
+  ]
+    .map((v) => (v < 10 ? "0" + v : v))
+    .join(":")
+
+  return formattedTime
+}
+```
+
+</Step>
+
+<Step>
+
+Copy `audio-recorder.tsx` into your project.
+
+<ComponentPreviewWrapper name="audio-recorder" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Update the import paths to match your project setup.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+</Tabs>
+
+## Usage
+
+```tsx
+import { AudioRecorder } from "@/components/ui/audio-recorder"
+```
+
+```tsx
+<AudioRecorder onRecordEnd={(blob) => console.log(blob)} />
+```
+
+## Examples
+
+### Minimal
+
+<ComponentPreviewWrapper name="audio-recorder-minimal" />
+
+### Max Duration
+
+Auto-stop after N seconds using `maxDuration`.
+
+<ComponentPreviewWrapper name="audio-recorder-timed" />
+
+```tsx
+<AudioRecorder
+  maxDuration={30}
+  onRecordEnd={handleBlob}
+/>
+```
+
+### Custom Waveform
+
+`waveColor` and `progressColor` accept any CSS value including `var(--*)` tokens — resolved at runtime for the Canvas API.
+
+<ComponentPreviewWrapper name="audio-recorder-custom-wave" />
+
+```tsx
+<AudioRecorder
+  waveColor="var(--chart-1)"
+  progressColor="var(--chart-2)"
+  barWidth={4}
+  barGap={3}
+  barRadius={8}
+  onRecordEnd={handleBlob}
+/>
+```
+
+## API Reference
+
+### AudioRecorder
+
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `onRecordEnd` | `(blob: Blob) => void` | — | Fires on successful stop. Not fired on discard. |
+| `onRecordStart` | `() => void` | — | Fires when recording starts. |
+| `onRecordPause` | `() => void` | — | Fires when recording is paused. |
+| `onRecordResume` | `() => void` | — | Fires when recording resumes. |
+| `onDiscard` | `() => void` | — | Fires when user discards. |
+| `onError` | `(error: Error) => void` | — | Fires on mic / MediaRecorder error. |
+| `maxDuration` | `number` | — | Auto-stop after N seconds. |
+| `mimeType` | `string` | browser default | e.g. `"audio/webm;codecs=opus"` |
+| `audioBitsPerSecond` | `number` | — | Bitrate passed to `MediaRecorder`. |
+| `deviceId` | `string` | — | Specific mic device ID to use. |
+| `disabled` | `boolean` | `false` | Disables all controls. |
+| `showWaveform` | `boolean` | `true` | Show live waveform during recording. |
+| `showTimer` | `boolean` | `true` | Show duration counter. |
+| `waveColor` | `string` | `var(--primary)` | Accepts CSS vars, hex, hsl, oklch. |
+| `progressColor` | `string` | `var(--primary-foreground)` | Same formats as `waveColor`. |
+| `waveformHeight` | `number` | `64` | Waveform height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Bar border radius in px. |
+| `barHeight` | `number` | `0.8` | Bar height multiplier (0–2). |
+| `className` | `string` | — | Root element class. |
+| `waveformClassName` | `string` | — | Waveform container class. |
+| `timerClassName` | `string` | — | Timer element class. |
+| `controlsClassName` | `string` | — | Controls row class. |
