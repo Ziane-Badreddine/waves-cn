@@ -3,13 +3,380 @@ title: Audio Player
 description: Audio player built with Wavesurfer.js and shadcn/ui
 ---
 
-import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+import { ComponentPreview } from "@/components/component-preview"
 
-<ComponentPreviewWrapper name="audio-player" />
+# Audio Player
+
+A fully themed, accessible audio player with waveform visualization powered by [WaveSurfer.js](https://wavesurfer.js.org/). Inherits your shadcn color palette automatically — including dark mode.
+
+<ComponentPreview
+  name="audio-player"
+  codeString={`import { AudioPlayer } from "@/components/ui/audio-player"
+
+export default function AudioPlayerDemo() {
+  return (
+    <AudioPlayer
+      src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+      title="SoundHelix — Song 1"
+    />
+  )
+}`}
+/>
 
 ---
 
 ## Installation
 
+### 1. Install dependencies
+
 ```bash
 npm install wavesurfer.js
+```
+
+### 2. Install shadcn primitives
+
+```bash
+npx shadcn@latest add card button slider
+```
+
+### 3. Add the component
+
+Create `components/ui/audio-player.tsx` and paste the source:
+
+```tsx
+"use client"
+
+import * as React from "react"
+import WaveSurfer from "wavesurfer.js"
+import { cn } from "@/lib/utils"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider"
+import { Play, Pause, Volume2, VolumeX, Loader2, RotateCcw } from "lucide-react"
+
+export interface AudioPlayerProps {
+  src: string
+  title?: string
+  defaultVolume?: number
+  barWidth?: number
+  barGap?: number
+  barRadius?: number
+  waveHeight?: number
+  minPxPerSec?: number
+  autoPlay?: boolean
+  onPlay?: () => void
+  onPause?: () => void
+  onFinish?: () => void
+  onTimeUpdate?: (currentTime: number, duration: number) => void
+  className?: string
+}
+
+function formatTime(t: number): string {
+  const m = Math.floor(t / 60)
+  const s = Math.floor(t % 60)
+  return `${m}:${s.toString().padStart(2, "0")}`
+}
+
+function resolveColorClass(twClass: string): string {
+  const el = document.createElement("div")
+  el.className = twClass
+  el.style.cssText = "position:fixed;pointer-events:none;opacity:0"
+  document.body.appendChild(el)
+  const color = getComputedStyle(el).color
+  document.body.removeChild(el)
+  return color || "rgb(100,100,100)"
+}
+
+export function AudioPlayer({
+  src,
+  title,
+  defaultVolume = 0.8,
+  barWidth = 3,
+  barGap = 2,
+  barRadius = 2,
+  waveHeight = 64,
+  minPxPerSec = 1,
+  autoPlay = false,
+  onPlay,
+  onPause,
+  onFinish,
+  onTimeUpdate,
+  className,
+}: AudioPlayerProps) {
+  const containerRef = React.useRef<HTMLDivElement | null>(null)
+  const waveRef = React.useRef<WaveSurfer | null>(null)
+
+  const [isPlaying, setIsPlaying] = React.useState(false)
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [isReady, setIsReady] = React.useState(false)
+  const [volume, setVolume] = React.useState(defaultVolume)
+  const [isMuted, setIsMuted] = React.useState(false)
+  const [duration, setDuration] = React.useState(0)
+  const [currentTime, setCurrentTime] = React.useState(0)
+
+  React.useEffect(() => {
+    if (!containerRef.current) return
+
+    setIsLoading(true)
+    setIsReady(false)
+    setIsPlaying(false)
+    setCurrentTime(0)
+    setDuration(0)
+
+    const waveColor     = resolveColorClass("text-muted-foreground")
+    const progressColor = resolveColorClass("text-primary")
+    const cursorColor   = resolveColorClass("text-primary")
+
+    const ws = WaveSurfer.create({
+      container: containerRef.current,
+      height: waveHeight,
+      waveColor,
+      progressColor,
+      cursorColor,
+      cursorWidth: 2,
+      barWidth,
+      barGap,
+      barRadius,
+      minPxPerSec,
+      fillParent: true,
+      url: src,
+      autoplay: autoPlay,
+      interact: true,
+      dragToSeek: true,
+      hideScrollbar: true,
+      audioRate: 1,
+      normalize: false,
+    })
+
+    waveRef.current = ws
+    ws.setVolume(defaultVolume)
+
+    ws.on("loading", () => setIsLoading(true))
+    ws.on("ready",   () => {
+      setDuration(ws.getDuration())
+      setIsLoading(false)
+      setIsReady(true)
+    })
+    ws.on("audioprocess", () => {
+      const t = ws.getCurrentTime()
+      setCurrentTime(t)
+      onTimeUpdate?.(t, ws.getDuration())
+    })
+    ws.on("seeking", () => setCurrentTime(ws.getCurrentTime()))
+    ws.on("play",    () => { setIsPlaying(true);  onPlay?.()   })
+    ws.on("pause",   () => { setIsPlaying(false); onPause?.()  })
+    ws.on("finish",  () => { setIsPlaying(false); onFinish?.() })
+
+    return () => ws.destroy()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [src])
+
+  const togglePlay = () => waveRef.current?.playPause()
+
+  const restart = () => {
+    if (!waveRef.current || !isReady) return
+    waveRef.current.setTime(0)
+    waveRef.current.play()
+  }
+
+  const handleVolume = (v: number[]) => {
+    const value = v[0]
+    setVolume(value)
+    setIsMuted(value === 0)
+    waveRef.current?.setVolume(value)
+  }
+
+  const toggleMute = () => {
+    if (!waveRef.current) return
+    const next = !isMuted
+    setIsMuted(next)
+    waveRef.current.setVolume(next ? 0 : volume)
+  }
+
+  const progress = duration > 0 ? currentTime / duration : 0
+
+  return (
+    <Card className={cn("w-full", className)}>
+      <CardContent className="p-4 space-y-3">
+        {title && (
+          <p className="text-sm font-medium text-foreground truncate">{title}</p>
+        )}
+
+        <div className="relative w-full rounded-sm overflow-hidden">
+          {isLoading && (
+            <div
+              className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-[2px]"
+              style={{ height: waveHeight }}
+            >
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            </div>
+          )}
+          <div ref={containerRef} className="w-full" />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] tabular-nums text-muted-foreground w-10 text-right shrink-0">
+            {formatTime(currentTime)}
+          </span>
+          <Slider
+            className="flex-1"
+            value={[progress]}
+            min={0} max={1} step={0.001}
+            disabled={!isReady}
+            onValueChange={([v]) => {
+              if (!waveRef.current || !isReady) return
+              waveRef.current.seekTo(v)
+            }}
+          />
+          <span className="text-[11px] tabular-nums text-muted-foreground w-10 shrink-0">
+            {formatTime(duration)}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5">
+            <Button size="icon" variant="ghost"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              disabled={!isReady} onClick={restart} aria-label="Restart">
+              <RotateCcw size={15} />
+            </Button>
+            <Button size="icon" variant="secondary" className="h-9 w-9"
+              disabled={!isReady} onClick={togglePlay}
+              aria-label={isPlaying ? "Pause" : "Play"}>
+              {isPlaying ? <Pause size={17} /> : <Play size={17} />}
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 w-36">
+            <Button size="icon" variant="ghost"
+              className="h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
+              onClick={toggleMute} aria-label={isMuted ? "Unmute" : "Mute"}>
+              {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+            </Button>
+            <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01}
+              onValueChange={handleVolume} aria-label="Volume" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default AudioPlayer
+```
+
+---
+
+## Usage
+
+### Basic
+
+```tsx
+import { AudioPlayer } from "@/components/ui/audio-player"
+
+export default function Page() {
+  return <AudioPlayer src="/audio/track.mp3" />
+}
+```
+
+### With title
+
+```tsx
+<AudioPlayer
+  src="/audio/track.mp3"
+  title="My Track — Album Name"
+/>
+```
+
+### Custom waveform
+
+<ComponentPreview
+  name="audio-player-custom"
+  codeString={`import { AudioPlayer } from "@/components/ui/audio-player"
+
+export default function AudioPlayerCustomDemo() {
+  return (
+    <AudioPlayer
+      src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+      title="Custom Waveform Style"
+      waveHeight={80}
+      barWidth={4}
+      barGap={3}
+      barRadius={4}
+      defaultVolume={0.6}
+    />
+  )
+}`}
+/>
+
+### Minimal
+
+<ComponentPreview
+  name="audio-player-minimal"
+  codeString={`import { AudioPlayer } from "@/components/ui/audio-player"
+
+export default function AudioPlayerMinimalDemo() {
+  return (
+    <AudioPlayer
+      src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+    />
+  )
+}`}
+/>
+
+### With event callbacks
+
+Because `onPlay`, `onPause`, `onFinish`, and `onTimeUpdate` are functions, they must be passed from a **Client Component**:
+
+```tsx
+"use client"
+
+import { AudioPlayer } from "@/components/ui/audio-player"
+
+export function MyPlayer() {
+  return (
+    <AudioPlayer
+      src="/audio/track.mp3"
+      title="Live Session"
+      onPlay={()  => console.log("Playing")}
+      onPause={() => console.log("Paused")}
+      onFinish={() => console.log("Finished")}
+      onTimeUpdate={(current, total) =>
+        console.log(`${current.toFixed(1)}s / ${total.toFixed(1)}s`)
+      }
+    />
+  )
+}
+```
+
+---
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `src` | `string` | — | **(Required)** Audio URL. Changing it destroys and reinitializes WaveSurfer. |
+| `title` | `string` | `undefined` | Track title displayed above the waveform. |
+| `defaultVolume` | `number` | `0.8` | Initial volume `0`–`1`. |
+| `barWidth` | `number` | `3` | Waveform bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Border radius of each bar. |
+| `waveHeight` | `number` | `64` | Waveform canvas height in px. |
+| `minPxPerSec` | `number` | `1` | Minimum pixels per second (zoom level). |
+| `autoPlay` | `boolean` | `false` | Start playing as soon as audio is ready. |
+| `onPlay` | `() => void` | `undefined` | Fired when playback starts. |
+| `onPause` | `() => void` | `undefined` | Fired when playback pauses. |
+| `onFinish` | `() => void` | `undefined` | Fired when the track ends. |
+| `onTimeUpdate` | `(currentTime: number, duration: number) => void` | `undefined` | Fired each tick with current time and total duration. |
+| `className` | `string` | `undefined` | Extra classes on the outer `<Card>`. |
+
+---
+
+## Notes & caveats
+
+**CORS** — WaveSurfer fetches audio directly from the browser. Your source URL must be same-origin or served with `Access-Control-Allow-Origin`. Add `fetchParams: { mode: "cors" }` to `WaveSurfer.create()` if needed.
+
+**Server Components** — Render `<AudioPlayer>` directly from a Server Component as long as you pass no function props. Wrap in a `"use client"` component if you need `onPlay`, `onPause`, etc.
+
+**Autoplay policy** — Browsers block autoplay with sound until the user has interacted with the page. `autoPlay={true}` may be silently ignored on first load.
+
+**Prop reactivity** — Only `src` triggers reinitialization. Props like `barWidth` and `waveHeight` are read once at mount. Add them to the `useEffect` dependency array and call `ws.setOptions()` if you need them to be reactive.
