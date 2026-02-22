@@ -229,14 +229,19 @@ export function AudioRecorder({
   return (
     <div className={cn("w-full space-y-3 ", className)} style={style}>
       {/* Waveform — always mounted for stable DOM ref, hidden when idle */}
-      <div className="flex items-center w-full gap-2">
+      <div
+        className={cn(
+          "flex items-center w-full ",
+          (!showWaveform && !showTimer) || !isActive ? "hidden" : "opacity-100",
+        )}
+      >
         <div
           ref={containerRef}
           aria-hidden="true"
           className={cn(
             "overflow-hidden transition-all duration-300 w-full",
             showWaveform && isActive
-              ? "opacity-100"
+              ? "opacity-100 mb-2"
               : "opacity-0 h-0 pointer-events-none",
             waveformClassName,
           )}

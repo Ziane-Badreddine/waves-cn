@@ -100,6 +100,14 @@ Update the import paths to match your project setup.
 </TabsContent>
 </Tabs>
 
+## Features
+
+- **Live waveform visualization** — a scrolling waveform rendered on a Canvas via wavesurfer.js updates in real time while recording, then hides itself at rest.
+- **Pause & resume** — pause mid-recording and continue without losing audio; the timer and waveform stay in sync throughout.
+- **Auto-stop** — pass `maxDuration` (in seconds) to automatically stop recording and emit the blob once the limit is reached.
+- **Discard** — lets the user throw away the current take; triggers `onDiscard` instead of `onRecordEnd` so unwanted audio is never processed.
+- **Custom waveform styling** — `waveColor`, `progressColor`, `barWidth`, `barGap`, `barRadius`, and `barHeight` all accept any CSS value including `var(--*)` tokens, resolved at runtime for the Canvas API.
+
 ## Usage
 
 ```tsx

@@ -88,10 +88,13 @@ export function ComponentPreview({
   // ==============================
   return (
     <div
-      className={cn("group relative my-4 flex flex-col space-y-2", className)}
+      className={cn(
+        "group relative my-4 flex flex-col space-y-2 not-prose min-h-96 ",
+        className,
+      )}
       {...props}
     >
-      <Tabs defaultValue="preview" className="relative w-full">
+      <Tabs defaultValue="preview" className="relative w-full size-full gap-0 ">
         <div className="flex items-center justify-between">
           {!hideCode && codeString && (
             <TabsList>
@@ -102,15 +105,23 @@ export function ComponentPreview({
         </div>
 
         {/* PREVIEW */}
-        <TabsContent value="preview">
+        <TabsContent
+          value="preview"
+          className="not-fumadocs-codeblock   p-0 size-full"
+        >
           <div
             className={cn(
-              "flex h-full p-4",
+              "flex h-full items-center  min-h-96 ",
               align === "center" && "justify-center",
               align === "start" && "justify-start",
               align === "end" && "justify-end",
+              "relative flex size-full flex-col items-center justify-center gap-4 overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)]",
             )}
           >
+            <div className="-translate-y-px absolute top-8 right-0 left-0 border border-foreground/10 border-dashed" />
+            <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-foreground/10 border-dashed" />
+            <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-foreground/10 border-dashed" />
+            <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-foreground/10 border-dashed" />
             <React.Suspense
               fallback={
                 <div className="flex items-center text-sm text-muted-foreground">
