@@ -6,7 +6,18 @@ export const Index: Record<string, any> = {
     name: "audio-player",
     description: "Shadcn audio player",
     type: "registry:component",
-    files: ["src/registry/examples/audio-player-example.tsx"],
+    files: ["src/registry/components/audio-player.tsx"],
+    component: React.lazy(() => import("@/registry/components/audio-player")),
+    category: "audio",
+    subcategory: "player",
+    chunks: [],
+  },
+
+  "audio-player-demo": {
+    name: "audio-player-demo",
+    description: "Shadcn audio player",
+    type: "registry:example",
+    files: ["src/registry/examples/audio-player/audio-player-example.tsx"],
     component: React.lazy(
       () => import("@/registry/examples/audio-player/audio-player-example"),
     ),
@@ -18,8 +29,10 @@ export const Index: Record<string, any> = {
   "audio-player-custom": {
     name: "audio-player-custom",
     description: "Shadcn audio player with custom waveform style",
-    type: "registry:component",
-    files: ["src/registry/examples/audio-player-custom-example.tsx"],
+    type: "registry:examples",
+    files: [
+      "src/registry/examples/audio-player/audio-player-custom-example.tsx",
+    ],
     component: React.lazy(
       () =>
         import("@/registry/examples/audio-player/audio-player-custom-example"),
@@ -32,8 +45,10 @@ export const Index: Record<string, any> = {
   "audio-player-minimal": {
     name: "audio-player-minimal",
     description: "Shadcn audio player minimal (no title)",
-    type: "registry:component",
-    files: ["src/registry/examples/audio-player-minimal-example.tsx"],
+    type: "registry:examples",
+    files: [
+      "src/registry/examples/audio-player/audio-player-minimal-example.tsx",
+    ],
     component: React.lazy(
       () =>
         import("@/registry/examples/audio-player/audio-player-minimal-example"),

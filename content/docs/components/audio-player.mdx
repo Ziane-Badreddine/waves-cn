@@ -3,22 +3,12 @@ title: Audio Player
 description: A shadcn-styled waveform audio player built on wavesurfer.js.
 ---
 
-import { ComponentPreview } from "@/components/component-preview"
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
 import { Tab, Tabs } from "fumadocs-ui/components/tabs"
 import { Steps, Step } from "fumadocs-ui/components/steps"
 
-<ComponentPreview
-  name="audio-player"
-  codeString={`import { AudioPlayer } from "@/components/ui/audio-player"
-
-export default function AudioPlayerDemo() {
-  return (
-    <AudioPlayer
-      src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-      title="SoundHelix — Song 1"
-    />
-  )
-}`}
+<ComponentPreviewWrapper
+  name="audio-player-example"
 />
 
 ## Installation
@@ -59,7 +49,7 @@ npx shadcn@latest add card button slider
 
 Copy `audio-player.tsx` into your project.
 
-<ComponentPreview name="audio-player" variant="codesource" />
+<ComponentPreviewWrapper name="audio-player" variant="codesource" />
 
 </Step>
 
@@ -97,18 +87,8 @@ import { AudioPlayer } from "@/components/ui/audio-player"
 
 ### With title
 
-<ComponentPreview
-  name="audio-player"
-  codeString={`import { AudioPlayer } from "@/components/ui/audio-player"
-
-export default function AudioPlayerDemo() {
-  return (
-    <AudioPlayer
-      src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-      title="SoundHelix — Song 1"
-    />
-  )
-}`}
+<ComponentPreviewWrapper
+  name="audio-player-demo"
 />
 
 
@@ -117,39 +97,15 @@ export default function AudioPlayerDemo() {
 
 `barWidth`, `barGap`, `barRadius`, and `waveHeight` let you fully control the shape of the waveform bars.
 
-<ComponentPreview
+<ComponentPreviewWrapper
   name="audio-player-custom"
-  codeString={`import { AudioPlayer } from "@/components/ui/audio-player"
-
-export default function AudioPlayerCustomDemo() {
-  return (
-    <AudioPlayer
-      src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-      title="Custom Waveform Style"
-      waveHeight={80}
-      barWidth={4}
-      barGap={3}
-      barRadius={4}
-      defaultVolume={0.6}
-    />
-  )
-}`}
 />
 
 
 ### Minimal
 
-<ComponentPreview
+<ComponentPreviewWrapper
   name="audio-player-minimal"
-  codeString={`import { AudioPlayer } from "@/components/ui/audio-player"
-
-export default function AudioPlayerMinimalDemo() {
-  return (
-    <AudioPlayer
-      src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-    />
-  )
-}`}
 />
 
 
