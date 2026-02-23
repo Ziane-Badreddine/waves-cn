@@ -1,6 +1,6 @@
 "use client"
 
-import AudioPlayer from "../components/audio-player"
+import AudioPlayer from "../../components/audio-player"
 
 
 export default function AudioPlayerMinimalDemo() {

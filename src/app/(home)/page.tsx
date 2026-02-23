@@ -1,4 +1,4 @@
-import AudioPlayerExample from '@/registry/examples/audio-player-example';
+import AudioPlayerExample from '@/registry/examples/audio-player/audio-player-example';
 import Link from 'next/link';
 
 

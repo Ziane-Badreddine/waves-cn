@@ -8,7 +8,7 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     files: ["src/registry/examples/audio-player-example.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-player-example"),
+      () => import("@/registry/examples/audio-player/audio-player-example"),
     ),
     category: "audio",
     subcategory: "player",
@@ -21,7 +21,7 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     files: ["src/registry/examples/audio-player-custom-example.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-player-custom-example"),
+      () => import("@/registry/examples/audio-player/audio-player-custom-example"),
     ),
     category: "audio",
     subcategory: "player",
@@ -34,7 +34,7 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     files: ["src/registry/examples/audio-player-minimal-example.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-player-minimal-example"),
+      () => import("@/registry/examples/audio-player/audio-player-minimal-example"),
     ),
     category: "audio",
     subcategory: "player",
@@ -111,4 +111,40 @@ export const Index: Record<string, any> = {
     subcategory: "recorder",
     chunks: [],
   },
+
+
+  "audio-timeline": {
+    name: "audio-timeline",
+    description: "Shadcn audio timeline",
+    type: "registry:component",
+    files: ["src/registry/examples/audio-timeline/audio-timeline-example.tsx"],
+    component: React.lazy(
+      () => import("@/registry/examples/audio-timeline/audio-timeline-example"),
+    ),
+    category: "audio",
+    subcategory: "player",
+    chunks: [],
+  },
+
+"audio-timeline-dual": {
+  name: "audio-timeline-dual",
+  description: "Audio timeline with both top and bottom rulers",
+  type: "registry:component",
+  files: ["src/registry/examples/audio-timeline/audio-timeline-dual-example.tsx"],
+  component: React.lazy(() => import("@/registry/examples/audio-timeline/audio-timeline-dual-example")),
+  category: "audio",
+  subcategory: "player",
+  chunks: [],
+},
+
+"audio-timeline-no-ruler": {
+  name: "audio-timeline-no-ruler",
+  description: "Audio timeline without ruler",
+  type: "registry:component",
+  files: ["src/registry/examples/audio-timeline/audio-timeline-no-ruler-example.tsx"],
+  component: React.lazy(() => import("@/registry/examples/audio-timeline/audio-timeline-no-ruler-example")),
+  category: "audio",
+  subcategory: "player",
+  chunks: [],
+},
 };
