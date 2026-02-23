@@ -4,6 +4,7 @@ description: Waveform player with timeline markers built with Wavesurfer.js and 
 ---
 
 import { ComponentPreview } from "@/components/component-preview"
+import { Tab, Tabs } from "fumadocs-ui/components/tabs"
 
 
 <ComponentPreview
@@ -24,6 +25,16 @@ export default function AudioTimelineDemo() {
 
 ## Installation
 
+<Tabs items={["CLI", "Manual"]}>
+  <Tab value="CLI">
+
+```bash
+npx shadcn@latest add "https://yoursite.com/r/audio-timeline.json"
+```
+
+  </Tab>
+  <Tab value="Manual">
+
 ### 1. Install dependencies
 
 ```bash
@@ -36,18 +47,37 @@ npm install wavesurfer.js
 npx shadcn@latest add card button slider
 ```
 
-### 3. add component
+### 3. Add the `useCssVar` hook
 
+Create `hooks/use-css-var.ts`:
 
-```bash
-npx shadcn@latest add audio-timeline
+```ts
+import { useEffect, useState } from "react"
+
+export function useCssVar(value: string): string {
+  const [resolved, setResolved] = useState(value)
+
+  useEffect(() => {
+    const match = value.match(/^var\((--[^)]+)\)$/)
+    if (!match) {
+      setResolved(value)
+      return
+    }
+    const varName = match[1]
+    const raw = getComputedStyle(document.documentElement)
+      .getPropertyValue(varName)
+      .trim()
+    const isHslChannels = /^[\d.]+ [\d.]+% [\d.]+%$/.test(raw)
+    setResolved(raw ? (isHslChannels ? `hsl(${raw})` : raw) : value)
+  }, [value])
+
+  return resolved
+}
 ```
 
+### 4. Add the component
 
----
-
-### View Code
-
+Create `components/ui/audio-timeline.tsx` and paste the source:
 
 ```tsx
 "use client"
@@ -236,7 +266,7 @@ export function AudioTimeline({
     waveRef.current?.zoom(next)
   }
 
-  const togglePlay = () => waveRef.current?.playPause()
+  const togglePlay  = () => waveRef.current?.playPause()
 
   const restart = () => {
     if (!waveRef.current || !isReady) return
@@ -345,6 +375,9 @@ export function AudioTimeline({
 export default AudioTimeline
 ```
 
+  </Tab>
+</Tabs>
+
 ---
 
 ## Usage
@@ -387,7 +420,6 @@ export default function AudioTimelineDualDemo() {
 />
 
 
-
 ### No timeline (waveform + zoom only)
 
 <ComponentPreview
@@ -405,6 +437,7 @@ export default function AudioTimelineNoRulerDemo() {
 }`}
 />
 
+
 ### Custom zoom range
 
 ```tsx
@@ -418,7 +451,7 @@ export default function AudioTimelineNoRulerDemo() {
 
 ### With event callbacks
 
-Wrap in a `"use client"` component when passing function props (onPlay, onFinish, onTimeUpdate):
+Wrap in a `"use client"` component when passing function props:
 
 ```tsx
 "use client"
@@ -468,28 +501,24 @@ export function MyTimeline() {
 
 ### `TimelineOptions`
 
-Passed to `topTimeline` or `bottomTimeline` to control how the ruler renders.
-
 | Option | Type | Default (top) | Default (bottom) | Description |
 |---|---|---|---|---|
 | `height` | `number` | `20` | `14` | Height of the timeline bar in px. |
 | `timeInterval` | `number` | `0.5` | `0.1` | Seconds between each tick mark. |
-| `primaryLabelInterval` | `number` | `5` | `1` | Seconds between labeled (primary) ticks. |
+| `primaryLabelInterval` | `number` | `5` | `1` | Seconds between labeled ticks. |
 | `secondaryLabelInterval` | `number` | `1` | `undefined` | Seconds between secondary labeled ticks. |
 | `fontSize` | `string` | `"11px"` | `"10px"` | CSS font size for labels. |
 
 ---
 
-
-
 ## Notes & caveats
 
-**Theme reactivity** — Colors are in the `useEffect` dependency array via `useCssVar`. Toggling dark mode will correctly destroy and recreate WaveSurfer with the updated palette. The brief re-render shows the loading spinner.
+**Theme reactivity** — Toggling dark mode destroys and recreates WaveSurfer with the correct palette. The brief re-render shows the loading spinner — this is expected.
 
-**CORS** — WaveSurfer fetches audio from the browser. Ensure your audio URL is same-origin or served with `Access-Control-Allow-Origin`.
+**CORS** — WaveSurfer fetches audio from the browser. Your audio URL must be same-origin or served with `Access-Control-Allow-Origin`.
 
-**Server Components** — Same rule as `AudioPlayer`: render directly from a Server Component with no function props, or wrap in `"use client"` if you need callbacks.
+**Server Components** — Render directly from a Server Component with no function props. Wrap in `"use client"` if you need `onPlay`, `onPause`, etc.
 
-**Timeline at low zoom** — At very low `minPxPerSec` values (e.g. `1–5`), timeline ticks may overlap. Tune `timeInterval` and `primaryLabelInterval` to match your expected zoom range.
+**Timeline at low zoom** — At very low `minPxPerSec` values (`1`–`5`), timeline ticks may overlap. Tune `timeInterval` and `primaryLabelInterval` to match your expected zoom range.
 
-**Prop reactivity** — Only `src` and the resolved CSS color values trigger reinitialization. Props like `barWidth`, `waveHeight`, and `defaultZoom` are read once at mount. To make them reactive, add them to the `useEffect` dependency array and call `ws.setOptions()` accordingly.
+**Prop reactivity** — Only `src` and resolved CSS color values trigger reinitialization. Props like `barWidth`, `waveHeight`, and `defaultZoom` are read once at mount. Add them to the `useEffect` dependency array and call `ws.setOptions()` if you need them reactive.
