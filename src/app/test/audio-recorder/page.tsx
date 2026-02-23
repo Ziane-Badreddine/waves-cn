@@ -1,5 +1,6 @@
 import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper";
+import AudioSpeed from "@/registry/components/audio-speed";
 
 export default function page() {
-  return <ComponentPreviewWrapper name="audio-recorder" variant="codesource" />;
+  return <AudioSpeed url="/coastline.mp3" />;
 }

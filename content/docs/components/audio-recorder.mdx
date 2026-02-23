@@ -39,26 +39,9 @@ npm install wavesurfer.js
 
 <Step>
 
-Add `useCssVar` to your project.
+Copy `use-wavesurfe.tsx` into your project.
 
-```ts title="hooks/use-css-var.ts"
-import { useState, useEffect } from "react"
-
-export function useCssVar(value: string): string {
-  const [resolved, setResolved] = useState(value)
-
-  useEffect(() => {
-    const match = value.match(/^var\((--[^)]+)\)$/)
-    if (!match) { setResolved(value); return }
-    const raw = getComputedStyle(document.documentElement)
-      .getPropertyValue(match[1]).trim()
-    const isHslChannels = /^[\d.]+ [\d.]+% [\d.]+%$/.test(raw)
-    setResolved(raw ? (isHslChannels ? `hsl(${raw})` : raw) : value)
-  }, [value])
-
-  return resolved
-}
-```
+<ComponentPreviewWrapper name="audio" variant="codesource" />
 
 </Step>
 

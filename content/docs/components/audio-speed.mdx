@@ -1,0 +1,119 @@
+---
+title: Audio Speed
+description: An audio player with variable playback speed control, built on wavesurfer.js.
+---
+
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+import { Steps, Step } from "@/components/steps"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+
+<ComponentPreviewWrapper name="audio-speed-demo" />
+
+## Installation
+
+<Tabs defaultValue="cli">
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+npm install wavesurfer.js
+```
+
+</TabsContent>
+<TabsContent value="manual">
+
+<Steps>
+
+<Step>
+
+Install the peer dependency.
+
+```bash
+npm install wavesurfer.js
+```
+
+</Step>
+
+<Step>
+
+Copy `use-wavesurfe.tsx` into your project.
+
+<ComponentPreviewWrapper name="audio" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Copy `audio-speed.tsx` into your project.
+
+<ComponentPreviewWrapper name="audio-speed" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Update the import paths to match your project setup.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+</Tabs>
+
+## Features
+
+- **Continuous speed slider** — smoothly adjust playback rate between `0.25x` and `4x` with fine-grained step control.
+- **Preserve pitch** — toggle pitch preservation independently from speed so the audio stays natural at higher rates.
+- **Live rate display** — a read-only badge shows the current playback rate as you drag the slider.
+- **Drag to seek** — click or drag anywhere on the audio to jump to that position.
+- **No re-render on speed change** — speed is applied imperatively via `setPlaybackRate`, so the audio is never destroyed or recreated when changing speed.
+
+## Usage
+
+```tsx
+import { AudioSpeed } from "@/components/ui/audio-speed"
+```
+
+```tsx
+<AudioSpeed url="/audio/track.mp3" onRecordEnd={(blob) => console.log(blob)} />
+```
+
+## Examples
+
+### Custom Range
+
+Narrow the speed range for a more focused control, e.g. podcast listening speeds.
+
+<ComponentPreviewWrapper name="audio-speed-podcast" />
+
+
+### Custom Colors
+
+`waveColor` and `progressColor` accept any CSS value including `var(--*)` tokens.
+
+<ComponentPreviewWrapper name="audio-speed-custom-wave" />
+
+
+## API Reference
+
+### AudioSpeed
+
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `url` | `string` | — | Audio file URL to load. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Audio bar color. Accepts CSS vars, hex, hsl, oklch. |
+| `progressColor` | `string` | `var(--primary)` | Progress bar color. Same formats as `waveColor`. |
+| `audioHeight` | `number` | `64` | Audio canvas height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Bar border radius in px. |
+| `minSpeed` | `number` | `0.25` | Minimum playback speed. |
+| `maxSpeed` | `number` | `4` | Maximum playback speed. |
+| `defaultSpeed` | `number` | `1` | Initial playback speed. |
+| `step` | `number` | `0.25` | Slider step increment. |
+| `className` | `string` | — | Root element class. |
+| `style` | `CSSProperties` | — | Root element inline style. |
