@@ -58,6 +58,22 @@ export const Index: Record<string, any> = {
     chunks: [],
   },
 
+  "audio-player-with-title": {
+    name: "audio-player-with-title",
+    description: "Shadcn audio player with title",
+    type: "registry:examples",
+    files: [
+      "src/registry/examples/audio-player/audio-player-with-title-example.tsx",
+    ],
+    component: React.lazy(
+      () =>
+        import("@/registry/examples/audio-player/audio-player-with-title-example"),
+    ),
+    category: "audio",
+    subcategory: "player",
+    chunks: [],
+  },
+
   // 🎤 RECORDER CORE
   "audio-recorder": {
     name: "audio-recorder",
@@ -132,6 +148,19 @@ export const Index: Record<string, any> = {
   "audio-timeline": {
     name: "audio-timeline",
     description: "Shadcn audio timeline",
+    type: "registry:component",
+    files: ["src/registry/components/audio-timeline.tsx"],
+    component: React.lazy(
+      () => import("@/registry/components/audio-timeline"),
+    ),
+    category: "audio",
+    subcategory: "player",
+    chunks: [],
+  },
+
+  "audio-timeline-demo": {
+    name: "audio-timeline-demo",
+    description: "Shadcn audio timeline demo",
     type: "registry:component",
     files: ["src/registry/examples/audio-timeline/audio-timeline-example.tsx"],
     component: React.lazy(

@@ -1,4 +1,4 @@
-import AudioPlayer from "../../components/audio-player";
+import AudioPlayer from "@/registry/components/audio-player";
 
 export default function AudioPlayerCustomDemo() {
 return (

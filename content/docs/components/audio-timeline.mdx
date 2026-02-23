@@ -3,21 +3,12 @@ title: Audio Timeline
 description: A waveform player with timeline markers built on wavesurfer.js.
 ---
 
-import { ComponentPreview } from "@/components/component-preview"
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
 import { Tab, Tabs } from "fumadocs-ui/components/tabs"
 import { Steps, Step } from "fumadocs-ui/components/steps"
 
-<ComponentPreview
-  name="audio-timeline"
-  codeString={`import { AudioTimeline } from "@/components/ui/audio-timeline"
-
-export default function AudioTimelineDemo() {
-  return (
-    <AudioTimeline
-      url="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-    />
-  )
-}`}
+<ComponentPreviewWrapper
+  name="audio-timeline-demo"
 />
 
 ## Installation
@@ -58,7 +49,7 @@ npx shadcn@latest add button slider
 
 Copy `use-wavesurfe.tsx` into your project.
 
-<ComponentPreview name="use-wavesurfe" variant="codesource" />
+<ComponentPreviewWrapper name="use-wavesurfe" variant="codesource" />
 
 </Step>
 
@@ -66,7 +57,7 @@ Copy `use-wavesurfe.tsx` into your project.
 
 Copy `audio-timeline.tsx` into your project.
 
-<ComponentPreview name="audio-timeline" variant="codesource" />
+<ComponentPreviewWrapper name="audio-timeline" variant="codesource" />
 
 </Step>
 
@@ -106,19 +97,8 @@ import { AudioTimeline } from "@/components/ui/audio-timeline"
 
 Show both a top and bottom timeline ruler.
 
-<ComponentPreview
+<ComponentPreviewWrapper
   name="audio-timeline-dual"
-  codeString={`import { AudioTimeline } from "@/components/ui/audio-timeline"
-
-export default function AudioTimelineDualDemo() {
-  return (
-    <AudioTimeline
-      url="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-      topTimeline={{ height: 20, primaryLabelInterval: 5, timeInterval: 0.5 }}
-      bottomTimeline={{ height: 14, primaryLabelInterval: 1, timeInterval: 0.1 }}
-    />
-  )
-}`}
 />
 
 
@@ -126,18 +106,8 @@ export default function AudioTimelineDualDemo() {
 
 Pass `topTimeline={false}` to render the waveform and zoom controls without any timeline.
 
-<ComponentPreview
+<ComponentPreviewWrapper
   name="audio-timeline-no-ruler"
-  codeString={`import { AudioTimeline } from "@/components/ui/audio-timeline"
-
-export default function AudioTimelineNoRulerDemo() {
-  return (
-    <AudioTimeline
-      url="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-      topTimeline={false}
-    />
-  )
-}`}
 />
 
 
