@@ -47,33 +47,11 @@ npm install wavesurfer.js
 npx shadcn@latest add card button slider
 ```
 
-### 3. Add the `useCssVar` hook
+### 3. Add the `useWavesurfer` hook
 
-Create `hooks/use-css-var.ts`:
+Create `hooks/use-wavesurfe.tsx`:
 
-```ts
-import { useEffect, useState } from "react"
-
-export function useCssVar(value: string): string {
-  const [resolved, setResolved] = useState(value)
-
-  useEffect(() => {
-    const match = value.match(/^var\((--[^)]+)\)$/)
-    if (!match) {
-      setResolved(value)
-      return
-    }
-    const varName = match[1]
-    const raw = getComputedStyle(document.documentElement)
-      .getPropertyValue(varName)
-      .trim()
-    const isHslChannels = /^[\d.]+ [\d.]+% [\d.]+%$/.test(raw)
-    setResolved(raw ? (isHslChannels ? `hsl(${raw})` : raw) : value)
-  }, [value])
-
-  return resolved
-}
-```
+<ComponentPreviewWrapper name="use-wavesurfe" variant="codesource" />
 
 ### 4. Add the component
 

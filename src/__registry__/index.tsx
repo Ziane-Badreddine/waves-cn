@@ -159,7 +159,7 @@ export const Index: Record<string, any> = {
     chunks: [],
   },
 
-  audio: {
+  "use-wavesurfe": {
     name: "use-wavesurfe",
     description:
       "useWavesurfer hook with shared defaults — base for all audio components",
