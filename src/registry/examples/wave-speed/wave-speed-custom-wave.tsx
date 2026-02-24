@@ -1,9 +1,9 @@
-import { AudioSpeed } from "@/registry/components/audio-speed";
+import { WaveSpeed } from "@/registry/components/wave-speed";
 
-export default function AudioSpeedCustomWave() {
+export default function WaveSpeedCustomWave() {
   return (
-    <div className="w-full max-w-2xl mx-auto p-6">
-      <AudioSpeed
+    <div className="w-full  mx-auto p-6">
+      <WaveSpeed
         url="/coastline.mp3"
         waveColor="var(--chart-1)"
         progressColor="var(--chart-2)"

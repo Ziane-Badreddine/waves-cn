@@ -2,11 +2,11 @@
 
 import React from "react";
 import { toast } from "sonner";
-import AudioRecorder from "@/registry/components/audio-recorder";
+import WaveRecorder from "@/registry/components/wave-recorder";
 
-export default function AudioRecorderDemo() {
+export default function WaveRecorderDemo() {
   return (
-    <AudioRecorder
+    <WaveRecorder
       onRecordEnd={(blob) => {
         const url = URL.createObjectURL(blob);
 

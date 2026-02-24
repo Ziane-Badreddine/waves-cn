@@ -1,0 +1,75 @@
+---
+title: WAVESURFER_DEFAULTS
+description: Shared default options applied automatically to every WavesurferPlayer and useWavesurfer instance in waves-cn.
+---
+
+## Overview
+
+`WAVESURFER_DEFAULTS` is a single exported constant that centralises the base configuration for every waveform in the package. Both `WavesurferPlayer` and `useWavesurfer` merge these defaults before creating the wavesurfer.js instance — so you never repeat `height`, `barWidth`, etc. in every component.
+
+```ts
+import { WAVESURFER_DEFAULTS } from "@/registry/lib/wave-cn"
+```
+
+## Values
+
+| Option | Default | Description |
+| ------ | ------- | ----------- |
+| `waveColor` | `var(--muted-foreground)` | Wave bar color. Resolved via `useCssVar` at runtime so CSS tokens work with the Canvas API. |
+| `progressColor` | `var(--primary)` | Progress overlay color. Same resolution as `waveColor`. |
+| `height` | `64` | Canvas height in px. |
+| `barWidth` | `3` | Bar width in px. |
+| `barGap` | `2` | Gap between bars in px. |
+| `barRadius` | `2` | Border radius of each bar. |
+| `minPxPerSec` | `1` | Minimum pixels per second — controls the initial zoom level. |
+
+## How overrides work
+
+Any option passed explicitly to `WavesurferPlayer` or `useWavesurfer` **overrides** the corresponding default. Passing `undefined` is safe — it falls back to the default rather than overwriting it.
+
+```tsx
+// Uses all defaults — height: 64, barWidth: 3, etc.
+useWavesurfer({ container, url })
+
+// Overrides only height — everything else stays default
+useWavesurfer({ container, url, height: 120 })
+
+// Safe — undefined does NOT override the default
+useWavesurfer({ container, url, height: undefined }) // → 64
+```
+
+## Extending defaults for your own components
+
+You can import `WAVESURFER_DEFAULTS` to build consistent custom components without hardcoding values:
+
+```tsx
+import { WAVESURFER_DEFAULTS } from "@/registry/lib/wave-cn"
+
+// Read a single value
+const defaultHeight = WAVESURFER_DEFAULTS.height // 64
+
+// Merge into a custom config
+const myConfig = {
+  ...WAVESURFER_DEFAULTS,
+  height: 100,
+  barWidth: 5,
+}
+```
+
+## Changing global defaults
+
+To change the defaults across your entire project, edit `WAVESURFER_DEFAULTS` in `wave-cn.tsx`:
+
+```ts
+export const WAVESURFER_DEFAULTS = {
+  waveColor: "var(--muted-foreground)",
+  progressColor: "var(--primary)",
+  height: 80,       // ← changed
+  barWidth: 4,      // ← changed
+  barGap: 3,        // ← changed
+  barRadius: 4,     // ← changed
+  minPxPerSec: 1,
+} as const satisfies Partial<WaveSurferOptions>
+```
+
+Every component that uses `WavesurferPlayer` or `useWavesurfer` will pick up the change automatically.

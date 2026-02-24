@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import AudioRecorder from "@/registry/components/audio-recorder";
+import WaveRecorder from "@/registry/components/wave-recorder";
 import { toast } from "sonner";
 
-export default function AudioRecorderCustomWave() {
+export default function WaveRecorderCustomWave() {
   return (
-    <AudioRecorder
+    <WaveRecorder
       waveColor="#7c3aed"
       progressColor="#ffffff"
       waveformHeight={80}

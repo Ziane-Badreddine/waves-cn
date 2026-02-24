@@ -1,13 +1,13 @@
 ---
-title: Audio Speed
-description: An audio player with variable playback speed control, built on wavesurfer.js.
+title: Wave Speed
+description: A wave player with variable playback speed control, built on wavesurfer.js.
 ---
 
 import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
 import { Steps, Step } from "@/components/steps"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
 
-<ComponentPreviewWrapper name="audio-speed-demo" />
+<ComponentPreviewWrapper name="wave-speed-demo" />
 
 ## Installation
 
@@ -39,17 +39,17 @@ npm install wavesurfer.js
 
 <Step>
 
-Copy `use-wavesurfe.tsx` into your project.
+Copy `wave-player.ts` into your project.
 
-<ComponentPreviewWrapper name="use-wavesurfe" variant="codesource" />
+<ComponentPreviewWrapper name="wave-player" variant="codesource" />
 
 </Step>
 
 <Step>
 
-Copy `audio-speed.tsx` into your project.
+Copy `wave-speed.tsx` into your project.
 
-<ComponentPreviewWrapper name="audio-speed" variant="codesource" />
+<ComponentPreviewWrapper name="wave-speed" variant="codesource" />
 
 </Step>
 
@@ -67,19 +67,19 @@ Update the import paths to match your project setup.
 ## Features
 
 - **Continuous speed slider** — smoothly adjust playback rate between `0.25x` and `4x` with fine-grained step control.
-- **Preserve pitch** — toggle pitch preservation independently from speed so the audio stays natural at higher rates.
+- **Preserve pitch** — toggle pitch preservation independently from speed so the wave stays natural at higher rates.
 - **Live rate display** — a read-only badge shows the current playback rate as you drag the slider.
-- **Drag to seek** — click or drag anywhere on the audio to jump to that position.
-- **No re-render on speed change** — speed is applied imperatively via `setPlaybackRate`, so the audio is never destroyed or recreated when changing speed.
+- **Drag to seek** — click or drag anywhere on the waveform to jump to that position.
+- **No re-render on speed change** — speed is applied imperatively via `setPlaybackRate`, so the wave is never destroyed or recreated when changing speed.
 
 ## Usage
 
 ```tsx
-import { AudioSpeed } from "@/components/ui/audio-speed"
+import { WaveSpeed } from "@/components/ui/wave-speed"
 ```
 
 ```tsx
-<AudioSpeed url="/audio/track.mp3" onRecordEnd={(blob) => console.log(blob)} />
+<WaveSpeed url="/audio/track.mp3" onRecordEnd={(blob) => console.log(blob)} />
 ```
 
 ## Examples
@@ -88,26 +88,45 @@ import { AudioSpeed } from "@/components/ui/audio-speed"
 
 Narrow the speed range for a more focused control, e.g. podcast listening speeds.
 
-<ComponentPreviewWrapper name="audio-speed-podcast" />
+<ComponentPreviewWrapper name="wave-speed-podcast" />
 
+```tsx
+<WaveSpeed
+  url="/audio/podcast.mp3"
+  minSpeed={0.5}
+  maxSpeed={2}
+  defaultSpeed={1}
+  step={0.25}
+/>
+```
 
 ### Custom Colors
 
 `waveColor` and `progressColor` accept any CSS value including `var(--*)` tokens.
 
-<ComponentPreviewWrapper name="audio-speed-custom-wave" />
+<ComponentPreviewWrapper name="wave-speed-custom-wave" />
 
+```tsx
+<WaveSpeed
+  url="/audio/track.mp3"
+  waveColor="var(--chart-1)"
+  progressColor="var(--chart-2)"
+  barWidth={4}
+  barGap={3}
+  barRadius={8}
+/>
+```
 
 ## API Reference
 
-### AudioSpeed
+### WaveSpeed
 
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| `url` | `string` | — | Audio file URL to load. |
-| `waveColor` | `string` | `var(--muted-foreground)` | Audio bar color. Accepts CSS vars, hex, hsl, oklch. |
+| `url` | `string` | — | Wave file URL to load. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Wave bar color. Accepts CSS vars, hex, hsl, oklch. |
 | `progressColor` | `string` | `var(--primary)` | Progress bar color. Same formats as `waveColor`. |
-| `audioHeight` | `number` | `64` | Audio canvas height in px. |
+| `waveHeight` | `number` | `64` | Wave canvas height in px. |
 | `barWidth` | `number` | `3` | Bar width in px. |
 | `barGap` | `number` | `2` | Gap between bars in px. |
 | `barRadius` | `number` | `2` | Bar border radius in px. |

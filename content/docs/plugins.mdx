@@ -1,0 +1,160 @@
+---
+title: Plugins
+description: How to inject any wavesurfer.js plugin into WavesurferPlayer or useWavesurfer.
+---
+
+## Overview
+
+waves-cn is fully compatible with every official wavesurfer.js plugin. There are two injection patterns depending on when the plugin needs to be registered:
+
+| Pattern | When to use |
+| ------- | ----------- |
+| `plugins` prop / option | Plugin must exist at instance creation time (e.g. `ZoomPlugin`, `TimelinePlugin`, `SpectrogramPlugin`) |
+| `onReady` / `useEffect` | Plugin requires the instance to already exist (e.g. `RecordPlugin`) |
+
+---
+
+## Pattern 1 — `plugins` prop (at creation time)
+
+Pass a **memoized** array to the `plugins` prop. The player and hook use array reference equality to decide whether to recreate the instance — a new array on every render will destroy and recreate the waveform on every render.
+
+### With `WavesurferPlayer`
+
+```tsx
+import { useMemo } from "react"
+import WavesurferPlayer from "@/registry/lib/wave-cn"
+import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js"
+import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js"
+
+export function MyPlayer() {
+  // ✅ Memoized — stable reference across renders
+  const plugins = useMemo(() => [
+    ZoomPlugin.create({ scale: 0.5, maxZoom: 1000 }),
+    TimelinePlugin.create(),
+  ], [])
+
+  return <WavesurferPlayer url="/audio/track.mp3" plugins={plugins} />
+}
+```
+
+### With `useWavesurfer`
+
+```tsx
+import { useRef, useMemo } from "react"
+import { useWavesurfer } from "@/registry/lib/wave-cn"
+import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js"
+
+export function MyPlayer() {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  const plugins = useMemo(() => [ZoomPlugin.create({ scale: 0.5 })], [])
+
+  const { wavesurfer, isReady } = useWavesurfer({
+    container: containerRef,
+    url: "/audio/track.mp3",
+    plugins,
+  })
+
+  return <div ref={containerRef} />
+}
+```
+
+> **Never do this:**
+> ```tsx
+> // ❌ New array every render → instance recreated every render
+> useWavesurfer({ plugins: [ZoomPlugin.create()] })
+> ```
+
+---
+
+## Pattern 2 — `onReady` / `useEffect` (after creation)
+
+Some plugins like `RecordPlugin` need to be registered after the instance is ready. Use `onReady` with `WavesurferPlayer`, or `useEffect` on `wavesurfer` with the hook.
+
+### With `WavesurferPlayer`
+
+```tsx
+import WavesurferPlayer from "@/registry/lib/wave-cn"
+import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js"
+
+<WavesurferPlayer
+  url=""
+  onReady={(ws) => {
+    ws.registerPlugin(
+      RecordPlugin.create({ scrollingWaveform: true })
+    )
+  }}
+/>
+```
+
+### With `useWavesurfer`
+
+```tsx
+import { useRef, useEffect } from "react"
+import { useWavesurfer } from "@/registry/lib/wave-cn"
+import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js"
+
+export function MyRecorder() {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const { wavesurfer } = useWavesurfer({ container: containerRef, url: "" })
+
+  useEffect(() => {
+    if (!wavesurfer) return
+    wavesurfer.registerPlugin(
+      RecordPlugin.create({ scrollingWaveform: true })
+    )
+  }, [wavesurfer])
+
+  return <div ref={containerRef} />
+}
+```
+
+---
+
+## Subscribing to plugin events
+
+Plugin events are accessed imperatively via `wavesurfer.on()` or through the plugin instance itself. Subscribe inside `onReady` or `useEffect`:
+
+```tsx
+<WavesurferPlayer
+  url="/audio/track.mp3"
+  plugins={plugins}
+  onReady={(ws) => {
+    ws.on("zoom", (minPxPerSec) => {
+      console.log("zoom level:", minPxPerSec)
+    })
+  }}
+/>
+```
+
+Or with the hook:
+
+```tsx
+useEffect(() => {
+  if (!wavesurfer) return
+  return wavesurfer.on("zoom", (minPxPerSec) => {
+    setZoom(Math.round(minPxPerSec))
+  })
+}, [wavesurfer])
+```
+
+> `wavesurfer.on()` returns an unsubscribe function — return it from `useEffect` for automatic cleanup.
+
+---
+
+## Available plugins
+
+All official wavesurfer.js plugins work with waves-cn:
+
+| Plugin | Import |
+| ------ | ------ |
+| `ZoomPlugin` | `wavesurfer.js/dist/plugins/zoom.esm.js` |
+| `TimelinePlugin` | `wavesurfer.js/dist/plugins/timeline.esm.js` |
+| `RecordPlugin` | `wavesurfer.js/dist/plugins/record.esm.js` |
+| `SpectrogramPlugin` | `wavesurfer.js/dist/plugins/spectrogram.esm.js` |
+| `MinimapPlugin` | `wavesurfer.js/dist/plugins/minimap.esm.js` |
+| `RegionsPlugin` | `wavesurfer.js/dist/plugins/regions.esm.js` |
+| `HoverPlugin` | `wavesurfer.js/dist/plugins/hover.esm.js` |
+| `EnvelopePlugin` | `wavesurfer.js/dist/plugins/envelope.esm.js` |
+
+See the full list at [wavesurfer.xyz/plugins](https://wavesurfer.xyz/plugins).

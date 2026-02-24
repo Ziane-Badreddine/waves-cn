@@ -1,17 +1,19 @@
 "use client";
 
-import { useRef, useState, useCallback, type CSSProperties } from "react";
+import { useState, useCallback, useRef, type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useWavesurfer } from "@/registry/hooks/use-wavesurfe";
+import WavesurferPlayer from "@/registry/lib/wave-cn";
+import type WaveSurfer from "wavesurfer.js";
+
 /**
- * Props for the AudioSpeed component
+ * Props for the WaveSpeed component
  */
-export type AudioSpeedProps = {
+export type WaveSpeedProps = {
   /** Audio file URL to load */
   url: string;
   /** Audio bar color. Accepts any CSS value including var(--*) tokens @default "var(--muted-foreground)" */
@@ -42,7 +44,7 @@ export type AudioSpeedProps = {
 /**
  * Audio player with variable playback speed control
  */
-export function AudioSpeed({
+export function WaveSpeed({
   url,
   waveColor,
   progressColor,
@@ -56,52 +58,58 @@ export function AudioSpeed({
   step = 0.25,
   className,
   style,
-}: AudioSpeedProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+}: WaveSpeedProps) {
+  const wavesurferRef = useRef<WaveSurfer | null>(null);
 
+  const [isReady, setIsReady] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(defaultSpeed);
   const [preservePitch, setPreservePitch] = useState(true);
 
-  // Colors, height, barWidth, barGap, barRadius, volume and minPxPerSec
-  // are handled by WAVESURFER_DEFAULTS inside useWavesurfer — only pass
-  // them here if you want to override the shared defaults.
-  const { wavesurfer, isReady, isPlaying } = useWavesurfer({
-    container: containerRef,
-    url,
-    waveColor,
-    progressColor,
-    height: audioHeight,
-    barWidth,
-    barGap,
-    barRadius,
-    dragToSeek: true,
-  });
-
-  const togglePlay = useCallback(() => wavesurfer?.playPause(), [wavesurfer]);
+  const togglePlay = useCallback(() => wavesurferRef.current?.playPause(), []);
 
   const handleSpeedChange = useCallback(
     ([value]: number[]) => {
       setSpeed(value);
-      wavesurfer?.setPlaybackRate(value, preservePitch);
+      wavesurferRef.current?.setPlaybackRate(value, preservePitch);
     },
-    [wavesurfer, preservePitch],
+    [preservePitch],
   );
 
   const handlePreservePitch = useCallback(
     (checked: boolean) => {
       setPreservePitch(checked);
-      wavesurfer?.setPlaybackRate(speed, checked);
+      wavesurferRef.current?.setPlaybackRate(speed, checked);
     },
-    [wavesurfer, speed],
+    [speed],
   );
 
   return (
     <div className={cn("w-full space-y-4", className)} style={style}>
-      <div
-        ref={containerRef}
-        className="w-full rounded-md overflow-hidden bg-muted/40"
-        style={{ height: audioHeight }}
-      />
+      {/* WavesurferPlayer renders the container div and wires up all events */}
+      <div className="w-full rounded-md overflow-hidden bg-muted/40">
+        <WavesurferPlayer
+          url={url}
+          waveColor={waveColor}
+          progressColor={progressColor}
+          height={audioHeight}
+          barWidth={barWidth}
+          barGap={barGap}
+          barRadius={barRadius}
+          dragToSeek
+          onReady={(ws) => {
+            wavesurferRef.current = ws;
+            setIsReady(true);
+          }}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onFinish={() => setIsPlaying(false)}
+          onDestroy={() => {
+            wavesurferRef.current = null;
+            setIsReady(false);
+          }}
+        />
+      </div>
 
       <div className="flex flex-wrap items-center gap-4">
         <Button
@@ -165,4 +173,4 @@ export function AudioSpeed({
   );
 }
 
-export default AudioSpeed;
+export default WaveSpeed;

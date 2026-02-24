@@ -1,0 +1,137 @@
+---
+title: Wave Zoom
+description: A wave player with mouse-wheel zoom, built on wavesurfer.js ZoomPlugin.
+---
+
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+import { Steps, Step } from "@/components/steps"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+
+<ComponentPreviewWrapper name="wave-zoom-demo" />
+
+## Installation
+
+<Tabs defaultValue="cli">
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+npm install wavesurfer.js
+```
+
+</TabsContent>
+<TabsContent value="manual">
+
+<Steps>
+
+<Step>
+
+Install the peer dependency.
+
+```bash
+npm install wavesurfer.js
+```
+
+</Step>
+
+<Step>
+
+Copy `wave-cn.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-cn" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Copy `wave-zoom.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-zoom" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Update the import paths to match your project setup.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+</Tabs>
+
+## Features
+
+- **Mouse-wheel zoom** — scroll anywhere on the waveform to zoom in or out. Powered by wavesurfer.js `ZoomPlugin`, injected into `WavesurferPlayer` via `onReady`.
+- **Live zoom indicator** — displays the current zoom level in `px/s` as you scroll.
+- **Skip controls** — forward and backward buttons jump by `skipSeconds` (default `5s`).
+- **Drag to seek** — click or drag anywhere on the waveform to jump to that position.
+- **Custom waveform styling** — `waveColor`, `progressColor`, `barWidth`, `barGap`, and `barRadius` accept any CSS value including `var(--*)` tokens.
+
+## Usage
+
+```tsx
+import { WaveZoom } from "@/components/ui/wave-zoom"
+```
+
+```tsx
+<WaveZoom url="/audio/track.mp3" />
+```
+
+## Examples
+
+### Custom Colors
+
+`waveColor` and `progressColor` accept any CSS value including `var(--*)` tokens.
+
+<ComponentPreviewWrapper name="wave-zoom-custom-wave" />
+
+```tsx
+<WaveZoom
+  url="/audio/track.mp3"
+  waveColor="var(--chart-1)"
+  progressColor="var(--chart-2)"
+  barWidth={4}
+  barGap={3}
+  barRadius={8}
+/>
+```
+
+### Custom Zoom Range
+
+Control how fast and how far the user can zoom.
+
+<ComponentPreviewWrapper name="wave-zoom-custom-range" />
+
+```tsx
+<WaveZoom
+  url="/audio/track.mp3"
+  zoomScale={0.25}
+  maxZoom={500}
+  defaultZoom={50}
+/>
+```
+
+## API Reference
+
+### WaveZoom
+
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `url` | `string` | — | Wave file URL to load. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Wave bar color. Accepts CSS vars, hex, hsl, oklch. |
+| `progressColor` | `string` | `var(--primary)` | Progress bar color. Same formats as `waveColor`. |
+| `audioHeight` | `number` | `64` | Wave canvas height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Bar border radius in px. |
+| `zoomScale` | `number` | `0.5` | Magnification per scroll step (0–1). |
+| `maxZoom` | `number` | `1000` | Maximum zoom level in px/s. |
+| `defaultZoom` | `number` | `100` | Initial zoom level in px/s (`minPxPerSec`). |
+| `skipSeconds` | `number` | `5` | Seconds to skip on forward/backward. |
+| `className` | `string` | — | Root element class. |
+| `style` | `CSSProperties` | — | Root element inline style. |

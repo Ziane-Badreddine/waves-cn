@@ -1,0 +1,120 @@
+---
+title: useWavesurfer
+description: The primary React hook for wavesurfer.js. Wraps instance creation, state tracking, CSS variable resolution, and shared defaults into a single call.
+---
+
+## Overview
+
+`useWavesurfer` is the lower-level alternative to `WavesurferPlayer`. Use it when you need full control over the container element, want to co-locate the waveform inside a complex layout, or need to read reactive state (`isPlaying`, `currentTime`, etc.) directly in your component.
+
+## Usage
+
+```tsx
+import { useRef } from "react"
+import { useWavesurfer } from "@/registry/lib/wave-cn"
+
+export function MyPlayer() {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  const { wavesurfer, isReady, isPlaying, currentTime } = useWavesurfer({
+    container: containerRef,
+    url: "/audio/track.mp3",
+  })
+
+  return (
+    <div>
+      <div ref={containerRef} />
+      <button onClick={() => wavesurfer?.playPause()} disabled={!isReady}>
+        {isPlaying ? "Pause" : "Play"}
+      </button>
+      <span>{currentTime.toFixed(2)}s</span>
+    </div>
+  )
+}
+```
+
+## Overriding defaults
+
+Any option overrides `WAVESURFER_DEFAULTS`. Passing `undefined` gracefully falls back to the default — no need to repeat shared values in every component.
+
+```tsx
+// All WAVESURFER_DEFAULTS apply
+useWavesurfer({ container, url })
+
+// Override only what you need
+useWavesurfer({ container, url, height: 120, barWidth: 5 })
+```
+
+## With plugins
+
+Always memoize the `plugins` array — the hook uses array reference equality to decide whether to recreate the instance.
+
+```tsx
+import { useMemo } from "react"
+import { useWavesurfer } from "@/registry/lib/wave-cn"
+import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js"
+
+const plugins = useMemo(
+  () => [ZoomPlugin.create({ scale: 0.5, maxZoom: 1000 })],
+  [],
+)
+
+const { wavesurfer, isReady } = useWavesurfer({ container, url, plugins })
+```
+
+For plugins that require the instance to already exist, register them in a `useEffect`:
+
+```tsx
+import { useEffect } from "react"
+import { useWavesurfer } from "@/registry/lib/wave-cn"
+import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js"
+
+const { wavesurfer } = useWavesurfer({ container, url: "" })
+
+useEffect(() => {
+  if (!wavesurfer) return
+  wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: true }))
+}, [wavesurfer])
+```
+
+## Imperative calls
+
+Speed, volume, and seek should be called imperatively — never passed as options — to avoid recreating the instance:
+
+```tsx
+// ❌ Recreates instance on every speed change
+useWavesurfer({ audioRate: speed })
+
+// ✅ Imperative — no re-creation
+wavesurfer?.setPlaybackRate(speed, true)
+wavesurfer?.setVolume(0.5)
+wavesurfer?.seekTo(0.5) // 0–1 normalized
+```
+
+## API Reference
+
+### Parameters
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `container` | `RefObject<HTMLDivElement>` | — | **Required.** Ref to the container element. |
+| `url` | `string` | — | Audio file URL. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Accepts CSS vars, hex, hsl, oklch. |
+| `progressColor` | `string` | `var(--primary)` | Same formats as `waveColor`. |
+| `height` | `number` | `64` | Canvas height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Bar border radius. |
+| `minPxPerSec` | `number` | `1` | Minimum pixels per second (zoom level). |
+| `plugins` | `GenericPlugin[]` | `[]` | Memoized plugin array. |
+| `...rest` | `WaveSurferOptions` | — | Any other wavesurfer.js option. |
+
+### Returns
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| `wavesurfer` | `WaveSurfer \| null` | The live instance. `null` until mounted. |
+| `isReady` | `boolean` | `true` after the `ready` event fires. |
+| `isPlaying` | `boolean` | `true` while audio is playing. |
+| `hasFinished` | `boolean` | `true` after the `finish` event fires. |
+| `currentTime` | `number` | Current playback position in seconds. |

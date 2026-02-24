@@ -1,13 +1,13 @@
 ---
-title: Audio Recorder
-description: A headless-friendly audio recorder with live waveform, built on wavesurfer.js.
+title: Wave Recorder
+description: A headless-friendly wave recorder with live waveform, built on wavesurfer.js.
 ---
 
 import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
 import { Steps, Step } from "@/components/steps"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
 
-<ComponentPreviewWrapper name="audio-recorder-demo"  />
+<ComponentPreviewWrapper name="wave-recorder-demo" />
 
 ## Installation
 
@@ -39,9 +39,9 @@ npm install wavesurfer.js
 
 <Step>
 
-Copy `use-wavesurfe.tsx` into your project.
+Copy `wave-cn.tsx` into your project.
 
-<ComponentPreviewWrapper name="use-wavesurfe" variant="codesource" />
+<ComponentPreviewWrapper name="wave-cn" variant="codesource" />
 
 </Step>
 
@@ -66,9 +66,9 @@ export function formatDuration(duration: number) {
 
 <Step>
 
-Copy `audio-recorder.tsx` into your project.
+Copy `wave-recorder.tsx` into your project.
 
-<ComponentPreviewWrapper name="audio-recorder" variant="codesource" />
+<ComponentPreviewWrapper name="wave-recorder" variant="codesource" />
 
 </Step>
 
@@ -90,31 +90,32 @@ Update the import paths to match your project setup.
 - **Auto-stop** — pass `maxDuration` (in seconds) to automatically stop recording and emit the blob once the limit is reached.
 - **Discard** — lets the user throw away the current take; triggers `onDiscard` instead of `onRecordEnd` so unwanted audio is never processed.
 - **Custom waveform styling** — `waveColor`, `progressColor`, `barWidth`, `barGap`, `barRadius`, and `barHeight` all accept any CSS value including `var(--*)` tokens, resolved at runtime for the Canvas API.
+- **Plugin-ready** — `RecordPlugin` is injected into `WavesurferPlayer` (or `useWavesurfer`) via `onReady`, so any other wavesurfer.js plugin can be added the same way without touching the core.
 
 ## Usage
 
 ```tsx
-import { AudioRecorder } from "@/components/ui/audio-recorder"
+import { WaveRecorder } from "@/components/ui/wave-recorder"
 ```
 
 ```tsx
-<AudioRecorder onRecordEnd={(blob) => console.log(blob)} />
+<WaveRecorder onRecordEnd={(blob) => console.log(blob)} />
 ```
 
 ## Examples
 
 ### Minimal
 
-<ComponentPreviewWrapper name="audio-recorder-minimal" />
+<ComponentPreviewWrapper name="wave-recorder-minimal" />
 
 ### Max Duration
 
 Auto-stop after N seconds using `maxDuration`.
 
-<ComponentPreviewWrapper name="audio-recorder-timed" />
+<ComponentPreviewWrapper name="wave-recorder-timed" />
 
 ```tsx
-<AudioRecorder
+<WaveRecorder
   maxDuration={30}
   onRecordEnd={handleBlob}
 />
@@ -124,10 +125,10 @@ Auto-stop after N seconds using `maxDuration`.
 
 `waveColor` and `progressColor` accept any CSS value including `var(--*)` tokens — resolved at runtime for the Canvas API.
 
-<ComponentPreviewWrapper name="audio-recorder-custom-wave" />
+<ComponentPreviewWrapper name="wave-recorder-custom-wave" />
 
 ```tsx
-<AudioRecorder
+<WaveRecorder
   waveColor="var(--chart-1)"
   progressColor="var(--chart-2)"
   barWidth={4}
@@ -139,7 +140,7 @@ Auto-stop after N seconds using `maxDuration`.
 
 ## API Reference
 
-### AudioRecorder
+### WaveRecorder
 
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |

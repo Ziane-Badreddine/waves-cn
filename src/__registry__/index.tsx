@@ -2,266 +2,312 @@
 import * as React from "react";
 
 export const Index: Record<string, any> = {
-  "audio-player": {
-    name: "audio-player",
-    description: "Shadcn audio player",
+  "wave-cn": {
+    name: "wave-cn",
+    description:
+      "Shared wave utilities and configuration used across wave components.",
+    type: "registry:lib",
+    files: ["src/registry/lib/wave-cn.tsx"],
+    component: React.lazy(() => import("@/registry/lib/wave-cn.tsx")),
+    category: "wave",
+    subcategory: "utility",
+    chunks: [],
+  },
+  "wave-player": {
+    name: "wave-player",
+    description: "Shadcn wave player",
     type: "registry:component",
-    files: ["src/registry/components/audio-player.tsx"],
-    component: React.lazy(() => import("@/registry/components/audio-player")),
-    category: "audio",
+    files: ["src/registry/components/wave-player.tsx"],
+    component: React.lazy(() => import("@/registry/components/wave-player")),
+    category: "wave",
     subcategory: "player",
     chunks: [],
   },
 
-  "audio-player-demo": {
-    name: "audio-player-demo",
-    description: "Shadcn audio player",
+  "wave-player-demo": {
+    name: "wave-player-demo",
+    description: "Shadcn wave player",
     type: "registry:example",
-    files: ["src/registry/examples/audio-player/audio-player-example.tsx"],
+    files: ["src/registry/examples/wave-player/wave-player-example.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-player/audio-player-example"),
+      () => import("@/registry/examples/wave-player/wave-player-example"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "player",
     chunks: [],
   },
 
-  "audio-player-custom": {
-    name: "audio-player-custom",
-    description: "Shadcn audio player with custom waveform style",
+  "wave-player-custom": {
+    name: "wave-player-custom",
+    description: "Shadcn wave player with custom waveform style",
     type: "registry:examples",
-    files: [
-      "src/registry/examples/audio-player/audio-player-custom-example.tsx",
-    ],
+    files: ["src/registry/examples/wave-player/wave-player-custom-example.tsx"],
     component: React.lazy(
       () =>
-        import("@/registry/examples/audio-player/audio-player-custom-example"),
+        import("@/registry/examples/wave-player/wave-player-custom-example"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "player",
     chunks: [],
   },
 
-  "audio-player-minimal": {
-    name: "audio-player-minimal",
-    description: "Shadcn audio player minimal (no title)",
+  "wave-player-minimal": {
+    name: "wave-player-minimal",
+    description: "Shadcn wave player minimal (no title)",
     type: "registry:examples",
     files: [
-      "src/registry/examples/audio-player/audio-player-minimal-example.tsx",
+      "src/registry/examples/wave-player/wave-player-minimal-example.tsx",
     ],
     component: React.lazy(
       () =>
-        import("@/registry/examples/audio-player/audio-player-minimal-example"),
+        import("@/registry/examples/wave-player/wave-player-minimal-example"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "player",
     chunks: [],
   },
 
-  "audio-player-with-title": {
-    name: "audio-player-with-title",
-    description: "Shadcn audio player with title",
+  "wave-player-with-title": {
+    name: "wave-player-with-title",
+    description: "Shadcn wave player with title",
     type: "registry:examples",
     files: [
-      "src/registry/examples/audio-player/audio-player-with-title-example.tsx",
+      "src/registry/examples/wave-player/wave-player-with-title-example.tsx",
     ],
     component: React.lazy(
       () =>
-        import("@/registry/examples/audio-player/audio-player-with-title-example"),
+        import("@/registry/examples/wave-player/wave-player-with-title-example"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "player",
     chunks: [],
   },
 
   // 🎤 RECORDER CORE
-  "audio-recorder": {
-    name: "audio-recorder",
+  "wave-recorder": {
+    name: "wave-recorder",
     description: "Voice message recorder",
     type: "registry:component",
-    files: ["src/registry/components/audio-recorder.tsx"],
-    component: React.lazy(() => import("@/registry/components/audio-recorder")),
-    category: "audio",
+    files: ["src/registry/components/wave-recorder.tsx"],
+    component: React.lazy(() => import("@/registry/components/wave-recorder")),
+    category: "wave",
     subcategory: "recorder",
     chunks: [],
   },
 
   // 🎬 DEMO
-  "audio-recorder-demo": {
-    name: "audio-recorder-demo",
-    description: "Audio recorder demo",
+  "wave-recorder-demo": {
+    name: "wave-recorder-demo",
+    description: "wave recorder demo",
     type: "registry:example",
-    files: ["src/registry/examples/audio-recorder/audio-recorder-demo.tsx"],
+    files: ["src/registry/examples/wave-recorder/wave-recorder-demo.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-recorder/audio-recorder-demo"),
+      () => import("@/registry/examples/wave-recorder/wave-recorder-demo"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "recorder",
     chunks: [],
   },
 
   // 🎤 MINIMAL
-  "audio-recorder-minimal": {
-    name: "audio-recorder-minimal",
+  "wave-recorder-minimal": {
+    name: "wave-recorder-minimal",
     description: "Minimal voice recorder",
     type: "registry:example",
-    files: ["src/registry/examples/audio-recorder/audio-recorder-minimal.tsx"],
+    files: ["src/registry/examples/wave-recorder/wave-recorder-minimal.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-recorder/audio-recorder-minimal"),
+      () => import("@/registry/examples/wave-recorder/wave-recorder-minimal"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "recorder",
     chunks: [],
   },
 
   // ⏱ TIMED
-  "audio-recorder-timed": {
-    name: "audio-recorder-timed",
+  "wave-recorder-timed": {
+    name: "wave-recorder-timed",
     description: "Timed voice recorder",
     type: "registry:example",
-    files: ["src/registry/examples/audio-recorder/audio-recorder-timed.tsx"],
+    files: ["src/registry/examples/wave-recorder/wave-recorder-timed.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-recorder/audio-recorder-timed"),
+      () => import("@/registry/examples/wave-recorder/wave-recorder-timed"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "recorder",
     chunks: [],
   },
 
   // 🌊 CUSTOM WAVE
-  "audio-recorder-custom-wave": {
-    name: "audio-recorder-custom-wave",
+  "wave-recorder-custom-wave": {
+    name: "wave-recorder-custom-wave",
     description: "Custom waveform voice recorder",
     type: "registry:example",
     files: [
-      "src/registry/examples/audio-recorder/audio-recorder-custom-wave.tsx",
+      "src/registry/examples/wave-recorder/wave-recorder-custom-wave.tsx",
     ],
     component: React.lazy(
       () =>
-        import("@/registry/examples/audio-recorder/audio-recorder-custom-wave"),
+        import("@/registry/examples/wave-recorder/wave-recorder-custom-wave"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "recorder",
     chunks: [],
   },
 
-  "audio-timeline": {
-    name: "audio-timeline",
-    description: "Shadcn audio timeline",
+  "wave-timeline": {
+    name: "wave-timeline",
+    description: "Shadcn wave timeline",
     type: "registry:component",
-    files: ["src/registry/components/audio-timeline.tsx"],
-    component: React.lazy(
-      () => import("@/registry/components/audio-timeline"),
-    ),
-    category: "audio",
+    files: ["src/registry/components/wave-timeline.tsx"],
+    component: React.lazy(() => import("@/registry/components/wave-timeline")),
+    category: "wave",
     subcategory: "player",
     chunks: [],
   },
 
-  "audio-timeline-demo": {
-    name: "audio-timeline-demo",
-    description: "Shadcn audio timeline demo",
+  "wave-timeline-demo": {
+    name: "wave-timeline-demo",
+    description: "Shadcn wave timeline demo",
     type: "registry:component",
-    files: ["src/registry/examples/audio-timeline/audio-timeline-example.tsx"],
+    files: ["src/registry/examples/wave-timeline/wave-timeline-example.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-timeline/audio-timeline-example"),
+      () => import("@/registry/examples/wave-timeline/wave-timeline-example"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "player",
     chunks: [],
   },
 
-  "audio-timeline-dual": {
-    name: "audio-timeline-dual",
-    description: "Audio timeline with both top and bottom rulers",
+  "wave-timeline-dual": {
+    name: "wave-timeline-dual",
+    description: "wave timeline with both top and bottom rulers",
     type: "registry:component",
     files: [
-      "src/registry/examples/audio-timeline/audio-timeline-dual-example.tsx",
+      "src/registry/examples/wave-timeline/wave-timeline-dual-example.tsx",
     ],
     component: React.lazy(
       () =>
-        import("@/registry/examples/audio-timeline/audio-timeline-dual-example"),
+        import("@/registry/examples/wave-timeline/wave-timeline-dual-example"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "player",
     chunks: [],
   },
 
-  "audio-timeline-no-ruler": {
-    name: "audio-timeline-no-ruler",
-    description: "Audio timeline without ruler",
+  "wave-timeline-no-ruler": {
+    name: "wave-timeline-no-ruler",
+    description: "wave timeline without ruler",
     type: "registry:component",
     files: [
-      "src/registry/examples/audio-timeline/audio-timeline-no-ruler-example.tsx",
+      "src/registry/examples/wave-timeline/wave-timeline-no-ruler-example.tsx",
     ],
     component: React.lazy(
       () =>
-        import("@/registry/examples/audio-timeline/audio-timeline-no-ruler-example"),
+        import("@/registry/examples/wave-timeline/wave-timeline-no-ruler-example"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "player",
     chunks: [],
   },
 
-  "use-wavesurfe": {
-    name: "use-wavesurfe",
-    description:
-      "useWavesurfer hook with shared defaults — base for all audio components",
-    type: "registry:hook",
-    files: ["src/registry/hooks/use-wavesurfe.tsx"],
-    component: React.lazy(() => import("@/registry/hooks/use-wavesurfe")),
-    category: "audio",
-    subcategory: "hook",
-    chunks: [],
-  },
-
-  "audio-speed": {
-    name: "audio-speed",
-    description: "Audio player with variable playback speed control",
+  "wave-speed": {
+    name: "wave-speed",
+    description: "wave player with variable playback speed control",
     type: "registry:component",
-    files: ["src/registry/components/audio-speed.tsx"],
-    component: React.lazy(() => import("@/registry/components/audio-speed")),
-    category: "audio",
+    files: ["src/registry/components/wave-speed.tsx"],
+    component: React.lazy(() => import("@/registry/components/wave-speed")),
+    category: "wave",
     subcategory: "speed",
     chunks: [],
   },
 
-  "audio-speed-demo": {
-    name: "audio-speed-demo",
-    description: "Audio speed demo",
+  "wave-speed-demo": {
+    name: "wave-speed-demo",
+    description: "wave speed demo",
     type: "registry:example",
-    files: ["src/registry/examples/audio-speed/audio-speed-demo.tsx"],
+    files: ["src/registry/examples/wave-speed/wave-speed-demo.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-speed/audio-speed-demo"),
+      () => import("@/registry/examples/wave-speed/wave-speed-demo"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "speed",
     chunks: [],
   },
 
-  "audio-speed-podcast": {
-    name: "audio-speed-podcast",
-    description: "Audio speed player with podcast range (0.5x–2x)",
+  "wave-speed-podcast": {
+    name: "wave-speed-podcast",
+    description: "wave speed player with podcast range (0.5x–2x)",
     type: "registry:example",
-    files: ["src/registry/examples/audio-speed/audio-speed-podcast.tsx"],
+    files: ["src/registry/examples/wave-speed/wave-speed-podcast.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-speed/audio-speed-podcast"),
+      () => import("@/registry/examples/wave-speed/wave-speed-podcast"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "speed",
     chunks: [],
   },
 
-  "audio-speed-custom-wave": {
-    name: "audio-speed-custom-wave",
-    description: "Audio speed player with custom colors",
+  "wave-speed-custom-wave": {
+    name: "wave-speed-custom-wave",
+    description: "wave speed player with custom colors",
     type: "registry:example",
-    files: ["src/registry/examples/audio-speed/audio-speed-custom-wave.tsx"],
+    files: ["src/registry/examples/wave-speed/wave-speed-custom-wave.tsx"],
     component: React.lazy(
-      () => import("@/registry/examples/audio-speed/audio-speed-custom-wave"),
+      () => import("@/registry/examples/wave-speed/wave-speed-custom-wave"),
     ),
-    category: "audio",
+    category: "wave",
     subcategory: "speed",
+    chunks: [],
+  },
+
+  "wave-zoom": {
+    name: "wave-zoom",
+    description: "Wave player with mouse-wheel zoom (ZoomPlugin)",
+    type: "registry:component",
+    files: ["src/registry/components/wave-zoom.tsx"],
+    component: React.lazy(() => import("@/registry/components/wave-zoom")),
+    category: "wave",
+    subcategory: "zoom",
+    chunks: [],
+  },
+
+  // 🎬 DEMO
+  "wave-zoom-demo": {
+    name: "wave-zoom-demo",
+    description: "Wave zoom demo",
+    type: "registry:example",
+    files: ["src/registry/examples/wave-zoom/wave-zoom-demo.tsx"],
+    component: React.lazy(
+      () => import("@/registry/examples/wave-zoom/wave-zoom-demo"),
+    ),
+    category: "wave",
+    subcategory: "zoom",
+    chunks: [],
+  },
+
+  "wave-zoom-custom-wave": {
+    name: "wave-zoom-custom-wave",
+    description: "Wave zoom with custom waveform styling",
+    type: "registry:example",
+    files: ["src/registry/examples/wave-zoom/wave-zoom-custom-wave.tsx"],
+    component: React.lazy(
+      () => import("@/registry/examples/wave-zoom/wave-zoom-custom-wave"),
+    ),
+    category: "wave",
+    subcategory: "zoom",
+    chunks: [],
+  },
+
+  "wave-zoom-custom-range": {
+    name: "wave-zoom-custom-range",
+    description: "Wave zoom with custom zoom configuration",
+    type: "registry:example",
+    files: ["src/registry/examples/wave-zoom/wave-zoom-custom-range.tsx"],
+    component: React.lazy(
+      () => import("@/registry/examples/wave-zoom/wave-zoom-custom-range"),
+    ),
+    category: "wave",
+    subcategory: "zoom",
     chunks: [],
   },
 };

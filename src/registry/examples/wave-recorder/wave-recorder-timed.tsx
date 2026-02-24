@@ -1,14 +1,13 @@
 "use client";
 
 import React from "react";
-import AudioRecorder from "@/registry/components/audio-recorder";
+import WaveRecorder from "@/registry/components/wave-recorder";
 import { toast } from "sonner";
 
-export default function AudioRecorderMinimal() {
+export default function WaveRecorderTimed() {
   return (
-    <AudioRecorder
-      showWaveform={false}
-      showTimer={false}
+    <WaveRecorder
+      maxDuration={10}
       onRecordEnd={(blob) => {
         const url = URL.createObjectURL(blob);
 

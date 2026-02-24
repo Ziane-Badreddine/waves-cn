@@ -1,0 +1,118 @@
+---
+title: WavesurferPlayer
+description: A declarative, memoized React component that renders a wavesurfer.js waveform. The simplest way to drop a player into any component.
+---
+
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+
+## Overview
+
+`WavesurferPlayer` (exported as default from `wave-cn.tsx`) is a thin wrapper around `useWavesurfer`. It owns its container `<div>`, applies `WAVESURFER_DEFAULTS`, resolves CSS variables automatically, and exposes every wavesurfer.js event as an `on`-prefixed prop.
+
+Use it when you want a **declarative** player and don't need to manage the wavesurfer instance yourself.
+
+## Usage
+
+```tsx
+import WavesurferPlayer from "@/registry/lib/wave-cn"
+
+<WavesurferPlayer
+  url="/audio/track.mp3"
+  waveColor="var(--primary)"
+  height={80}
+  onReady={(ws) => console.log("ready", ws)}
+  onFinish={() => console.log("finished")}
+/>
+```
+
+## Getting the instance
+
+Pass `onReady` to receive the live `WaveSurfer` instance and store it in a ref for imperative calls:
+
+```tsx
+import { useRef, useCallback } from "react"
+import WavesurferPlayer from "@/registry/lib/wave-cn"
+import type WaveSurfer from "wavesurfer.js"
+
+export function MyPlayer() {
+  const wsRef = useRef<WaveSurfer | null>(null)
+
+  const handleReady = useCallback((ws: WaveSurfer) => {
+    wsRef.current = ws
+  }, [])
+
+  return (
+    <WavesurferPlayer
+      url="/audio/track.mp3"
+      onReady={handleReady}
+      onPlay={() => console.log("playing")}
+      onPause={() => console.log("paused")}
+      onDestroy={() => { wsRef.current = null }}
+    />
+  )
+}
+```
+
+## Injecting plugins
+
+Pass a **memoized** `plugins` array. The player compares array references — not deep equality — so a new array on every render will recreate the instance on every render.
+
+```tsx
+import { useMemo } from "react"
+import WavesurferPlayer from "@/registry/lib/wave-cn"
+import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js"
+import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js"
+
+const plugins = useMemo(() => [
+  ZoomPlugin.create({ scale: 0.5, maxZoom: 1000 }),
+  TimelinePlugin.create(),
+], [])
+
+<WavesurferPlayer url="/audio/track.mp3" plugins={plugins} />
+```
+
+For plugins that need to be registered **after** the instance exists (e.g. `RecordPlugin`), use `onReady` instead:
+
+```tsx
+<WavesurferPlayer
+  url=""
+  onReady={(ws) => {
+    ws.registerPlugin(RecordPlugin.create({ scrollingWaveform: true }))
+  }}
+/>
+```
+
+## Events
+
+Every wavesurfer.js event is available as an `on`-prefixed prop. The handler receives the `WaveSurfer` instance as the first argument, followed by the event's own arguments.
+
+```tsx
+<WavesurferPlayer
+  url="/audio/track.mp3"
+  onReady={(ws) => {}}
+  onPlay={(ws) => {}}
+  onPause={(ws) => {}}
+  onFinish={(ws) => {}}
+  onTimeupdate={(ws) => console.log(ws.getCurrentTime())}
+  onSeeking={(ws, currentTime) => {}}
+  onDestroy={(ws) => {}}
+/>
+```
+
+See the full event list at [wavesurfer.js docs](https://wavesurfer.xyz/docs/types/wavesurfer.WaveSurferEvents).
+
+## API Reference
+
+Accepts all `WaveSurferOptions` (except `container` — the player owns it) plus every `on{Event}` handler.
+
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `url` | `string` | — | Audio file URL to load. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Accepts CSS vars, hex, hsl, oklch. |
+| `progressColor` | `string` | `var(--primary)` | Same formats as `waveColor`. |
+| `height` | `number` | `64` | Canvas height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Bar border radius. |
+| `plugins` | `GenericPlugin[]` | `[]` | Memoized plugin array. |
+| `on{Event}` | `(ws, ...args) => void` | — | Any wavesurfer.js event handler. |

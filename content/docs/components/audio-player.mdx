@@ -1,5 +1,5 @@
 ---
-title: Audio Player
+title: Wave Player
 description: A shadcn-styled waveform audio player built on wavesurfer.js.
 ---
 
@@ -8,7 +8,7 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs"
 import { Steps, Step } from "fumadocs-ui/components/steps"
 
 <ComponentPreviewWrapper
-  name="audio-player-demo"
+  name="wave-player-demo"
 />
 
 ## Installation
@@ -17,7 +17,7 @@ import { Steps, Step } from "fumadocs-ui/components/steps"
   <Tab value="CLI">
 
 ```bash
-npx shadcn@latest add "https://yoursite.com/r/audio-player.json"
+npx shadcn@latest add "https://yoursite.com/r/wave-player.json"
 ```
 
   </Tab>
@@ -47,9 +47,9 @@ npx shadcn@latest add card button slider
 
 <Step>
 
-Copy `audio-player.tsx` into your project.
+Copy `wave-player.tsx` into your project.
 
-<ComponentPreviewWrapper name="audio-player" variant="codesource" />
+<ComponentPreviewWrapper name="wave-player" variant="codesource" />
 
 </Step>
 
@@ -76,7 +76,7 @@ Update the import paths to match your project setup.
 ## Usage
 
 ```tsx
-import { AudioPlayer } from "@/components/ui/audio-player"
+import { AudioPlayer } from "@/components/ui/wave-player"
 ```
 
 ```tsx
@@ -88,13 +88,13 @@ import { AudioPlayer } from "@/components/ui/audio-player"
 ### Minimal
 
 <ComponentPreviewWrapper
-  name="audio-player-minimal"
+  name="wave-player-minimal"
 />
 
 ### With title
 
 <ComponentPreviewWrapper
-  name="audio-player-with-title"
+  name="wave-player-with-title"
 />
 
 
@@ -104,7 +104,7 @@ import { AudioPlayer } from "@/components/ui/audio-player"
 `barWidth`, `barGap`, `barRadius`, and `waveHeight` let you fully control the shape of the waveform bars.
 
 <ComponentPreviewWrapper
-  name="audio-player-custom"
+  name="wave-player-custom"
 />
 
 
@@ -116,7 +116,7 @@ Because `onPlay`, `onPause`, `onFinish`, and `onTimeUpdate` are functions, they 
 ```tsx
 "use client"
 
-import { AudioPlayer } from "@/components/ui/audio-player"
+import { AudioPlayer } from "@/components/ui/wave-player"
 
 export function MyPlayer() {
   return (

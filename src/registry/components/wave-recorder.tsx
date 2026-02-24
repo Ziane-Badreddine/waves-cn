@@ -1,6 +1,5 @@
 "use client";
 
-import { useWavesurfer } from "@/components/cors/wavesurfer-player";
 import {
   useRef,
   useMemo,
@@ -17,12 +16,13 @@ import RecordPlugin, {
 } from "wavesurfer.js/dist/plugins/record.esm.js";
 import { cn, formatDuration } from "@/lib/utils";
 import { useCssVar } from "@/hooks/use-css-var";
+import { useWavesurfer } from "@/registry/lib/wave-cn";
 
 // Types
 
 export type RecordState = "idle" | "recording" | "paused" | "done";
 
-export type AudioRecorderProps = {
+export type WaveRecorderProps = {
   // Callbacks
   onRecordEnd?: (blob: Blob) => void;
   onRecordStart?: () => void;
@@ -57,7 +57,7 @@ export type AudioRecorderProps = {
   controlsClassName?: string;
 };
 
-export function AudioRecorder({
+export function WaveRecorder({
   onRecordEnd,
   onRecordStart,
   onRecordPause,
@@ -83,7 +83,7 @@ export function AudioRecorder({
   waveformClassName,
   timerClassName,
   controlsClassName,
-}: AudioRecorderProps) {
+}: WaveRecorderProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [recordPlugin, setRecordPlugin] = useState<InstanceType<
     typeof RecordPlugin
@@ -324,4 +324,4 @@ export function AudioRecorder({
   );
 }
 
-export default AudioRecorder;
+export default WaveRecorder;

@@ -5,14 +5,12 @@
   "pages": [
     "---Getting Started---",
     "index",
-    "what-is-fumadocs",
-    "comparisons",
-    "manual-installation",
-    "guides",
+    "wavesurfer-player",
+    "use-wavesurfer.mdx",
+    "wave-defaults.mdx",
+    "plugins",
     "---Components---",
     "...components",
-    "markdown",
-    "---Extensions---",
-    "...extensions"
+    "markdown"
   ]
 }

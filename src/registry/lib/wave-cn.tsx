@@ -242,7 +242,34 @@ function useWavesurferEvents(
  */
 const WavesurferPlayer = memo((props: WavesurferProps): ReactElement => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [options, events] = useWavesurferProps(props);
+  const [rawOptions, events] = useWavesurferProps(props);
+
+  // Apply WAVESURFER_DEFAULTS and resolve CSS var() tokens — same logic as
+  // useWavesurfer — so WavesurferPlayer benefits from shared defaults too.
+  const waveColor =
+    (rawOptions.waveColor as string | undefined) ??
+    WAVESURFER_DEFAULTS.waveColor;
+  const progressColor =
+    (rawOptions.progressColor as string | undefined) ??
+    WAVESURFER_DEFAULTS.progressColor;
+  const resolvedWaveColor = useCssVar(waveColor);
+  const resolvedProgressColor = useCssVar(progressColor);
+
+  const options = useMemo(() => {
+    const { waveColor: _wc, progressColor: _pc, ...rest } = rawOptions;
+    const cleanOptions = Object.fromEntries(
+      Object.entries(rest).filter(([, v]) => v !== undefined),
+    ) as PartialWavesurferOptions;
+
+    return {
+      ...WAVESURFER_DEFAULTS,
+      ...cleanOptions,
+      waveColor: resolvedWaveColor,
+      progressColor: resolvedProgressColor,
+    } as PartialWavesurferOptions;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedWaveColor, resolvedProgressColor, ...Object.values(rawOptions)]);
+
   const wavesurfer = useWavesurferInstance(containerRef, options);
   useWavesurferEvents(wavesurfer, events);
 

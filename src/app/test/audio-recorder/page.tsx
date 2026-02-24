@@ -1,6 +1,10 @@
-import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper";
-import AudioSpeed from "@/registry/components/audio-speed";
+import WaveSpeed from "@/registry/components/wave-speed";
+import WavesurferPlayer from "@/registry/lib/wave-cn";
 
 export default function page() {
-  return <AudioSpeed url="/coastline.mp3" />;
+  return (
+    // <WavesurferPlayer url="/coastline.mp3" autoplay={true} dragToSeek={true} />
+    // <AudioZoom url="/coastline.mp3" />
+    null
+  );
 }
