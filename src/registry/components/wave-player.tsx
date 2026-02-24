@@ -1,31 +1,34 @@
 "use client"
 
 import * as React from "react"
-import WaveSurfer from "wavesurfer.js"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Play, Pause, Volume2, VolumeX, Loader2, RotateCcw } from "lucide-react"
+import WavesurferPlayer from "@/registry/lib/wave-cn"
+import type WaveSurfer from "wavesurfer.js"
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface AudioPlayerProps {
+export interface WavePlayerProps {
   /** Audio source URL */
   src: string
   /** Optional title shown above the waveform */
   title?: string
   /** Initial volume (0–1) */
   defaultVolume?: number
-  /** Waveform bar width in px */
+  /** Audio bar color. Accepts any CSS value including var(--*) tokens @default "var(--muted-foreground)" */
+  waveColor?: string
+  /** Progress bar color. Accepts any CSS value including var(--*) tokens @default "var(--primary)" */
+  progressColor?: string
+  /** Waveform bar width in px @default 3 */
   barWidth?: number
-  /** Waveform bar gap in px */
+  /** Waveform bar gap in px @default 2 */
   barGap?: number
-  /** Rounded borders for bars */
+  /** Rounded borders for bars @default 2 */
   barRadius?: number
-  /** Waveform height in px */
+  /** Waveform height in px @default 64 */
   waveHeight?: number
-  /** Minimum pixels per second (zoom level) */
+  /** Minimum pixels per second (zoom level) @default 1 */
   minPxPerSec?: number
   /** Autoplay on mount */
   autoPlay?: boolean
@@ -40,194 +43,171 @@ export interface AudioPlayerProps {
   className?: string
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
+// ─── Helpers
 function formatTime(t: number): string {
   const m = Math.floor(t / 60)
   const s = Math.floor(t % 60)
   return `${m}:${s.toString().padStart(2, "0")}`
 }
 
-/**
- * Resolves a Tailwind/shadcn utility class to a real computed color string.
- * Works with any color format: hsl(), oklch(), rgb(), etc.
- *
- * We apply the class to a hidden <div>, mount it, read getComputedStyle().color,
- * then remove it. This always returns a resolved "rgb(...)" value that WaveSurfer
- * (which uses Canvas) can consume directly — unlike CSS variables which may be
- * raw channel values (e.g. "220 14% 96%") that Canvas cannot parse.
- */
-function resolveColorClass(twClass: string): string {
-  const el = document.createElement("div")
-  el.className = twClass
-  el.style.cssText = "position:fixed;pointer-events:none;opacity:0"
-  document.body.appendChild(el)
-  const color = getComputedStyle(el).color
-  document.body.removeChild(el)
-  return color || "rgb(100,100,100)"
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
-
-export function AudioPlayer({
+// ─── Component
+export function WavePlayer({
   src,
   title,
   defaultVolume = 0.8,
-  barWidth = 3,
-  barGap = 2,
-  barRadius = 2,
-  waveHeight = 64,
-  minPxPerSec = 1,
+  waveColor,
+  progressColor,
+  barWidth,
+  barGap,
+  barRadius,
+  waveHeight,
+  minPxPerSec,
   autoPlay = false,
   onPlay,
   onPause,
   onFinish,
   onTimeUpdate,
   className,
-}: AudioPlayerProps) {
-  const containerRef = React.useRef<HTMLDivElement | null>(null)
-  const waveRef = React.useRef<WaveSurfer | null>(null)
+}: WavePlayerProps) {
+  const wavesurferRef = React.useRef<WaveSurfer | null>(null)
 
-  const [isPlaying, setIsPlaying] = React.useState(false)
-  const [isLoading, setIsLoading] = React.useState(true)
   const [isReady, setIsReady] = React.useState(false)
+  const [isPlaying, setIsPlaying] = React.useState(false)
   const [volume, setVolume] = React.useState(defaultVolume)
   const [isMuted, setIsMuted] = React.useState(false)
   const [duration, setDuration] = React.useState(0)
   const [currentTime, setCurrentTime] = React.useState(0)
 
-  // ── Init ──────────────────────────────────────────────────────────────────
+  // ── Controls
+  const togglePlay = React.useCallback(
+    () => wavesurferRef.current?.playPause(),
+    [],
+  )
 
-  React.useEffect(() => {
-    if (!containerRef.current) return
+  const restart = React.useCallback(() => {
+    if (!wavesurferRef.current || !isReady) return
+    wavesurferRef.current.setTime(0)
+    wavesurferRef.current.play()
+  }, [isReady])
 
-    setIsLoading(true)
+  const handleVolume = React.useCallback(
+    (v: number[]) => {
+      const value = v[0]
+      setVolume(value)
+      setIsMuted(value === 0)
+      wavesurferRef.current?.setVolume(value)
+    },
+    [],
+  )
+
+  const toggleMute = React.useCallback(() => {
+    if (!wavesurferRef.current) return
+    const next = !isMuted
+    setIsMuted(next)
+    wavesurferRef.current.setVolume(next ? 0 : volume)
+  }, [isMuted, volume])
+
+  const handleSeek = React.useCallback(
+    ([v]: number[]) => {
+      if (!wavesurferRef.current || !isReady) return
+      wavesurferRef.current.seekTo(v)
+    },
+    [isReady],
+  )
+
+  // ── WavesurferPlayer event handlers
+
+  const handleReady = React.useCallback(
+    (ws: WaveSurfer) => {
+      wavesurferRef.current = ws
+      ws.setVolume(defaultVolume)
+      if (autoPlay) ws.play()
+      setDuration(ws.getDuration())
+      setIsReady(true)
+    },
+    [defaultVolume, autoPlay],
+  )
+
+  const handlePlay = React.useCallback(() => {
+    setIsPlaying(true)
+    onPlay?.()
+  }, [onPlay])
+
+  const handlePause = React.useCallback(() => {
+    setIsPlaying(false)
+    onPause?.()
+  }, [onPause])
+
+  const handleFinish = React.useCallback(
+    (ws: WaveSurfer) => {
+      setIsPlaying(false)
+      onFinish?.()
+    },
+    [onFinish],
+  )
+
+  const handleTimeupdate = React.useCallback(
+    (ws: WaveSurfer) => {
+      const t = ws.getCurrentTime()
+      setCurrentTime(t)
+      onTimeUpdate?.(t, ws.getDuration())
+    },
+    [onTimeUpdate],
+  )
+
+  const handleSeeking = React.useCallback((ws: WaveSurfer) => {
+    setCurrentTime(ws.getCurrentTime())
+  }, [])
+
+  const handleDestroy = React.useCallback(() => {
+    wavesurferRef.current = null
     setIsReady(false)
     setIsPlaying(false)
     setCurrentTime(0)
     setDuration(0)
+  }, [])
 
-    // Resolve shadcn Tailwind classes → real browser-computed colors.
-    // We use text-* classes because getComputedStyle().color is always fully
-    // resolved by the browser, unlike reading CSS variables directly which
-    // may return raw channel values (e.g. "220 14% 96%") Canvas can't parse.
-    const waveColor     = resolveColorClass("text-muted-foreground")
-    const progressColor = resolveColorClass("text-primary")
-    const cursorColor   = resolveColorClass("text-primary")
-
-    const ws = WaveSurfer.create({
-      container: containerRef.current,
-      height: waveHeight,
-      waveColor,
-      progressColor,
-      cursorColor,
-      cursorWidth: 2,
-      barWidth,
-      barGap,
-      barRadius,
-      minPxPerSec,
-      fillParent: true,
-      url: src,
-      autoplay: autoPlay,
-      interact: true,
-      dragToSeek: true,
-      hideScrollbar: true,
-      audioRate: 1,
-      normalize: false,
-    })
-
-    waveRef.current = ws
-    ws.setVolume(defaultVolume)
-
-    ws.on("loading", () => setIsLoading(true))
-
-    ws.on("ready", () => {
-      setDuration(ws.getDuration())
-      setIsLoading(false)
-      setIsReady(true)
-    })
-
-    ws.on("audioprocess", () => {
-      const t = ws.getCurrentTime()
-      setCurrentTime(t)
-      onTimeUpdate?.(t, ws.getDuration())
-    })
-
-    // fires when user clicks or drags the waveform natively
-    ws.on("seeking", () => {
-      setCurrentTime(ws.getCurrentTime())
-    })
-
-    ws.on("play", () => {
-      setIsPlaying(true)
-      onPlay?.()
-    })
-
-    ws.on("pause", () => {
-      setIsPlaying(false)
-      onPause?.()
-    })
-
-    ws.on("finish", () => {
-      setIsPlaying(false)
-      onFinish?.()
-    })
-
-    return () => ws.destroy()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [src])
-
-  // ── Controls ──────────────────────────────────────────────────────────────
-
-  const togglePlay = () => waveRef.current?.playPause()
-
-  const restart = () => {
-    if (!waveRef.current || !isReady) return
-    waveRef.current.setTime(0)   // setTime() from WaveSurfer docs
-    waveRef.current.play()
-  }
-
-  const handleVolume = (v: number[]) => {
-    const value = v[0]
-    setVolume(value)
-    setIsMuted(value === 0)
-    waveRef.current?.setVolume(value)
-  }
-
-  const toggleMute = () => {
-    if (!waveRef.current) return
-    const next = !isMuted
-    setIsMuted(next)
-    waveRef.current.setVolume(next ? 0 : volume)
-  }
-
+  // ── Derived 
   const progress = duration > 0 ? currentTime / duration : 0
 
-  // ── Render ────────────────────────────────────────────────────────────────
-
+  // ── Render
   return (
     <Card className={cn("w-full", className)}>
       <CardContent className="p-4 space-y-3">
 
-        {/* Title */}
         {title && (
           <p className="text-sm font-medium text-foreground truncate">{title}</p>
         )}
 
-        {/* Waveform — WaveSurfer mounts its <canvas> inside this div */}
-        <div className="relative w-full rounded-sm overflow-hidden">
-          {isLoading && (
+        <div className="relative w-full rounded-sm overflow-hidden bg-muted/40">
+          {!isReady && (
             <div
               className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-[2px]"
-              style={{ height: waveHeight }}
+              style={{ height: waveHeight ?? 64 }}
             >
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             </div>
           )}
-          <div ref={containerRef} className="w-full" />
+          <WavesurferPlayer
+            url={src}
+            waveColor={waveColor}
+            progressColor={progressColor}
+            height={waveHeight}
+            barWidth={barWidth}
+            barGap={barGap}
+            barRadius={barRadius}
+            minPxPerSec={minPxPerSec}
+            dragToSeek
+            onReady={handleReady}
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onFinish={handleFinish}
+            onTimeupdate={handleTimeupdate}
+            onSeeking={handleSeeking}
+            onDestroy={handleDestroy}
+          />
         </div>
 
-        {/* Seek bar */}
         <div className="flex items-center gap-2">
           <span className="text-[11px] tabular-nums text-muted-foreground w-10 text-right shrink-0">
             {formatTime(currentTime)}
@@ -239,17 +219,13 @@ export function AudioPlayer({
             max={1}
             step={0.001}
             disabled={!isReady}
-            onValueChange={([v]) => {
-              if (!waveRef.current || !isReady) return
-              waveRef.current.seekTo(v) // seekTo(0–1) per WaveSurfer docs
-            }}
+            onValueChange={handleSeek}
           />
           <span className="text-[11px] tabular-nums text-muted-foreground w-10 shrink-0">
             {formatTime(duration)}
           </span>
         </div>
 
-        {/* Controls */}
         <div className="flex items-center justify-between gap-3">
 
           <div className="flex items-center gap-1.5">
@@ -301,4 +277,4 @@ export function AudioPlayer({
   )
 }
 
-export default AudioPlayer
+export default WavePlayer

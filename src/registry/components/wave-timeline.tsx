@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,23 +16,24 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import { useCssVar } from "@/hooks/use-css-var";
+import WavesurferPlayer from "@/registry/lib/wave-cn";
+import type WaveSurfer from "wavesurfer.js";
 
-// Types
-
+// ─── Types
 export interface TimelineOptions {
   height?: number;
   timeInterval?: number;
   primaryLabelInterval?: number;
   secondaryLabelInterval?: number;
   fontSize?: string;
-  position?: "top" | "bottom";
 }
 
-export interface AudioTimelineProps {
+export interface WaveTimelineProps {
   src: string;
   title?: string;
   defaultVolume?: number;
+  waveColor?: string;
+  progressColor?: string;
   barWidth?: number;
   barGap?: number;
   barRadius?: number;
@@ -50,20 +50,20 @@ export interface AudioTimelineProps {
   className?: string;
 }
 
-// Helpers
-
+// ─── Helpers
 function formatTime(t: number): string {
   const m = Math.floor(t / 60);
   const s = Math.floor(t % 60);
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-// Component
-
-export function AudioTimeline({
+// ─── Component
+export function WaveTimeline({
   src,
   title,
   defaultVolume = 0.8,
+  waveColor,
+  progressColor,
   barWidth = 2,
   barGap = 1,
   barRadius = 2,
@@ -78,61 +78,43 @@ export function AudioTimeline({
   onFinish,
   onTimeUpdate,
   className,
-}: AudioTimelineProps) {
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const waveRef = React.useRef<WaveSurfer | null>(null);
+}: WaveTimelineProps) {
+  const wavesurferRef = React.useRef<WaveSurfer | null>(null);
 
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [isReady, setIsReady] = React.useState(false);
+  const [isPlaying, setIsPlaying] = React.useState(false);
   const [volume, setVolume] = React.useState(defaultVolume);
   const [isMuted, setIsMuted] = React.useState(false);
   const [duration, setDuration] = React.useState(0);
   const [currentTime, setCurrentTime] = React.useState(0);
   const [zoom, setZoom] = React.useState(defaultZoom);
 
-  // Resolve shadcn CSS vars → real color strings via the hook
-  const waveColor = useCssVar("var(--muted-foreground)");
-  const progressColor = useCssVar("var(--primary)");
-  const cursorColor = useCssVar("var(--primary)");
-  const labelColor = useCssVar("var(--muted-foreground)");
-  const mutedColor = useCssVar("var(--muted)");
+  // ── Memoized plugins ──────────────────────────────────────────────────────
+  // Stable array reference — WavesurferPlayer uses reference equality to decide
+  // whether to recreate the instance, so this must not change on every render.
 
-  // Init
-
-  React.useEffect(() => {
-    if (!containerRef.current) return;
-    if (!waveColor || !progressColor) return;
-
-    setIsLoading(true);
-    setIsReady(false);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-
-    //Build timeline plugins
-
-    const plugins: InstanceType<typeof TimelinePlugin>[] = [];
+  const plugins = React.useMemo(() => {
+    const list: InstanceType<typeof TimelinePlugin>[] = [];
 
     if (topTimeline !== false) {
-      plugins.push(
+      list.push(
         TimelinePlugin.create({
           height: topTimeline.height ?? 20,
-          insertPosition: "beforebegin", // renders ABOVE the waveform
+          insertPosition: "beforebegin",
           timeInterval: topTimeline.timeInterval ?? 0.5,
           primaryLabelInterval: topTimeline.primaryLabelInterval ?? 5,
           secondaryLabelInterval: topTimeline.secondaryLabelInterval ?? 1,
           style: {
             fontSize: topTimeline.fontSize ?? "11px",
-            color: labelColor,
-            background: mutedColor,
+            color: "var(--muted-foreground)",
+            background: "var(--muted)",
           },
         }),
       );
     }
 
     if (bottomTimeline !== false) {
-      plugins.push(
+      list.push(
         TimelinePlugin.create({
           height: bottomTimeline.height ?? 14,
           timeInterval: bottomTimeline.timeInterval ?? 0.1,
@@ -140,130 +122,135 @@ export function AudioTimeline({
           secondaryLabelInterval: bottomTimeline.secondaryLabelInterval,
           style: {
             fontSize: bottomTimeline.fontSize ?? "10px",
-            color: labelColor,
-            background: mutedColor,
+            color: "var(--muted-foreground)",
+            background: "var(--muted)",
           },
         }),
       );
     }
 
-    // ── Create WaveSurfer
+    return list;
+  }, [JSON.stringify(topTimeline), JSON.stringify(bottomTimeline)]);
 
-    const ws = WaveSurfer.create({
-      container: containerRef.current,
-      height: waveHeight,
-      waveColor,
-      progressColor,
-      cursorColor,
-      cursorWidth: 2,
-      barWidth,
-      barGap,
-      barRadius,
-      minPxPerSec: defaultZoom,
-      fillParent: true,
-      url: src,
-      interact: true,
-      dragToSeek: true,
-      hideScrollbar: false, // show scrollbar so user can pan when zoomed in
-      audioRate: 1,
-      normalize: false,
-      plugins,
-    });
-
-    waveRef.current = ws;
-    ws.setVolume(defaultVolume);
-
-    ws.on("loading", () => setIsLoading(true));
-    ws.on("ready", () => {
+  // ── Event handlers 
+  const handleReady = React.useCallback(
+    (ws: WaveSurfer) => {
+      wavesurferRef.current = ws;
+      ws.setVolume(defaultVolume);
       setDuration(ws.getDuration());
-      setIsLoading(false);
       setIsReady(true);
-    });
-    ws.on("audioprocess", () => {
+    },
+    [defaultVolume],
+  );
+
+  const handlePlay = React.useCallback(() => {
+    setIsPlaying(true);
+    onPlay?.();
+  }, [onPlay]);
+
+  const handlePause = React.useCallback(() => {
+    setIsPlaying(false);
+    onPause?.();
+  }, [onPause]);
+
+  const handleFinish = React.useCallback(
+    (_ws: WaveSurfer) => {
+      setIsPlaying(false);
+      onFinish?.();
+    },
+    [onFinish],
+  );
+
+  const handleTimeupdate = React.useCallback(
+    (ws: WaveSurfer) => {
       const t = ws.getCurrentTime();
       setCurrentTime(t);
       onTimeUpdate?.(t, ws.getDuration());
-    });
-    ws.on("seeking", () => setCurrentTime(ws.getCurrentTime()));
-    ws.on("play", () => {
-      setIsPlaying(true);
-      onPlay?.();
-    });
-    ws.on("pause", () => {
-      setIsPlaying(false);
-      onPause?.();
-    });
-    ws.on("finish", () => {
-      setIsPlaying(false);
-      onFinish?.();
-    });
+    },
+    [onTimeUpdate],
+  );
 
-    return () => ws.destroy();
-    // Re-init when src or resolved colors change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [src, waveColor, progressColor, labelColor, mutedColor]);
+  const handleSeeking = React.useCallback((ws: WaveSurfer) => {
+    setCurrentTime(ws.getCurrentTime());
+  }, []);
 
-  // ── Zoom ─────────────────────────────────────────────────────────────────
+  const handleDestroy = React.useCallback(() => {
+    wavesurferRef.current = null;
+    setIsReady(false);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+  }, []);
 
-  const handleZoom = (v: number[]) => {
+  // ── Zoom ──────────────────────────────────────────────────────────────────
+  const handleZoom = React.useCallback((v: number[]) => {
     const value = v[0];
     setZoom(value);
-    waveRef.current?.zoom(value);
-  };
+    wavesurferRef.current?.zoom(value);
+  }, []);
 
-  const zoomIn = () => {
+  const zoomIn = React.useCallback(() => {
     const next = Math.min(zoom * 1.5, maxZoom);
     setZoom(next);
-    waveRef.current?.zoom(next);
-  };
+    wavesurferRef.current?.zoom(next);
+  }, [zoom, maxZoom]);
 
-  const zoomOut = () => {
+  const zoomOut = React.useCallback(() => {
     const next = Math.max(zoom / 1.5, minZoom);
     setZoom(next);
-    waveRef.current?.zoom(next);
-  };
+    wavesurferRef.current?.zoom(next);
+  }, [zoom, minZoom]);
 
-  // Playback
+  // ── Playback ──────────────────────────────────────────────────────────────
+  const togglePlay = React.useCallback(
+    () => wavesurferRef.current?.playPause(),
+    [],
+  );
 
-  const togglePlay = () => waveRef.current?.playPause();
+  const restart = React.useCallback(() => {
+    if (!wavesurferRef.current || !isReady) return;
+    wavesurferRef.current.setTime(0);
+    wavesurferRef.current.play();
+  }, [isReady]);
 
-  const restart = () => {
-    if (!waveRef.current || !isReady) return;
-    waveRef.current.setTime(0);
-    waveRef.current.play();
-  };
-
-  const handleVolume = (v: number[]) => {
+  const handleVolume = React.useCallback((v: number[]) => {
     const value = v[0];
     setVolume(value);
     setIsMuted(value === 0);
-    waveRef.current?.setVolume(value);
-  };
+    wavesurferRef.current?.setVolume(value);
+  }, []);
 
-  const toggleMute = () => {
-    if (!waveRef.current) return;
+  const toggleMute = React.useCallback(() => {
+    if (!wavesurferRef.current) return;
     const next = !isMuted;
     setIsMuted(next);
-    waveRef.current.setVolume(next ? 0 : volume);
-  };
+    wavesurferRef.current.setVolume(next ? 0 : volume);
+  }, [isMuted, volume]);
 
+  const handleSeek = React.useCallback(
+    ([v]: number[]) => {
+      if (!wavesurferRef.current || !isReady) return;
+      wavesurferRef.current.seekTo(v);
+    },
+    [isReady],
+  );
+
+  // ── Derived ───────────────────────────────────────────────────────────────
   const progress = duration > 0 ? currentTime / duration : 0;
 
-  // Render
-
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <Card className={cn("w-full", className)}>
       <CardContent className="p-4 space-y-3">
+
         {/* Title */}
         {title && (
-          <p className="text-sm font-medium text-foreground truncate">
-            {title}
-          </p>
+          <p className="text-sm font-medium text-foreground truncate">{title}</p>
         )}
 
         {/* Waveform + timeline */}
         <div className="relative w-full rounded-sm overflow-hidden border border-border">
-          {isLoading && (
+          {!isReady && (
             <div
               className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-[2px]"
               style={{ minHeight: waveHeight }}
@@ -271,8 +258,27 @@ export function AudioTimeline({
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             </div>
           )}
-          {/* WaveSurfer + TimelinePlugin mount here */}
-          <div ref={containerRef} className="w-full" />
+          <WavesurferPlayer
+            url={src}
+            waveColor={waveColor}
+            progressColor={progressColor}
+            height={waveHeight}
+            barWidth={barWidth}
+            barGap={barGap}
+            barRadius={barRadius}
+            minPxPerSec={defaultZoom}
+            fillParent
+            dragToSeek
+            hideScrollbar={false}
+            plugins={plugins}
+            onReady={handleReady}
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onFinish={handleFinish}
+            onTimeupdate={handleTimeupdate}
+            onSeeking={handleSeeking}
+            onDestroy={handleDestroy}
+          />
         </div>
 
         {/* Seek bar */}
@@ -287,10 +293,7 @@ export function AudioTimeline({
             max={1}
             step={0.001}
             disabled={!isReady}
-            onValueChange={([v]) => {
-              if (!waveRef.current || !isReady) return;
-              waveRef.current.seekTo(v);
-            }}
+            onValueChange={handleSeek}
           />
           <span className="text-[11px] tabular-nums text-muted-foreground w-10 shrink-0">
             {formatTime(duration)}
@@ -299,6 +302,7 @@ export function AudioTimeline({
 
         {/* Controls */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
+
           {/* Playback */}
           <div className="flex items-center gap-1.5">
             <Button
@@ -324,7 +328,7 @@ export function AudioTimeline({
           </div>
 
           {/* Zoom */}
-          <div className="flex items-center gap-2 flex-1 max-w-[200px]">
+          <div className="flex items-center gap-2 flex-1 max-w-50">
             <Button
               size="icon"
               variant="ghost"
@@ -376,10 +380,11 @@ export function AudioTimeline({
               aria-label="Volume"
             />
           </div>
+
         </div>
       </CardContent>
     </Card>
   );
 }
 
-export default AudioTimeline;
+export default WaveTimeline;
