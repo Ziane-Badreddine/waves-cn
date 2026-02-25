@@ -12,6 +12,10 @@ export default function WaveHero() {
       barRadius={1}
       className="  bottom-1/2 left-0 w-full px-4 md:px-6  "
       onInteraction={(ws) => ws.play()}
+      dragToSeek={true}
+      onFinish={(ws) => {
+        ws.setTime(0);
+      }}
     />
   );
 }
