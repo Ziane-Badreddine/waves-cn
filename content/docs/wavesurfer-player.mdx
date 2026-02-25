@@ -14,7 +14,7 @@ Use it when you want a **declarative** player and don't need to manage the waves
 ## Usage
 
 ```tsx
-import WavesurferPlayer from "@/registry/lib/wave-cn"
+import WavesurferPlayer from "@/lib/wave-cn"
 
 <WavesurferPlayer
   url="/audio/track.mp3"
@@ -31,7 +31,7 @@ Pass `onReady` to receive the live `WaveSurfer` instance and store it in a ref f
 
 ```tsx
 import { useRef, useCallback } from "react"
-import WavesurferPlayer from "@/registry/lib/wave-cn"
+import WavesurferPlayer from "@/lib/wave-cn"
 import type WaveSurfer from "wavesurfer.js"
 
 export function MyPlayer() {
@@ -59,7 +59,7 @@ Pass a **memoized** `plugins` array. The player compares array references — no
 
 ```tsx
 import { useMemo } from "react"
-import WavesurferPlayer from "@/registry/lib/wave-cn"
+import WavesurferPlayer from "@/lib/wave-cn"
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js"
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js"
 

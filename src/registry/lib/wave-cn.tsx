@@ -46,7 +46,10 @@ type PartialWavesurferOptions = Omit<WaveSurferOptions, "container">;
  * Props for the Wavesurfer component
  * @public
  */
-export type WavesurferProps = PartialWavesurferOptions & OnWavesurferEvents;
+export type WavesurferProps = PartialWavesurferOptions &
+  OnWavesurferEvents & {
+    className?: string;
+  };
 
 /**
  * Shared waveform defaults applied to every useWavesurfer instance.
@@ -60,6 +63,7 @@ export const WAVESURFER_DEFAULTS = {
   barGap: 2,
   barRadius: 2,
   minPxPerSec: 1,
+  cursorWidth: 0,
 } as const satisfies Partial<WaveSurferOptions>;
 
 /**
@@ -242,7 +246,8 @@ function useWavesurferEvents(
  */
 const WavesurferPlayer = memo((props: WavesurferProps): ReactElement => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [rawOptions, events] = useWavesurferProps(props);
+  const { className, ...propsWithoutClassName } = props;
+  const [rawOptions, events] = useWavesurferProps(propsWithoutClassName);
 
   // Apply WAVESURFER_DEFAULTS and resolve CSS var() tokens — same logic as
   // useWavesurfer — so WavesurferPlayer benefits from shared defaults too.
@@ -274,7 +279,7 @@ const WavesurferPlayer = memo((props: WavesurferProps): ReactElement => {
   useWavesurferEvents(wavesurfer, events);
 
   // Create a container div
-  return <div ref={containerRef} />;
+  return <div ref={containerRef} className={className} />;
 });
 
 /**
