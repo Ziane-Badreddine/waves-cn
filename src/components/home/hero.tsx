@@ -32,20 +32,13 @@ const icons = [
     name: "Lucide",
     color: "#f67373",
   },
-  {
-    icon: SiRadixui,
-    name: "Radix UI",
-    color: "#000000",
-  },
 ];
 
 export const Hero = () => (
   <section
-    className="relative isolate overflow-hidden rounded-4xl bg-background pt-8 sm:pt-12 md:pt-16 lg:pt-24"
+    className="md:h-screen relative  isolate overflow-hidden rounded-4xl bg-background pt-20 sm:pt-12 md:pt-32 lg:pt-32"
     style={{
       backgroundColor: "var(--background)",
-      backgroundImage:
-        "radial-gradient(at 81% 100%, var(--color-pink-300) 0px, transparent 50%), radial-gradient(at 19% 100%, var(--color-purple-300) 0px, transparent 50%)",
     }}
   >
     <div className="pointer-events-none absolute right-0 bottom-0 left-0 select-none border-background/15 border-t">
@@ -69,7 +62,7 @@ export const Hero = () => (
             />{" "}
             <span>shadcn/ui</span>
           </div>{" "}
-          components built with{" "}
+          components built with WaveSurfer.js and{" "}
           <div className="-space-x-2 -translate-y-1.5 md:-translate-y-2.5 inline-flex items-center justify-center">
             {icons.map((icon, index) => (
               <Tooltip key={icon.name}>
@@ -93,14 +86,17 @@ export const Hero = () => (
         </h1>
         <div className="mx-auto max-w-4xl text-center">
           <p className="mt-0 mb-0 text-muted-foreground lg:text-lg xl:text-xl 2xl:text-2xl">
-            Kibo UI is a custom registry of composable, accessible and
+            WavesCn is a custom registry of composable, accessible and
             extensible components designed for use with shadcn/ui. Free and open
             source, forever.
           </p>
         </div>
         <div className="flex items-center justify-center gap-4">
           <Button asChild size="lg">
-            <Link href="/components">Browse components</Link>
+            <Link href="/docs/components">Browse components</Link>
+          </Button>
+          <Button variant="secondary" asChild size="lg">
+            <Link href="/docs">Get started</Link>
           </Button>
         </div>
       </div>
