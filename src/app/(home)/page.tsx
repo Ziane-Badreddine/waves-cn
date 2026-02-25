@@ -5,7 +5,7 @@ import { Hero } from "@/components/home/hero";
 
 export default function HomePage() {
   return (
-    <div className="w-[95%] mx-auto">
+    <div className="w-full mx-auto">
       <Hero />
       <ComponentsExample />
       <ContributorsSection />

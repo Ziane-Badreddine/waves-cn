@@ -13,12 +13,12 @@ import WaveVideo from "@/registry/components/wave-video";
 import WaveZoom from "@/registry/components/wave-zoom";
 
 // ─── Source pages ─────────────────────────────────────────────────────────────
-const wavePlayer   = source.getPage(["components", "wave-player"]);
+const wavePlayer = source.getPage(["components", "wave-player"]);
 const waveRecorder = source.getPage(["components", "wave-recorder"]);
-const waveSpeed    = source.getPage(["components", "wave-speed"]);
+const waveSpeed = source.getPage(["components", "wave-speed"]);
 const waveTimeline = source.getPage(["components", "wave-timeline"]);
-const waveVideo    = source.getPage(["components", "wave-video"]);
-const waveZoom     = source.getPage(["components", "wave-zoom"]);
+const waveVideo = source.getPage(["components", "wave-video"]);
+const waveZoom = source.getPage(["components", "wave-zoom"]);
 
 // ─── Demo audio / video ───────────────────────────────────────────────────────
 const DEMO_AUDIO = "/coastline.mp3";
@@ -30,49 +30,37 @@ const examples = [
     icon: wavePlayer?.data.icon,
     name: wavePlayer?.data.title,
     description: wavePlayer?.data.description,
-    component: () => (
-      <WavePlayer src={DEMO_AUDIO} title="Demo Track" />
-    ),
+    component: () => <WavePlayer src={DEMO_AUDIO} title="Demo Track" />,
   },
   {
     icon: waveRecorder?.data.icon,
     name: waveRecorder?.data.title,
     description: waveRecorder?.data.description,
-    component: () => (
-      <WaveRecorder />
-    ),
+    component: () => <WaveRecorder />,
   },
   {
     icon: waveSpeed?.data.icon,
     name: waveSpeed?.data.title,
     description: waveSpeed?.data.description,
-    component: () => (
-      <WaveSpeed url={DEMO_AUDIO} />
-    ),
+    component: () => <WaveSpeed url={DEMO_AUDIO} />,
   },
   {
     icon: waveTimeline?.data.icon,
     name: waveTimeline?.data.title,
     description: waveTimeline?.data.description,
-    component: () => (
-      <WaveTimeline src={DEMO_AUDIO} title="Demo Track" />
-    ),
+    component: () => <WaveTimeline src={DEMO_AUDIO} title="Demo Track" />,
   },
   {
     icon: waveVideo?.data.icon,
     name: waveVideo?.data.title,
     description: waveVideo?.data.description,
-    component: () => (
-      <WaveVideo url={DEMO_VIDEO} />
-    ),
+    component: () => <WaveVideo url={DEMO_VIDEO} />,
   },
   {
     icon: waveZoom?.data.icon,
     name: waveZoom?.data.title,
     description: waveZoom?.data.description,
-    component: () => (
-      <WaveZoom url={DEMO_AUDIO} />
-    ),
+    component: () => <WaveZoom url={DEMO_AUDIO} />,
   },
 ];
 
@@ -121,7 +109,7 @@ const ExampleCard = ({
 
 // ─── Components ───────────────────────────────────────────────────────────────
 export const ComponentsExample = () => (
-  <div className="container mx-2 md:mx-auto grid gap-8 md:mt-0 mt-20">
+  <div className="px-4 md:px-6 mx-2 md:mx-auto grid gap-8 md:mt-0 mt-20">
     <div className="flex w-full flex-col items-start justify-between gap-4 md:flex-row">
       <div className="grid gap-4">
         <h2 className="max-w-lg font-semibold text-3xl text-start">

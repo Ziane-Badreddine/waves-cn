@@ -249,20 +249,20 @@ export function WaveRecorder({
             showWaveform && isActive ? { height: waveformHeight } : undefined
           }
         />
-
-        {showTimer && isActive && (
-          <p
-            className={cn(
-              "text-base tabular-nums text-muted-foreground shrink-0",
-              timerClassName,
-            )}
-          >
-            {formatDuration(duration)}
-          </p>
-        )}
       </div>
 
       {/* Controls */}
+
+      {showTimer && isActive && (
+        <p
+          className={cn(
+            "text-base tabular-nums text-muted-foreground shrink-0 text-center",
+            timerClassName,
+          )}
+        >
+          {formatDuration(duration)}
+        </p>
+      )}
       <div
         className={cn(
           "flex items-center gap-2 justify-center",

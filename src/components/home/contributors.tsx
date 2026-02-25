@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Github, Heart } from "lucide-react"
-import Link from "next/link"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Github, Heart } from "lucide-react";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const contributors = [
   {
@@ -20,11 +20,11 @@ const contributors = [
     avatar: "https://github.com/MouadSadik.png",
     url: "https://github.com/MouadSadik",
   },
-]
+];
 
 export function ContributorsSection() {
   return (
-    <section className="relative py-24 px-6 lg:px-8">
+    <section className="relative py-24 px-4 md:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl text-center space-y-6">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -86,23 +86,24 @@ export function ContributorsSection() {
           transition={{ delay: 0.3 }}
           className="mt-16 space-y-6"
         >
-          <div className="text-xl font-semibold">
-            Want to contribute?
-          </div>
+          <div className="text-xl font-semibold">Want to contribute?</div>
 
           <p className="text-muted-foreground max-w-xl mx-auto">
             Help us improve components, fix bugs, add new features, or enhance
             documentation. Every contribution matters.
           </p>
 
-          <Link href="https://github.com/Ziane-Badreddine/waves-cn" target="_blank">
+          <Link
+            href="https://github.com/Ziane-Badreddine/waves-cn"
+            target="_blank"
+          >
             <Button size="lg" className="rounded-2xl">
-              <Heart className="mr-2 h-5 w-5" />
+              <Heart className="size-5" />
               Become a Contributor
             </Button>
           </Link>
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
