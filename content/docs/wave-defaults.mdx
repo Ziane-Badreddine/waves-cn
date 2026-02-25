@@ -8,7 +8,7 @@ description: Shared default options applied automatically to every WavesurferPla
 `WAVESURFER_DEFAULTS` is a single exported constant that centralises the base configuration for every waveform in the package. Both `WavesurferPlayer` and `useWavesurfer` merge these defaults before creating the wavesurfer.js instance — so you never repeat `height`, `barWidth`, etc. in every component.
 
 ```ts
-import { WAVESURFER_DEFAULTS } from "@/registry/lib/wave-cn"
+import { WAVESURFER_DEFAULTS } from "@/lib/wave-cn"
 ```
 
 ## Values
@@ -43,7 +43,7 @@ useWavesurfer({ container, url, height: undefined }) // → 64
 You can import `WAVESURFER_DEFAULTS` to build consistent custom components without hardcoding values:
 
 ```tsx
-import { WAVESURFER_DEFAULTS } from "@/registry/lib/wave-cn"
+import { WAVESURFER_DEFAULTS } from "@/lib/wave-cn"
 
 // Read a single value
 const defaultHeight = WAVESURFER_DEFAULTS.height // 64

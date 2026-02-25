@@ -310,4 +310,43 @@ export const Index: Record<string, any> = {
     subcategory: "zoom",
     chunks: [],
   },
+
+  "wave-video": {
+    name: "wave-video",
+    description: "Waveform player synced to a video element",
+    type: "registry:component",
+    files: ["src/registry/components/wave-video.tsx"],
+    component: React.lazy(() => import("@/registry/components/wave-video")),
+    category: "wave",
+    subcategory: "video",
+    chunks: [],
+  },
+
+  // 🎬 VIDEO DEMO
+  "wave-video-demo": {
+    name: "wave-video-demo",
+    description: "Wave video demo",
+    type: "registry:example",
+    files: ["src/registry/examples/wave-video/wave-video-demo.tsx"],
+    component: React.lazy(
+      () => import("@/registry/examples/wave-video/wave-video-demo"),
+    ),
+    category: "wave",
+    subcategory: "video",
+    chunks: [],
+  },
+
+  // 🎨 VIDEO CUSTOM WAVE
+  "wave-video-custom-wave": {
+    name: "wave-video-custom-wave",
+    description: "Wave video with custom waveform colors",
+    type: "registry:example",
+    files: ["src/registry/examples/wave-video/wave-video-custom-wave.tsx"],
+    component: React.lazy(
+      () => import("@/registry/examples/wave-video/wave-video-custom-wave"),
+    ),
+    category: "wave",
+    subcategory: "video",
+    chunks: [],
+  },
 };

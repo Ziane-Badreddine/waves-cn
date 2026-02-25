@@ -11,7 +11,7 @@ description: The primary React hook for wavesurfer.js. Wraps instance creation, 
 
 ```tsx
 import { useRef } from "react"
-import { useWavesurfer } from "@/registry/lib/wave-cn"
+import { useWavesurfer } from "@/lib/wave-cn"
 
 export function MyPlayer() {
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -51,7 +51,7 @@ Always memoize the `plugins` array — the hook uses array reference equality to
 
 ```tsx
 import { useMemo } from "react"
-import { useWavesurfer } from "@/registry/lib/wave-cn"
+import { useWavesurfer } from "@/lib/wave-cn"
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js"
 
 const plugins = useMemo(
@@ -66,7 +66,7 @@ For plugins that require the instance to already exist, register them in a `useE
 
 ```tsx
 import { useEffect } from "react"
-import { useWavesurfer } from "@/registry/lib/wave-cn"
+import { useWavesurfer } from "@/lib/wave-cn"
 import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js"
 
 const { wavesurfer } = useWavesurfer({ container, url: "" })

@@ -22,7 +22,7 @@ Pass a **memoized** array to the `plugins` prop. The player and hook use array r
 
 ```tsx
 import { useMemo } from "react"
-import WavesurferPlayer from "@/registry/lib/wave-cn"
+import WavesurferPlayer from "@/lib/wave-cn"
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js"
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js"
 
@@ -41,7 +41,7 @@ export function MyPlayer() {
 
 ```tsx
 import { useRef, useMemo } from "react"
-import { useWavesurfer } from "@/registry/lib/wave-cn"
+import { useWavesurfer } from "@/lib/wave-cn"
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js"
 
 export function MyPlayer() {
@@ -74,7 +74,7 @@ Some plugins like `RecordPlugin` need to be registered after the instance is rea
 ### With `WavesurferPlayer`
 
 ```tsx
-import WavesurferPlayer from "@/registry/lib/wave-cn"
+import WavesurferPlayer from "@/lib/wave-cn"
 import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js"
 
 <WavesurferPlayer
@@ -91,7 +91,7 @@ import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js"
 
 ```tsx
 import { useRef, useEffect } from "react"
-import { useWavesurfer } from "@/registry/lib/wave-cn"
+import { useWavesurfer } from "@/lib/wave-cn"
 import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js"
 
 export function MyRecorder() {

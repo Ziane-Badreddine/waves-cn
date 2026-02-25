@@ -89,12 +89,15 @@ export function ComponentPreview({
   return (
     <div
       className={cn(
-        "group relative my-4 flex flex-col space-y-2 not-prose min-h-96 ",
+        "group relative my-4 flex flex-col space-y-2 not-prose  ",
         className,
       )}
       {...props}
     >
-      <Tabs defaultValue="preview" className="relative w-full size-full gap-0 ">
+      <Tabs
+        defaultValue="preview"
+        className="relative w-full size-full gap-0  "
+      >
         <div className="flex items-center justify-between">
           {!hideCode && codeString && (
             <TabsList>
@@ -137,7 +140,7 @@ export function ComponentPreview({
 
         {/* CODE */}
         {codeString && (
-          <TabsContent value="code" className="pb-0">
+          <TabsContent value="code" className="pb-0 ">
             <DynamicCodeBlock lang="tsx" code={codeString} />
           </TabsContent>
         )}

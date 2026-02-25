@@ -1,0 +1,147 @@
+---
+title: Wave Video
+description: A waveform player synced to a video element, built on wavesurfer.js.
+---
+
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+import { Steps, Step } from "@/components/steps"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+
+<ComponentPreviewWrapper name="wave-video-demo" />
+
+## Installation
+
+<Tabs defaultValue="cli">
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+npm install wavesurfer.js
+```
+
+</TabsContent>
+<TabsContent value="manual">
+
+<Steps>
+
+<Step>
+
+Install the peer dependency.
+
+```bash
+npm install wavesurfer.js
+```
+
+</Step>
+
+<Step>
+
+Copy `wave-cn.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-cn" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Copy `wave-video.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-video" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Update the import paths to match your project setup.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+</Tabs>
+
+## Features
+
+- **Synced waveform** — wavesurfer.js uses the `<video>` element as its media source via the `media` prop, so the waveform progress always stays in sync with the video.
+- **Callback ref pattern** — the waveform mounts only after the `<video>` element is in the DOM, eliminating any null reference race condition.
+- **Drag to seek** — click or drag on the waveform to seek the video.
+- **Custom waveform styling** — `waveColor`, `progressColor`, `barWidth`, `barGap`, `barRadius` accept any CSS value including `var(--*)` tokens.
+- **Granular class control** — separate `className` props for the root, video element, waveform container, and canvas wrapper.
+- **Video element passthrough** — `videoProps` forwards any native `<video>` attribute (`poster`, `loop`, `muted`, etc.) without wrapping.
+
+## Usage
+
+```tsx
+import { WaveVideo } from "@/registry/components/wave-video"
+```
+
+```tsx
+<WaveVideo url="/video/track.mp4" />
+```
+
+## How the sync works
+
+`WaveVideo` passes the mounted `<video>` element directly to `WavesurferPlayer` via the `media` prop. wavesurfer.js then uses it as its audio/video source instead of fetching a URL — so both the native video controls and the waveform share the exact same `HTMLVideoElement`:
+
+```tsx
+// Simplified internals
+<video ref={videoCallbackRef} src={url} />
+
+<WavesurferPlayer
+  url=""         // ignored when media is provided
+  media={videoEl}  // ← the live <video> element
+  onReady={(ws) => { wavesurferRef.current = ws }}
+/>
+```
+
+> **`url=""` is required** by the type but ignored at runtime when `media` is set. This is the same pattern used by `WaveRecorder`.
+
+## Examples
+
+### Custom Waveform
+
+`waveColor` and `progressColor` accept any CSS value including `var(--*)` tokens.
+
+<ComponentPreviewWrapper name="wave-video-custom-wave" />
+
+
+### With Video Poster & Loop
+
+Use `videoProps` to pass any native `<video>` attribute.
+
+```tsx
+<WaveVideo
+  url="/video/track.mp4"
+  videoProps={{
+    poster: "/video/thumbnail.jpg",
+    loop: true,
+    muted: true,
+  }}
+/>
+```
+
+## API Reference
+
+### WaveVideo
+
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `url` | `string` | — | Video file URL. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Wave bar color. Accepts CSS vars, hex, hsl, oklch. |
+| `progressColor` | `string` | `var(--primary)` | Progress bar color. Same formats as `waveColor`. |
+| `waveHeight` | `number` | `64` | Wave canvas height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Bar border radius in px. |
+| `showVideo` | `boolean` | `true` | Show the native `<video>` element. |
+| `className` | `string` | — | Root wrapper class. |
+| `style` | `CSSProperties` | — | Root wrapper inline style. |
+| `videoClassName` | `string` | — | Class applied to the `<video>` element. |
+| `videoStyle` | `CSSProperties` | — | Inline style applied to the `<video>` element. |
+| `waveformClassName` | `string` | — | Class applied to the waveform + controls container. |
+| `waveClassName` | `string` | — | Class applied to the WavesurferPlayer canvas wrapper. |
+| `videoProps` | `VideoHTMLAttributes` | — | Extra props forwarded to `<video>` (`poster`, `loop`, `muted`, etc.). `src`, `ref`, `controls`, `playsInline` are managed internally. |
