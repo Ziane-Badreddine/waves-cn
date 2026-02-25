@@ -66,9 +66,17 @@ export function ComponentPreview({
   if (variant === "preview") {
     return (
       <div
-        className={cn("my-4 flex items-center justify-center p-4", className)}
+        className={cn(
+          "my-4 flex items-center justify-center p-4",
+          "relative flex size-full flex-col items-center justify-center gap-4 overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)]",
+          className,
+        )}
         {...props}
       >
+        <div className="-translate-y-px absolute top-8 right-0 left-0 border border-primary  border-dashed" />
+        <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-primary border-dashed" />
+        <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-primary border-dashed" />
+        <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-primary border-dashed" />
         <React.Suspense
           fallback={
             <div className="flex items-center text-sm text-muted-foreground">
@@ -90,6 +98,7 @@ export function ComponentPreview({
     <div
       className={cn(
         "group relative my-4 flex flex-col space-y-2 not-prose  ",
+
         className,
       )}
       {...props}

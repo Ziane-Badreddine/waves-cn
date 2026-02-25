@@ -30,37 +30,55 @@ const examples = [
     icon: wavePlayer?.data.icon,
     name: wavePlayer?.data.title,
     description: wavePlayer?.data.description,
-    component: () => <WavePlayer src={DEMO_AUDIO} title="Demo Track" />,
+    component: () => (
+      <WavePlayer
+        src={DEMO_AUDIO}
+        title="Demo Track"
+        className="px-6 pb-6 my-auto"
+      />
+    ),
   },
   {
     icon: waveRecorder?.data.icon,
     name: waveRecorder?.data.title,
     description: waveRecorder?.data.description,
-    component: () => <WaveRecorder />,
+    component: () => <WaveRecorder className="px-6 pb-6 my-auto" />,
   },
   {
     icon: waveSpeed?.data.icon,
     name: waveSpeed?.data.title,
     description: waveSpeed?.data.description,
-    component: () => <WaveSpeed url={DEMO_AUDIO} />,
+    component: () => (
+      <WaveSpeed url={DEMO_AUDIO} className="px-6 pb-6 my-auto" />
+    ),
   },
   {
     icon: waveTimeline?.data.icon,
     name: waveTimeline?.data.title,
     description: waveTimeline?.data.description,
-    component: () => <WaveTimeline src={DEMO_AUDIO} title="Demo Track" />,
+    component: () => (
+      <WaveTimeline
+        src={DEMO_AUDIO}
+        title="Demo Track"
+        className="px-6 pb-6 my-auto"
+      />
+    ),
   },
   {
     icon: waveVideo?.data.icon,
     name: waveVideo?.data.title,
     description: waveVideo?.data.description,
-    component: () => <WaveVideo url={DEMO_VIDEO} />,
+    component: () => (
+      <WaveVideo url={DEMO_VIDEO} className="px-6 pb-6 my-auto" />
+    ),
   },
   {
     icon: waveZoom?.data.icon,
     name: waveZoom?.data.title,
     description: waveZoom?.data.description,
-    component: () => <WaveZoom url={DEMO_AUDIO} />,
+    component: () => (
+      <WaveZoom url={DEMO_AUDIO} className="px-6 pb-6 my-auto" />
+    ),
   },
 ];
 
@@ -87,11 +105,16 @@ const ExampleCard = ({
   return (
     <div
       className={cn(
-        "flex h-full flex-col gap-8 rounded-lg bg-secondary p-4 sm:p-8",
+        "flex h-full flex-col gap-8  bg-card p-4 sm:p-8",
+        "relative flex size-full flex-col items-center gap-4 overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)] bg-card",
         className,
       )}
     >
-      <div className="grid gap-4">
+      <div className="-translate-y-px absolute top-8 right-0 left-0 border border-primary  border-dashed" />
+      <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-primary border-dashed" />
+      <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-primary border-dashed" />
+      <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-primary border-dashed" />
+      <div className="grid gap-2 px-6 pt-6">
         <div className="flex items-center gap-2">
           {Icon && <Icon className="text-muted-foreground" size={16} />}
           {name && <p className="font-medium">{name}</p>}
@@ -100,9 +123,7 @@ const ExampleCard = ({
           <p className="text-balance text-muted-foreground">{description}</p>
         )}
       </div>
-      <div className="text-left">
-        <Component />
-      </div>
+      <Component />
     </div>
   );
 };
@@ -115,7 +136,7 @@ export const ComponentsExample = () => (
         <h2 className="max-w-lg font-semibold text-3xl text-start">
           Waveform components for every use case
         </h2>
-        <p className="max-w-lg text-balance text-lg text-muted-foreground text-start">
+        <p className="max-w-xl text-balance text-lg text-muted-foreground text-start">
           waves-cn components are built on wavesurfer.js and shadcn/ui — copy
           them into your project and own them completely.
         </p>

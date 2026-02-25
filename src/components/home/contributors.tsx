@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Github, Heart } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { cn } from "@/lib/utils";
+import { SiGithub } from "react-icons/si";
 
 const contributors = [
   {
@@ -30,6 +32,7 @@ export function ContributorsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
           className="text-3xl md:text-4xl font-bold tracking-tight"
         >
           Built by the Community
@@ -48,33 +51,34 @@ export function ContributorsSection() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className={cn(
+                "my-4 flex items-center justify-center p-4",
+                "relative flex size-full flex-col items-center justify-center gap-4 overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)] bg-card",
+              )}
             >
-              <Card className="hover:shadow-xl transition-all duration-300 border">
-                <CardContent className="p-6 flex flex-col items-center space-y-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src={contributor.avatar} />
-                    <AvatarFallback>
-                      {contributor.name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
+              <div className="-translate-y-px absolute top-8 right-0 left-0 border border-primary  border-dashed" />
+              <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-primary border-dashed" />
+              <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-primary border-dashed" />
+              <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-primary border-dashed" />
+              <Avatar className="size-20 mt-6">
+                <AvatarImage src={contributor.avatar} />
+                <AvatarFallback>{contributor.name.charAt(0)}</AvatarFallback>
+              </Avatar>
 
-                  <div className="text-center">
-                    <h3 className="font-semibold text-lg">
-                      {contributor.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      @{contributor.username}
-                    </p>
-                  </div>
+              <div className="text-center">
+                <h3 className="font-semibold text-lg">{contributor.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  @{contributor.username}
+                </p>
+              </div>
 
-                  <Link href={contributor.url} target="_blank">
-                    <Button variant="outline" size="sm">
-                      <Github className="mr-2 h-4 w-4" />
-                      GitHub
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+              <Link href={contributor.url} target="_blank" className="mb-6">
+                <Button variant="outline" size="sm">
+                  <SiGithub className="size-4" />
+                  GitHub
+                </Button>
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -85,6 +89,7 @@ export function ContributorsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="mt-16 space-y-6"
+          viewport={{ once: true }}
         >
           <div className="text-xl font-semibold">Want to contribute?</div>
 
@@ -97,9 +102,13 @@ export function ContributorsSection() {
             href="https://github.com/Ziane-Badreddine/waves-cn"
             target="_blank"
           >
-            <Button size="lg" className="rounded-2xl">
-              <Heart className="size-5" />
-              Become a Contributor
+            <Button className="relative text-sm font-medium rounded-full h-12 p-1 ps-6 pe-14 group transition-all duration-500 hover:ps-14 hover:pe-6 w-fit overflow-hidden cursor-pointer">
+              <span className="relative z-10 transition-all duration-500">
+                Become a Contributor
+              </span>
+              <div className="absolute right-1 w-10 h-10 bg-background text-foreground rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-[calc(100%-44px)] group-hover:rotate-45">
+                <Heart className="size-5" />
+              </div>
             </Button>
           </Link>
         </motion.div>

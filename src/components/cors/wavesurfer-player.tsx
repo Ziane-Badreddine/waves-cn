@@ -28,6 +28,8 @@ import WaveSurfer, {
   type WaveSurferEvents,
   type WaveSurferOptions,
 } from "wavesurfer.js";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useCssVar } from "@/hooks/use-css-var";
 
 type WavesurferEventHandler<T extends unknown[]> = (
   wavesurfer: WaveSurfer,
@@ -46,7 +48,11 @@ type PartialWavesurferOptions = Omit<WaveSurferOptions, "container">;
  * Props for the Wavesurfer component
  * @public
  */
-export type WavesurferProps = PartialWavesurferOptions & OnWavesurferEvents;
+export type WavesurferProps = PartialWavesurferOptions &
+  OnWavesurferEvents & {
+    /** Class applied to the waveform container div */
+    className?: string;
+  };
 
 /**
  * Shared waveform defaults applied to every useWavesurfer instance.
@@ -242,12 +248,73 @@ function useWavesurferEvents(
  */
 const WavesurferPlayer = memo((props: WavesurferProps): ReactElement => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [options, events] = useWavesurferProps(props);
+  // Extract className before passing props to useWavesurferProps so it
+  // never leaks into WaveSurferOptions (which has no className field).
+  const { className, ...propsWithoutClassName } = props;
+  const [rawOptions, events] = useWavesurferProps(propsWithoutClassName);
+
+  // Apply WAVESURFER_DEFAULTS and resolve CSS var() tokens — same logic as
+  // useWavesurfer — so WavesurferPlayer benefits from shared defaults too.
+  const waveColor =
+    (rawOptions.waveColor as string | undefined) ??
+    WAVESURFER_DEFAULTS.waveColor;
+  const progressColor =
+    (rawOptions.progressColor as string | undefined) ??
+    WAVESURFER_DEFAULTS.progressColor;
+  const resolvedWaveColor = useCssVar(waveColor);
+  const resolvedProgressColor = useCssVar(progressColor);
+
+  const options = useMemo(() => {
+    const { waveColor: _wc, progressColor: _pc, ...rest } = rawOptions;
+    const cleanOptions = Object.fromEntries(
+      Object.entries(rest).filter(([, v]) => v !== undefined),
+    ) as PartialWavesurferOptions;
+
+    return {
+      ...WAVESURFER_DEFAULTS,
+      ...cleanOptions,
+      waveColor: resolvedWaveColor,
+      progressColor: resolvedProgressColor,
+    } as PartialWavesurferOptions;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedWaveColor, resolvedProgressColor, ...Object.values(rawOptions)]);
+
   const wavesurfer = useWavesurferInstance(containerRef, options);
   useWavesurferEvents(wavesurfer, events);
 
-  // Create a container div
-  return <div ref={containerRef} />;
+  // Track ready state locally to show skeleton while waveform is loading
+  const [isReady, setIsReady] = useState(false);
+  useEffect(() => {
+    if (!wavesurfer) return;
+    const unsubs = [
+      wavesurfer.on("ready", () => setIsReady(true)),
+      wavesurfer.on("load", () => setIsReady(false)),
+      wavesurfer.on("destroy", () => setIsReady(false)),
+    ];
+    return () => unsubs.forEach((fn) => fn());
+  }, [wavesurfer]);
+
+  const height =
+    (rawOptions.height as number | undefined) ?? WAVESURFER_DEFAULTS.height;
+
+  return (
+    <div className={className} style={{ position: "relative" }}>
+      {/* Skeleton shown while waveform is decoding / loading */}
+      {!isReady && (
+        <Skeleton
+          style={{
+            height,
+            width: "100%",
+            position: "absolute",
+            inset: 0,
+            borderRadius: 4,
+          }}
+        />
+      )}
+      {/* Canvas container — hidden until ready to avoid flash of empty canvas */}
+      <div ref={containerRef} style={!isReady ? { opacity: 0 } : undefined} />
+    </div>
+  );
 });
 
 /**
@@ -315,27 +382,4 @@ export function useWavesurfer({
   const wavesurfer = useWavesurferInstance(container, mergedOptions);
   const state = useWavesurferState(wavesurfer);
   return useMemo(() => ({ ...state, wavesurfer }), [state, wavesurfer]);
-}
-
-export function useCssVar(value: string): string {
-  const [resolved, setResolved] = useState(value);
-
-  useEffect(() => {
-    // Only resolve if the value looks like a CSS variable
-    const match = value.match(/^var\((--[^)]+)\)$/);
-    if (!match) {
-      setResolved(value);
-      return;
-    }
-    const varName = match[1];
-    const raw = getComputedStyle(document.documentElement)
-      .getPropertyValue(varName)
-      .trim();
-    // shadcn stores values as bare HSL channels e.g. "222.2 47.4% 11.2%"
-    // Canvas needs a full color string — wrap in hsl() if needed
-    const isHslChannels = /^[\d.]+ [\d.]+% [\d.]+%$/.test(raw);
-    setResolved(raw ? (isHslChannels ? `hsl(${raw})` : raw) : value);
-  }, [value]);
-
-  return resolved;
 }

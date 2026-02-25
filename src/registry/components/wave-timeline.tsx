@@ -94,6 +94,7 @@ export function WaveTimeline({
   // whether to recreate the instance, so this must not change on every render.
 
   const plugins = React.useMemo(() => {
+    if (typeof window === "undefined") return [];
     const list: InstanceType<typeof TimelinePlugin>[] = [];
 
     if (topTimeline !== false) {
@@ -132,7 +133,7 @@ export function WaveTimeline({
     return list;
   }, [JSON.stringify(topTimeline), JSON.stringify(bottomTimeline)]);
 
-  // ── Event handlers 
+  // ── Event handlers
   const handleReady = React.useCallback(
     (ws: WaveSurfer) => {
       wavesurferRef.current = ws;
@@ -242,10 +243,11 @@ export function WaveTimeline({
   return (
     <Card className={cn("w-full", className)}>
       <CardContent className="p-4 space-y-3">
-
         {/* Title */}
         {title && (
-          <p className="text-sm font-medium text-foreground truncate">{title}</p>
+          <p className="text-sm font-medium text-foreground truncate">
+            {title}
+          </p>
         )}
 
         {/* Waveform + timeline */}
@@ -302,7 +304,6 @@ export function WaveTimeline({
 
         {/* Controls */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
-
           {/* Playback */}
           <div className="flex items-center gap-1.5">
             <Button
@@ -380,7 +381,6 @@ export function WaveTimeline({
               aria-label="Volume"
             />
           </div>
-
         </div>
       </CardContent>
     </Card>

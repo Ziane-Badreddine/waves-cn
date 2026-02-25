@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { ChevronDown, Github, Library } from "lucide-react";
 import Link from "next/link";
@@ -12,6 +14,10 @@ import {
   SiShadcnui,
 } from "@icons-pack/react-simple-icons";
 import { ComponentPreviewWrapper } from "../component-preview-wrapper";
+import { SiGithub } from "react-icons/si";
+import { GiWaveSurfer } from "react-icons/gi";
+import WavesurferPlayer from "../cors/wavesurfer-player";
+import WaveHero from "./wave-hero";
 
 const icons = [
   {
@@ -39,17 +45,25 @@ const icons = [
     name: "Shadcn UI",
     color: "#000000",
   },
+  {
+    icon: GiWaveSurfer,
+    name: "WaveSurfer",
+    color: "#7F00FF",
+  },
 ];
 
 export function Hero() {
   return (
-    <section className="relative px-4 md:px-6 md:mb-40 grid grid-cols-1 items-center justify-center gap-8 xl:h-[max(650px,min(800px,calc(75vh)))] xl:grid-cols-2 xl:flex-row">
-      <aside className="my-16 flex flex-col items-center self-center xl:my-24 xl:-mr-10 xl:ml-10 xl:flex-1 xl:items-start">
-        <h1 className="text-6xl md:text-8xl">@waves/cn</h1>
-        <p className="my-8 text-center text-2xl md:text-3xl xl:text-left">
-          A collection of waveform components
+    <section className="relative isolate overflow-hidden rounded-4xl bg-background py-8 sm:py-12 md:py-16 lg:py-24">
+      <aside className="my-16 relative text-center justify-center flex flex-col items-center self-center  xl:flex-1 ">
+        <WaveHero />
+        <p className="my-8 text-center text-2xl md:text-3xl ">
+          <span className="font-semibold">@waves/cn</span> a collection of
+          waveform components
           <br />
-          built with wavesurfer.js and shadcn/ui.
+          built with <span className="font-semibold">
+            wavesurfer.js
+          </span> and <span className="font-semibold">shadcn/ui.</span>
         </p>
         <nav className="flex flex-wrap gap-4">
           <Link
@@ -61,7 +75,7 @@ export function Hero() {
               "text-md w-full rounded-full sm:w-auto",
             )}
           >
-            <Library className="mr-2 inline-block" size={20} />
+            <Library className=" inline-block" size={20} />
             Documentation
           </Link>
           <a
@@ -74,7 +88,7 @@ export function Hero() {
               "text-md w-full rounded-full sm:w-auto",
             )}
           >
-            <Github className="mr-2 -ml-1 inline-block" size={20} />
+            <SiGithub className=" -ml-1 inline-block" size={20} />
             GitHub
           </a>
         </nav>
@@ -83,7 +97,7 @@ export function Hero() {
             <Tooltip key={icon.name}>
               <TooltipTrigger asChild>
                 <div
-                  className="inline-flex size-8 items-center justify-center rounded-full text-white sm:size-10 md:size-12 lg:size-12"
+                  className="inline-flex size-14 items-center justify-center rounded-full text-white border border-primary "
                   style={{
                     backgroundColor: icon.color,
                     maskImage: index
@@ -91,7 +105,7 @@ export function Hero() {
                       : "none",
                   }}
                 >
-                  <icon.icon className="size-3 sm:size-4 md:size-5 lg:size-6" />
+                  <icon.icon className="size-6 lg:size-7" />
                 </div>
               </TooltipTrigger>
               <TooltipContent>{icon.name}</TooltipContent>
@@ -99,19 +113,22 @@ export function Hero() {
           ))}
         </div>
       </aside>
-      <aside className="relative xl:my-auto xl:flex-1 xl:pt-4">
+      {/* <aside className="relative xl:my-auto xl:flex-1 xl:pt-4">
         <div className="absolute -z-1 inset-0 bg-[radial-gradient(ellipse_at_90%_30%,var(--primary),transparent_25%)] blur-3xl" />
 
         <div className="absolute -z-1 inset-0 bg-[radial-gradient(ellipse_at_10%_70%,var(--primary),transparent_10%)] blur-3xl" />
 
         <ComponentPreviewWrapper name="wave-video-demo" variant="preview" />
-      </aside>
+      </aside> */}
+
       <div
-        className="absolute right-0 -bottom-12 left-0 hidden h-12 items-center justify-center xl:flex"
+        className="animate-bounce right-0 -bottom-12 left-0 hidden h-12 items-center justify-center xl:flex"
         aria-hidden
       >
         <ChevronDown />
       </div>
+
+      <div className="absolute -z-1 inset-0 bg-[radial-gradient(ellipse_at_10%_70%,var(--primary),transparent_10%)] blur-3xl" />
     </section>
   );
 }
