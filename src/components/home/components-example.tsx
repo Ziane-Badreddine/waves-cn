@@ -121,7 +121,7 @@ const ExampleCard = ({
 
 // ─── Components ───────────────────────────────────────────────────────────────
 export const ComponentsExample = () => (
-  <div className="container mx-2 md:mx-auto grid gap-8 md:mt-0 mt-40">
+  <div className="container mx-2 md:mx-auto grid gap-8 md:mt-0 mt-20">
     <div className="flex w-full flex-col items-start justify-between gap-4 md:flex-row">
       <div className="grid gap-4">
         <h2 className="max-w-lg font-semibold text-3xl text-start">

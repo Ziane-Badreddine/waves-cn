@@ -1,15 +1,19 @@
+import { cn } from '@/lib/utils'
+import { ChevronDown, Github, Library } from 'lucide-react'
+import Link from 'next/link'
+import WaveVideo from '@/registry/components/wave-video'
+import { buttonVariants } from '../ui/button'
+import { WorksWith } from './works-with'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
+
 import {
   SiLucide,
-  SiRadixui,
   SiReact,
   SiTailwindcss,
   SiTypescript,
+  SiShadcnui
 } from "@icons-pack/react-simple-icons";
-
-import Image from "next/image";
-import Link from "next/link";
-import { Tooltip, TooltipContent, TooltipTrigger,  } from "../ui/tooltip";
-import { Button } from "../ui/button";
+import { ComponentPreviewWrapper } from '../component-preview-wrapper'
 
 const icons = [
   {
@@ -32,43 +36,58 @@ const icons = [
     name: "Lucide",
     color: "#f67373",
   },
+  {
+    icon: SiShadcnui,
+    name: "Shadcn UI",
+    color: "#000000",
+  },
 ];
 
-export const Hero = () => (
-  <section
-    className="md:h-screen relative  isolate overflow-hidden rounded-4xl bg-background pt-20 sm:pt-12 md:pt-32 lg:pt-32"
-    style={{
-      backgroundColor: "var(--background)",
-    }}
-  >
-    <div className="pointer-events-none absolute right-0 bottom-0 left-0 select-none border-background/15 border-t">
-      <div className="grid grid-cols-24 divide-x divide-y divide-background/15">
-        {new Array(24 * 12).fill(0).map((_, index) => (
-          <div className="aspect-square w-full" key={index} />
-        ))}
-      </div>
-    </div>
-    <div className="container relative z-10 grid gap-8 sm:gap-12 md:gap-16">
-      <div className="mx-auto flex flex-col justify-center gap-6 text-balance">
-        <h1 className="mb-0 text-balance text-center font-semibold text-4xl tracking-[-0.06em]! sm:text-5xl md:text-6xl xl:text-7xl">
-          High quality{" "}
-          <div className="ml-2 inline-flex items-center justify-center gap-2 align-bottom">
-            <Image
-              alt="shadcn/ui"
-              className="size-8 overflow-hidden rounded-full sm:size-10 md:size-12 lg:size-14"
-              height={56}
-              src="/shadcn.jpg"
-              width={56}
-            />{" "}
-            <span>shadcn/ui</span>
-          </div>{" "}
-          components built with WaveSurfer.js and{" "}
-          <div className="-space-x-2 -translate-y-1.5 md:-translate-y-2.5 inline-flex items-center justify-center">
+export function Hero() {
+  return (
+    <section className="relative container md:mb-40 grid grid-cols-1 items-center justify-center gap-8 xl:h-[max(650px,min(800px,calc(75vh)))] xl:grid-cols-2 xl:flex-row">
+      <aside className="my-16 flex flex-col items-center self-center xl:my-24 xl:-mr-10 xl:ml-10 xl:flex-1 xl:items-start">
+        <h1 className="text-6xl md:text-8xl">
+          @waves/cn
+        </h1>
+        <p className="my-8 text-center text-2xl md:text-3xl xl:text-left">
+          A collection of waveform components
+          <br />
+           built with wavesurfer.js and shadcn/ui.
+        </p>
+        <nav className="flex flex-wrap gap-4">
+          <Link
+            href="/docs"
+            className={cn(
+              buttonVariants({
+                size: 'lg'
+              }),
+              'text-md w-full rounded-full sm:w-auto'
+            )}
+          >
+            <Library className="mr-2 inline-block" size={20} />
+            Documentation
+          </Link>
+          <a
+            href="https://github.com/Ziane-Badreddine/waves-cn"
+            className={cn(
+              buttonVariants({
+                size: 'lg',
+                variant: 'secondary'
+              }),
+              'text-md w-full rounded-full sm:w-auto'
+            )}
+          >
+            <Github className="mr-2 -ml-1 inline-block" size={20} />
+            GitHub
+          </a>
+        </nav>
+         <div className="-space-x-2 -translate-y-1.5 md:-translate-y-2.5 inline-flex items-center justify-center mt-7">
             {icons.map((icon, index) => (
               <Tooltip key={icon.name}>
                 <TooltipTrigger asChild>
                   <div
-                    className="inline-flex size-8 items-center justify-center rounded-full text-white sm:size-10 md:size-12 lg:size-14"
+                    className="inline-flex size-8 items-center justify-center rounded-full text-white sm:size-10 md:size-12 lg:size-12"
                     style={{
                       backgroundColor: icon.color,
                       maskImage: index
@@ -83,23 +102,18 @@ export const Hero = () => (
               </Tooltip>
             ))}
           </div>
-        </h1>
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="mt-0 mb-0 text-muted-foreground lg:text-lg xl:text-xl 2xl:text-2xl">
-            WavesCn is a custom registry of composable, accessible and
-            extensible components designed for use with shadcn/ui. Free and open
-            source, forever.
-          </p>
-        </div>
-        <div className="flex items-center justify-center gap-4">
-          <Button asChild size="lg">
-            <Link href="/docs/components">Browse components</Link>
-          </Button>
-          <Button variant="secondary" asChild size="lg">
-            <Link href="/docs">Get started</Link>
-          </Button>
-        </div>
+      </aside>
+      <aside className="relative my-4 xl:my-auto xl:flex-1 xl:pt-4">
+        <ComponentPreviewWrapper
+          name="wave-video-demo"
+        />
+      </aside>
+      <div
+        className="absolute right-0 -bottom-12 left-0 hidden h-12 items-center justify-center xl:flex"
+        aria-hidden
+      >
+        <ChevronDown />
       </div>
-    </div>
-  </section>
-);
+    </section>
+  )
+}
