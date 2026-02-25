@@ -1,8 +1,8 @@
-import AudioPlayer from "@/registry/components/wave-player";
+import WavePlayer from "@/registry/components/wave-player";
 
 export default function AudioPlayerCustomDemo() {
   return (
-    <AudioPlayer
+    <WavePlayer
       src="/coastline.mp3"
       title="Custom Waveform Style"
       waveHeight={80}

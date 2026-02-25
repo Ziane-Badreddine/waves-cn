@@ -1,5 +1,5 @@
-import AudioPlayer from "@/registry/components/wave-player";
+import WavePlayer from "@/registry/components/wave-player";
 
 export default function AudioPlayerMinimalDemo() {
-  return <AudioPlayer src="/coastline.mp3" />;
+  return <WavePlayer src="/coastline.mp3" />;
 }
