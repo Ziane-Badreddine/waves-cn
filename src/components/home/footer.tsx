@@ -17,14 +17,14 @@ export function Footer() {
             <p className="text-sm text-zinc-500">
               Made by{' '}
               <a
-                href="https://x.com/mouad15s"
+                href="https://github.com/MouadSadik"
                 className="font-semibold hover:underline"
               >
                 Mouad Sadik
               </a>{' '}
               and{' '}
               <a
-                href="https://x.com/badr"
+                href="https://github.com/Ziane-Badreddine"
                 className="font-semibold hover:underline"
               >
                 Badreddine Ziane
@@ -77,7 +77,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://x.com/wavescn"
+                  href="https://x.com/wavescn0"
                   className="inline-flex items-center gap-1 hover:underline"
                 >
                   <SiX role="presentation" className="mr-2 size-5" />

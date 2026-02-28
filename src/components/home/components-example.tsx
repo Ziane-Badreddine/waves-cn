@@ -142,7 +142,7 @@ export const ComponentsExample = () => (
         </p>
       </div>
       <Button asChild size="lg">
-        <Link href="/docs/components">
+        <Link href="/docs">
           <span>Explore components</span>
           <ArrowRightIcon size={16} />
         </Link>
