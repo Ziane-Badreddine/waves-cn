@@ -1,0 +1,137 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry.json",
+	"name": "@waves-cn/ui",
+	"homepage": "https://waves-cn.com",
+	"items": [
+		{
+			"name": "wave-cn",
+			"title": "wave-cn",
+			"description": "Core hook, player and shared defaults powering all waves-cn components. Built on wavesurfer.js.",
+			"type": "registry:lib",
+			"dependencies": [
+				"wavesurfer.js"
+			],
+			"registryDependencies": [],
+			"files": [
+				{
+					"type": "registry:lib",
+					"path": "wave-cn.tsx"
+				}
+			]
+		},
+		{
+			"name": "wave-player",
+			"title": "Wave Player",
+			"description": "Full-featured audio player with play/pause, volume, seek bar and optional title.",
+			"type": "registry:component",
+			"dependencies": [
+				"wavesurfer.js",
+				"lucide-react"
+			],
+			"registryDependencies": [
+				"wave-cn"
+			],
+			"files": [
+				{
+					"type": "registry:component",
+					"path": "wave-player.tsx"
+				}
+			]
+		},
+		{
+			"name": "wave-recorder",
+			"title": "Wave Recorder",
+			"description": "Voice message recorder with live waveform, pause/resume, discard and auto-stop.",
+			"type": "registry:component",
+			"dependencies": [
+				"wavesurfer.js",
+				"lucide-react"
+			],
+			"registryDependencies": [
+				"wave-cn"
+			],
+			"files": [
+				{
+					"type": "registry:component",
+					"path": "wave-recorder.tsx"
+				}
+			]
+		},
+		{
+			"name": "wave-speed",
+			"title": "Wave Speed",
+			"description": "Audio player with continuous playback speed control and preserve-pitch toggle.",
+			"type": "registry:component",
+			"dependencies": [
+				"wavesurfer.js",
+				"lucide-react"
+			],
+			"registryDependencies": [
+				"wave-cn"
+			],
+			"files": [
+				{
+					"type": "registry:component",
+					"path": "wave-speed.tsx"
+				}
+			]
+		},
+		{
+			"name": "wave-zoom",
+			"title": "Wave Zoom",
+			"description": "Audio player with mouse-wheel zoom via wavesurfer.js ZoomPlugin.",
+			"type": "registry:component",
+			"dependencies": [
+				"wavesurfer.js",
+				"lucide-react"
+			],
+			"registryDependencies": [
+				"wave-cn"
+			],
+			"files": [
+				{
+					"type": "registry:component",
+					"path": "wave-zoom.tsx"
+				}
+			]
+		},
+		{
+			"name": "wave-video",
+			"title": "Wave Video",
+			"description": "Waveform player synced to a video element via the wavesurfer.js media prop.",
+			"type": "registry:component",
+			"dependencies": [
+				"wavesurfer.js",
+				"lucide-react"
+			],
+			"registryDependencies": [
+				"wave-cn"
+			],
+			"files": [
+				{
+					"type": "registry:component",
+					"path": "wave-video.tsx"
+				}
+			]
+		},
+		{
+			"name": "wave-timeline",
+			"title": "Wave Timeline",
+			"description": "Audio player with timeline ruler, zoom slider and volume control. Powered by wavesurfer.js TimelinePlugin.",
+			"type": "registry:component",
+			"dependencies": [
+				"wavesurfer.js",
+				"lucide-react"
+			],
+			"registryDependencies": [
+				"wave-cn"
+			],
+			"files": [
+				{
+					"type": "registry:component",
+					"path": "wave-timeline.tsx"
+				}
+			]
+		}
+	]
+}

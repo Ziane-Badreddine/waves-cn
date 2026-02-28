@@ -8,10 +8,13 @@
     "start": "next start",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
-    "lint": "eslint"
+    "lint": "eslint",
+    "registry:build": "jsrepo build",
+    "registry:dev": "jsrepo build --watch"
   },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^13.11.2",
+    "@jsrepo/shadcn": "^6.0.1",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-navigation-menu": "^1.2.14",
     "@radix-ui/react-popover": "^1.1.15",
@@ -44,6 +47,7 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^10.0.0",
     "eslint-config-next": "16.1.6",
+    "jsrepo": "^3.6.1",
     "postcss": "^8.5.6",
     "shadcn": "^3.8.4",
     "tailwindcss": "^4.1.18",
