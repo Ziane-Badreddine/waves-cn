@@ -5,6 +5,7 @@
   "pages": [
     "---Getting Started---",
     "index",
+    "instalation",
     "wavesurfer-player",
     "use-wavesurfer.mdx",
     "wave-defaults.mdx",

@@ -3,7 +3,12 @@ title: Introduction
 description: A collection of wave players and waveform components built with wavesurfer.js and shadcn/ui.
 ---
 
-import { Coffee, Star } from "lucide-react"
+import { Coffee, Star, Heart } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Link from "next/link"
+import { SiGithub } from "react-icons/si"
+import { cn } from "@/lib/utils";
 
 ## Overview
 
@@ -21,24 +26,51 @@ waves-cn follows the same philosophy as [shadcn/ui](https://ui.shadcn.com) — c
 
 If you already use shadcn/ui, waves-cn slots right in: it shares the same `cn` utility, Tailwind tokens, and `Button` primitive so everything feels native from day one. Under the hood, audio rendering is powered by [wavesurfer.js](https://wavesurfer.xyz) — a battle-tested waveform library with a rich plugin ecosystem.
 
-
 ## Contribute
 
 Any contributions are welcome! Open an issue or a PR on [GitHub](https://github.com/Ziane-Badreddine/waves-cn) if you have any suggestions or improvements.
 
 ## Contributors
 
-Thanks to the amazing people who helped build and improve waves-cn:
+<div className="grid gap-6 sm:grid-cols-2 mt-6">
+  {[
+    { name: "Badreddine Ziane", username: "Ziane-Badreddine", url: "https://github.com/Ziane-Badreddine" },
+    { name: "Mouad Sadik",      username: "MouadSadik",       url: "https://github.com/MouadSadik"       },
+  ].map((c) => (
+    <div
+      key={c.username}
+       className={cn(
+                " flex items-center justify-center p-4",
+                "relative flex size-full flex-col items-center justify-center  overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)] bg-card",
+              )}
+    >
+      <div className="-translate-y-px absolute top-8 right-0 left-0 border border-primary border-dashed" />
+      <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-primary border-dashed" />
+      <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-primary border-dashed" />
+      <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-primary border-dashed" />
 
-- **Ziane Badreddine**  
-  GitHub: https://github.com/Ziane-Badreddine
+      <Avatar className="size-20 mt-6 relative mb-0 ">
+        <AvatarImage className=" self-center " src={`https://github.com/${c.username}.png`} />
+        <AvatarFallback>{c.name.charAt(0)}</AvatarFallback>
+      </Avatar>
 
-- **Mouad Sadik**  
-  GitHub: https://github.com/MouadSadik
+      <div className="text-center">
+        <h3 className="font-semibold text-lg">{c.name}</h3>
+        <p className="text-sm text-muted-foreground">@{c.username}</p>
+      </div>
+
+      <Link href={c.url} target="_blank" className="mb-6">
+        <Button variant="outline" size="sm">
+          <SiGithub className="size-4" />
+          GitHub
+        </Button>
+      </Link>
+    </div>
+  ))}
+</div>
+
 
 ## Support
-
-I appreciate any support you can offer:
 
 <div className="flex items-center gap-2 my-6">
   <a href="https://www.buymeacoffee.com/Ziane-Badreddine" target="_blank">

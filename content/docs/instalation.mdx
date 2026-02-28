@@ -1,0 +1,123 @@
+---
+title: Installation
+description: Add waves-cn components to your project.
+---
+
+import { Steps, Step } from "@/components/steps"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+
+waves-cn components are not a package — you copy the source into your project and own it.
+
+## Prerequisites
+
+- React 18+
+- Tailwind CSS
+- [shadcn/ui initialized](https://ui.shadcn.com/docs/installation) in your project
+
+---
+
+## Install a component
+
+<Tabs defaultValue="cli">
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+
+<TabsContent value="cli">
+
+<Steps>
+
+<Step>
+
+**Install the shadcn/ui primitives**
+
+Each component requires specific shadcn primitives. Check the component page for the exact list.
+
+```bash
+npx shadcn@latest add button slider skeleton
+```
+
+</Step>
+
+<Step>
+
+**Add the component**
+
+```bash
+npx jsrepo add @waves-cn/ui/wave-player
+```
+
+`wave-cn` (core), `wavesurfer.js` and `lucide-react` are installed automatically.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps>
+
+<Step>
+
+**Install the dependencies**
+
+```bash
+npm install wavesurfer.js lucide-react
+```
+
+</Step>
+
+<Step>
+
+**Install the shadcn/ui primitives**
+
+```bash
+npx shadcn@latest add button slider skeleton
+```
+
+</Step>
+
+<Step>
+
+**Copy `wave-cn.tsx` into your project**
+
+Every component depends on `wave-cn`. Copy it into `src/lib/wave-cn.tsx`.
+
+</Step>
+
+<Step>
+
+**Copy the component file**
+
+Copy the component source from its doc page into `src/components/ui/`.
+
+</Step>
+
+<Step>
+
+**Update the import paths**
+
+Adjust any `@/` aliases to match your project structure.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+</Tabs>
+
+---
+
+## Shadcn primitives per component
+
+| Component | Required primitives |
+|---|---|
+| `wave-player` | `card button slider skeleton` |
+| `wave-recorder` | `button skeleton` |
+| `wave-speed` | `button slider switch label skeleton` |
+| `wave-zoom` | `button slider skeleton` |
+| `wave-video` | `button skeleton` |
+| `wave-timeline` | `button slider card skeleton` |
