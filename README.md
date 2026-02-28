@@ -1,45 +1,59 @@
 # waves-cn
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+A collection of wave players and waveform components built with [wavesurfer.js](https://wavesurfer.xyz) and [shadcn/ui](https://ui.shadcn.com).
 
-Run development server:
+## Overview
 
-```bash
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
-```
+waves-cn is a custom shadcn/ui-style component package for audio and video waveform interfaces. It provides:
 
-Open http://localhost:3000 with your browser to see the result.
+- Waveform audio players with play/pause, volume, progress, speed control, zoom, and timeline
+- A wave recorder component for capturing audio directly in the browser
+- Video waveform support for synced audio visualization
+- Ready-to-use components crafted with [shadcn/ui](https://ui.shadcn.com)
+- Easy integration into your React/Next.js project
 
-## Explore
+## Philosophy
 
-In the project, you can see:
+waves-cn follows the same philosophy as [shadcn/ui](https://ui.shadcn.com) — components are **not** installed as a package. Instead, you copy the source directly into your project and own it completely. That means:
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+- No black-box updates
+- No version conflicts
+- Full freedom to adapt every component to your design system
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+If you already use shadcn/ui, waves-cn slots right in: it shares the same `cn` utility, Tailwind tokens, and `Button` primitive so everything feels native from day one.
 
-### Fumadocs MDX
+Under the hood, audio rendering is powered by [wavesurfer.js](https://wavesurfer.xyz) — a battle-tested waveform library with a rich plugin ecosystem.
 
-A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
+## Components
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+| Component | Description |
+|-----------|-------------|
+| **Wave Player** | Full-featured audio player with play/pause, volume, and progress |
+| **Wave Recorder** | Capture audio directly in the browser |
+| **Wave Speed** | Playback speed control for audio waveforms |
+| **Wave Timeline** | Timeline display synced with audio playback |
+| **Wave Video** | Video component with synced waveform visualization |
+| **Wave Zoom** | Zoom in/out on waveform detail |
 
-## Learn More
+## Getting Started
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
+### Prerequisites
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+- React 18+ or Next.js 13+
+- Tailwind CSS
+- shadcn/ui already configured in your project
+
+### To know more about installation and how to use components
+visit : [@waves/cn](https://waves-cn.vercel.app/)
+
+
+## Contributors
+
+Thanks to the amazing people who helped build and improve waves-cn:
+
+- **Ziane Badreddine** — [GitHub](https://github.com/Ziane-Badreddine)
+- **Mouad Sadik** — [GitHub](https://github.com/MouadSadik)
+
+## License
+
+MIT
