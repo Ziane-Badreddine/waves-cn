@@ -10,7 +10,6 @@
     "wave-defaults.mdx",
     "plugins",
     "---Components---",
-    "...components",
-    "markdown"
+    "...components"
   ]
 }
