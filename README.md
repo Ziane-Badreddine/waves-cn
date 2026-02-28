@@ -48,11 +48,7 @@ visit : [@waves/cn](https://waves-cn.vercel.app/)
 
 ## Contributors
 
-Thanks to the amazing people who helped build and improve waves-cn:
 
 - **Ziane Badreddine** — [GitHub](https://github.com/Ziane-Badreddine)
 - **Mouad Sadik** — [GitHub](https://github.com/MouadSadik)
 
-## License
-
-MIT
