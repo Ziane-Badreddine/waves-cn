@@ -35,7 +35,6 @@ Under the hood, audio rendering is powered by [wavesurfer.js](https://wavesurfer
 | **Wave Video** | Video component with synced waveform visualization |
 | **Wave Zoom** | Zoom in/out on waveform detail |
 
-## Getting Started
 
 ### Prerequisites
 
