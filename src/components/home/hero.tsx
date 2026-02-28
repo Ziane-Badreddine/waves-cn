@@ -14,7 +14,7 @@ import {
   SiShadcnui,
 } from "@icons-pack/react-simple-icons";
 import { ComponentPreviewWrapper } from "../component-preview-wrapper";
-import { SiGithub } from "react-icons/si";
+import { SiGithub, SiReadthedocs } from "react-icons/si";
 import { GiWaveSurfer } from "react-icons/gi";
 import WavesurferPlayer from "../cors/wavesurfer-player";
 import WaveHero from "./wave-hero";
@@ -75,7 +75,7 @@ export function Hero() {
               "text-md w-full rounded-full sm:w-auto",
             )}
           >
-            <Library className=" inline-block" size={20} />
+            <SiReadthedocs className=" inline-block" size={20} />
             Documentation
           </Link>
           <a

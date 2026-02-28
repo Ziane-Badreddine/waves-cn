@@ -7,18 +7,38 @@ import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
 import { Tab, Tabs } from "fumadocs-ui/components/tabs"
 import { Steps, Step } from "fumadocs-ui/components/steps"
 
-<ComponentPreviewWrapper
-  name="wave-player-demo"
-/>
+<ComponentPreviewWrapper name="wave-player-demo" />
 
 ## Installation
 
 <Tabs items={["CLI", "Manual"]}>
   <Tab value="CLI">
 
+<Steps>
+
+<Step>
+
+Install the required shadcn/ui primitives.
+
 ```bash
-npx shadcn@latest add "https://yoursite.com/r/wave-player.json"
+npx shadcn@latest add card button slider skeleton
 ```
+
+</Step>
+
+<Step>
+
+Add the component via jsrepo.
+
+```bash
+npx jsrepo add @waves-cn/ui/wave-player
+```
+
+This will automatically install `wave-cn` (the core hook) and `wavesurfer.js` + `lucide-react`.
+
+</Step>
+
+</Steps>
 
   </Tab>
   <Tab value="Manual">
@@ -40,7 +60,7 @@ npm install wavesurfer.js
 Install the required shadcn primitives.
 
 ```bash
-npx shadcn@latest add card button slider
+npx shadcn@latest add card button slider skeleton
 ```
 
 </Step>
@@ -88,34 +108,24 @@ import { AudioPlayer } from "@/components/ui/wave-player"
 ```
 
 ```tsx
-<AudioPlayer src="/audio/track.mp3" />
+<AudioPlayer src="/coastline.mp3" />
 ```
 
 ## Examples
 
 ### Minimal
 
-<ComponentPreviewWrapper
-  name="wave-player-minimal"
-/>
+<ComponentPreviewWrapper name="wave-player-minimal" />
 
 ### With title
 
-<ComponentPreviewWrapper
-  name="wave-player-with-title"
-/>
-
-
+<ComponentPreviewWrapper name="wave-player-with-title" />
 
 ### Custom waveform
 
 `barWidth`, `barGap`, `barRadius`, and `waveHeight` let you fully control the shape of the waveform bars.
 
-<ComponentPreviewWrapper
-  name="wave-player-custom"
-/>
-
-
+<ComponentPreviewWrapper name="wave-player-custom" />
 
 ### With event callbacks
 
@@ -129,7 +139,7 @@ import { AudioPlayer } from "@/components/ui/wave-player"
 export function MyPlayer() {
   return (
     <AudioPlayer
-      src="/audio/track.mp3"
+      src="/coastline.mp3"
       onPlay={()  => console.log("Playing")}
       onPause={() => console.log("Paused")}
       onFinish={() => console.log("Finished")}

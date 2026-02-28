@@ -1,7 +1,7 @@
 {
 	"$schema": "https://ui.shadcn.com/schema/registry.json",
 	"name": "@waves-cn/ui",
-	"homepage": "https://waves-cn.com",
+	"homepage": "https://waves-cn.vercel.app",
 	"items": [
 		{
 			"name": "wave-cn",

@@ -18,9 +18,31 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
 </TabsList>
 <TabsContent value="cli">
 
+<Steps>
+
+<Step>
+
+Install the required shadcn/ui primitives.
+
 ```bash
-npm install wavesurfer.js
+npx shadcn@latest add button slider switch label skeleton
 ```
+
+</Step>
+
+<Step>
+
+Add the component via jsrepo.
+
+```bash
+npx jsrepo add @waves-cn/ui/wave-speed
+```
+
+This will automatically install `wave-cn`, `wavesurfer.js` and `lucide-react`.
+
+</Step>
+
+</Steps>
 
 </TabsContent>
 <TabsContent value="manual">
@@ -39,9 +61,19 @@ npm install wavesurfer.js
 
 <Step>
 
-Copy `wave-player.ts` into your project.
+Install the required shadcn primitives.
 
-<ComponentPreviewWrapper name="wave-player" variant="codesource" />
+```bash
+npx shadcn@latest add button slider switch label skeleton
+```
+
+</Step>
+
+<Step>
+
+Copy `wave-cn.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-cn" variant="codesource" />
 
 </Step>
 
@@ -79,7 +111,7 @@ import { WaveSpeed } from "@/components/ui/wave-speed"
 ```
 
 ```tsx
-<WaveSpeed url="/audio/track.mp3" onRecordEnd={(blob) => console.log(blob)} />
+<WaveSpeed url="/coastline.mp3" />
 ```
 
 ## Examples
@@ -108,7 +140,7 @@ Narrow the speed range for a more focused control, e.g. podcast listening speeds
 
 ```tsx
 <WaveSpeed
-  url="/audio/track.mp3"
+  url="/coastline.mp3"
   waveColor="var(--chart-1)"
   progressColor="var(--chart-2)"
   barWidth={4}

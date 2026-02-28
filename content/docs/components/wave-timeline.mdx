@@ -1,5 +1,5 @@
 ---
-title: Audio Timeline
+title: Wave Timeline
 description: A waveform player with timeline markers built on wavesurfer.js.
 ---
 
@@ -7,18 +7,38 @@ import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
 import { Tab, Tabs } from "fumadocs-ui/components/tabs"
 import { Steps, Step } from "fumadocs-ui/components/steps"
 
-<ComponentPreviewWrapper
-  name="wave-timeline-demo"
-/>
+<ComponentPreviewWrapper name="wave-timeline-demo" />
 
 ## Installation
 
 <Tabs items={["CLI", "Manual"]}>
   <Tab value="CLI">
 
+<Steps>
+
+<Step>
+
+Install the required shadcn/ui primitives.
+
 ```bash
-npx shadcn@latest add "https://waves-cn.vercel.app/r/wave-timeline.json"
+npx shadcn@latest add button slider card skeleton
 ```
+
+</Step>
+
+<Step>
+
+Add the component via jsrepo.
+
+```bash
+npx jsrepo add @waves-cn/ui/wave-timeline
+```
+
+This will automatically install `wave-cn`, `wavesurfer.js` and `lucide-react`.
+
+</Step>
+
+</Steps>
 
   </Tab>
   <Tab value="Manual">
@@ -40,7 +60,7 @@ npm install wavesurfer.js
 Install the required shadcn primitives.
 
 ```bash
-npx shadcn@latest add button slider
+npx shadcn@latest add button slider card skeleton
 ```
 
 </Step>
@@ -88,7 +108,7 @@ import { AudioTimeline } from "@/components/ui/wave-timeline"
 ```
 
 ```tsx
-<AudioTimeline url="/audio/track.mp3" />
+<AudioTimeline url="/coastline.mp3" />
 ```
 
 ## Examples
@@ -97,27 +117,19 @@ import { AudioTimeline } from "@/components/ui/wave-timeline"
 
 Show both a top and bottom timeline ruler.
 
-<ComponentPreviewWrapper
-  name="wave-timeline-dual"
-/>
-
+<ComponentPreviewWrapper name="wave-timeline-dual" />
 
 ### No ruler
 
 Pass `topTimeline={false}` to render the waveform and zoom controls without any timeline.
 
-<ComponentPreviewWrapper
-  name="wave-timeline-no-ruler"
-/>
-
-
-
+<ComponentPreviewWrapper name="wave-timeline-no-ruler" />
 
 ### Custom zoom range
 
 ```tsx
 <AudioTimeline
-  url="/audio/track.mp3"
+  url="/coastline.mp3"
   defaultZoom={100}
   minZoom={20}
   maxZoom={1000}

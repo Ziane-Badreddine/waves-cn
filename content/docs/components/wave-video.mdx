@@ -18,9 +18,31 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
 </TabsList>
 <TabsContent value="cli">
 
+<Steps>
+
+<Step>
+
+Install the required shadcn/ui primitives.
+
 ```bash
-npm install wavesurfer.js
+npx shadcn@latest add button skeleton
 ```
+
+</Step>
+
+<Step>
+
+Add the component via jsrepo.
+
+```bash
+npx jsrepo add @waves-cn/ui/wave-video
+```
+
+This will automatically install `wave-cn`, `wavesurfer.js` and `lucide-react`.
+
+</Step>
+
+</Steps>
 
 </TabsContent>
 <TabsContent value="manual">
@@ -33,6 +55,16 @@ Install the peer dependency.
 
 ```bash
 npm install wavesurfer.js
+```
+
+</Step>
+
+<Step>
+
+Install the required shadcn primitives.
+
+```bash
+npx shadcn@latest add button skeleton
 ```
 
 </Step>
@@ -92,7 +124,7 @@ import { WaveVideo } from "@/registry/components/wave-video"
 <video ref={videoCallbackRef} src={url} />
 
 <WavesurferPlayer
-  url=""         // ignored when media is provided
+  url=""           // ignored when media is provided
   media={videoEl}  // ← the live <video> element
   onReady={(ws) => { wavesurferRef.current = ws }}
 />
@@ -107,7 +139,6 @@ import { WaveVideo } from "@/registry/components/wave-video"
 `waveColor` and `progressColor` accept any CSS value including `var(--*)` tokens.
 
 <ComponentPreviewWrapper name="wave-video-custom-wave" />
-
 
 ### With Video Poster & Loop
 

@@ -16,7 +16,7 @@ import RecordPlugin, {
 } from "wavesurfer.js/dist/plugins/record.esm.js";
 import { cn, formatDuration } from "@/lib/utils";
 import { useCssVar } from "@/hooks/use-css-var";
-import { useWavesurfer } from "@/registry/lib/wave-cn";
+import { useWavesurfer } from "@/lib/wave-cn";
 
 // Types
 

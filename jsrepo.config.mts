@@ -85,7 +85,7 @@ function defineComponent(entry: ComponentEntry): RegistryItem {
     files: [
       {
         path: isLib
-          ? `src/registry/lib/${entry.name}.tsx`
+          ? `src/lib/${entry.name}.tsx`
           : `src/registry/components/${entry.name}.tsx`,
         // Prevent jsrepo from chasing @/lib/utils and @/components/ui/* imports —
         // those are shadcn/ui peer deps that live in the user's project, not this registry
@@ -99,10 +99,11 @@ export default defineConfig({
   registry: {
     name: "@waves-cn/ui",
     description: "Waveform components for shadcn/ui — built on wavesurfer.js.",
-    homepage: "https://waves-cn.com",
+    homepage: "https://waves-cn.vercel.app",
     authors: ["Badreddine Ziane", "Mouad Sadik"],
-    bugs: "https://github.com/ton-username/waves-cn/issues",
+    bugs: "https://github.com/Ziane-Badreddinewaves-cn/issues",
     repository: "https://github.com/Ziane-Badreddine/waves-cn",
+    version: "1.0.4",
     tags: [
       "wavesurfer",
       "audio",

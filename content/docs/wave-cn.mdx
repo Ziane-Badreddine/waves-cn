@@ -61,7 +61,7 @@ export function MyPlayer() {
 
   const { wavesurfer, isReady, isPlaying, currentTime } = useWavesurfer({
     container: containerRef,
-    url: "/audio/track.mp3",
+    url: "/coastline.mp3",
   })
 
   return (
@@ -81,7 +81,7 @@ export function MyPlayer() {
 import WavesurferPlayer from "@/registry/hooks/audio"
 
 <WavesurferPlayer
-  url="/audio/track.mp3"
+  url="/coastline.mp3"
   waveColor="var(--primary)"
   height={80}
   onReady={(ws) => console.log("ready", ws)}

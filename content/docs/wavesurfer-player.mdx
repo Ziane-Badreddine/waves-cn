@@ -17,7 +17,7 @@ Use it when you want a **declarative** player and don't need to manage the waves
 import WavesurferPlayer from "@/lib/wave-cn"
 
 <WavesurferPlayer
-  url="/audio/track.mp3"
+  url="/coastline.mp3"
   waveColor="var(--primary)"
   height={80}
   onReady={(ws) => console.log("ready", ws)}
@@ -43,7 +43,7 @@ export function MyPlayer() {
 
   return (
     <WavesurferPlayer
-      url="/audio/track.mp3"
+      url="/coastline.mp3"
       onReady={handleReady}
       onPlay={() => console.log("playing")}
       onPause={() => console.log("paused")}
@@ -68,7 +68,7 @@ const plugins = useMemo(() => [
   TimelinePlugin.create(),
 ], [])
 
-<WavesurferPlayer url="/audio/track.mp3" plugins={plugins} />
+<WavesurferPlayer url="/coastline.mp3" plugins={plugins} />
 ```
 
 For plugins that need to be registered **after** the instance exists (e.g. `RecordPlugin`), use `onReady` instead:
@@ -88,7 +88,7 @@ Every wavesurfer.js event is available as an `on`-prefixed prop. The handler rec
 
 ```tsx
 <WavesurferPlayer
-  url="/audio/track.mp3"
+  url="/coastline.mp3"
   onReady={(ws) => {}}
   onPlay={(ws) => {}}
   onPause={(ws) => {}}

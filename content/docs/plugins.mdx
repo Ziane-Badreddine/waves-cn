@@ -33,7 +33,7 @@ export function MyPlayer() {
     TimelinePlugin.create(),
   ], [])
 
-  return <WavesurferPlayer url="/audio/track.mp3" plugins={plugins} />
+  return <WavesurferPlayer url="/coastline.mp3" plugins={plugins} />
 }
 ```
 
@@ -51,7 +51,7 @@ export function MyPlayer() {
 
   const { wavesurfer, isReady } = useWavesurfer({
     container: containerRef,
-    url: "/audio/track.mp3",
+    url: "/coastline.mp3",
     plugins,
   })
 
@@ -117,7 +117,7 @@ Plugin events are accessed imperatively via `wavesurfer.on()` or through the plu
 
 ```tsx
 <WavesurferPlayer
-  url="/audio/track.mp3"
+  url="/coastline.mp3"
   plugins={plugins}
   onReady={(ws) => {
     ws.on("zoom", (minPxPerSec) => {

@@ -8,7 +8,7 @@ export const Index: Record<string, any> = {
       "Shared wave utilities and configuration used across wave components.",
     type: "registry:lib",
     files: ["src/registry/lib/wave-cn.tsx"],
-    component: React.lazy(() => import("@/registry/lib/wave-cn.tsx")),
+    component: React.lazy(() => import("@/lib/wave-cn.tsx")),
     category: "wave",
     subcategory: "utility",
     chunks: [],

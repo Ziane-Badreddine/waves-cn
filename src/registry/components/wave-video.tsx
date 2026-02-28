@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";
-import WavesurferPlayer from "@/registry/lib/wave-cn";
+import WavesurferPlayer from "@/lib/wave-cn";
 import type WaveSurfer from "wavesurfer.js";
 
 /**

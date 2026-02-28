@@ -8,7 +8,8 @@ interface ComponentPreviewWrapperProps {
   variant?: "normal" | "preview" | "codesource";
   hideCode?: boolean;
 }
-const parseCode = (code: string) => code.replace(/@\/registry\//g, "@/");
+const parseCode = (code: string) =>
+  code.replace(/@\/registry\//g, "@/").replace(/^["']use client["'];?\n?/m, "");
 
 export function ComponentPreviewWrapper({
   name,

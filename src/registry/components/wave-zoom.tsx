@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { cn } from "@/lib/utils";
-import WavesurferPlayer from "@/registry/lib/wave-cn";
+import WavesurferPlayer from "@/lib/wave-cn";
 import type WaveSurfer from "wavesurfer.js";
 
 /**

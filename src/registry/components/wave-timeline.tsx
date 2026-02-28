@@ -16,7 +16,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import WavesurferPlayer from "@/registry/lib/wave-cn";
+import WavesurferPlayer from "@/lib/wave-cn";
 import type WaveSurfer from "wavesurfer.js";
 
 // ─── Types
@@ -241,8 +241,13 @@ export function WaveTimeline({
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <Card className={cn("w-full", className)}>
-      <CardContent className="p-4 space-y-3">
+    <Card
+      className={cn(
+        "w-full px-0 border-none rounded-none bg-transparent",
+        className,
+      )}
+    >
+      <CardContent className=" space-y-3 p-0">
         {/* Title */}
         {title && (
           <p className="text-sm font-medium text-foreground truncate">
