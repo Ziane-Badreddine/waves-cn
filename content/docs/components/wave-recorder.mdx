@@ -18,31 +18,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
 </TabsList>
 <TabsContent value="cli">
 
-<Steps>
-
-<Step>
-
-Install the required shadcn/ui primitives.
-
 ```bash
-npx shadcn@latest add button skeleton
+npx shadcn@latest add https://waves-cn.vercel.app/r/wave-recorder.json
 ```
-
-</Step>
-
-<Step>
-
-Add the component via jsrepo.
-
-```bash
-npx jsrepo add @waves-cn/ui/wave-recorder
-```
-
-This will automatically install `wave-cn`, `wavesurfer.js` and `lucide-react`.
-
-</Step>
-
-</Steps>
 
 </TabsContent>
 <TabsContent value="manual">
@@ -118,16 +96,16 @@ Update the import paths to match your project setup.
 ## Features
 
 - **Live waveform visualization** — a scrolling waveform rendered on a Canvas via wavesurfer.js updates in real time while recording, then hides itself at rest.
-- **Pause & resume** — pause mid-recording and continue without losing audio; the timer and waveform stay in sync throughout.
+- **Pause & resume** — pause mid-recording and continue without losing wave; the timer and waveform stay in sync throughout.
 - **Auto-stop** — pass `maxDuration` (in seconds) to automatically stop recording and emit the blob once the limit is reached.
-- **Discard** — lets the user throw away the current take; triggers `onDiscard` instead of `onRecordEnd` so unwanted audio is never processed.
+- **Discard** — lets the user throw away the current take; triggers `onDiscard` instead of `onRecordEnd` so unwanted wave is never processed.
 - **Custom waveform styling** — `waveColor`, `progressColor`, `barWidth`, `barGap`, `barRadius`, and `barHeight` all accept any CSS value including `var(--*)` tokens, resolved at runtime for the Canvas API.
 - **Plugin-ready** — `RecordPlugin` is injected into `WavesurferPlayer` (or `useWavesurfer`) via `onReady`, so any other wavesurfer.js plugin can be added the same way without touching the core.
 
 ## Usage
 
 ```tsx
-import { WaveRecorder } from "@/components/ui/wave-recorder"
+import { WaveRecorder } from "@/components/waves-cn/wave-recorder"
 ```
 
 ```tsx
@@ -146,29 +124,12 @@ Auto-stop after N seconds using `maxDuration`.
 
 <ComponentPreviewWrapper name="wave-recorder-timed" />
 
-```tsx
-<WaveRecorder
-  maxDuration={30}
-  onRecordEnd={handleBlob}
-/>
-```
 
 ### Custom Waveform
 
 `waveColor` and `progressColor` accept any CSS value including `var(--*)` tokens — resolved at runtime for the Canvas API.
 
 <ComponentPreviewWrapper name="wave-recorder-custom-wave" />
-
-```tsx
-<WaveRecorder
-  waveColor="var(--chart-1)"
-  progressColor="var(--chart-2)"
-  barWidth={4}
-  barGap={3}
-  barRadius={8}
-  onRecordEnd={handleBlob}
-/>
-```
 
 ## API Reference
 

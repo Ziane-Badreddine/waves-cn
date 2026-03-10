@@ -18,31 +18,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
 </TabsList>
 <TabsContent value="cli">
 
-<Steps>
-
-<Step>
-
-Install the required shadcn/ui primitives.
-
 ```bash
-npx shadcn@latest add button slider switch label skeleton
+npx shadcn@latest add https://waves-cn.vercel.app/r/wave-speed.json
 ```
-
-</Step>
-
-<Step>
-
-Add the component via jsrepo.
-
-```bash
-npx jsrepo add @waves-cn/ui/wave-speed
-```
-
-This will automatically install `wave-cn`, `wavesurfer.js` and `lucide-react`.
-
-</Step>
-
-</Steps>
 
 </TabsContent>
 <TabsContent value="manual">
@@ -107,11 +85,7 @@ Update the import paths to match your project setup.
 ## Usage
 
 ```tsx
-import { WaveSpeed } from "@/components/ui/wave-speed"
-```
-
-```tsx
-<WaveSpeed url="/coastline.mp3" />
+import { WaveSpeed } from "@/components/waves-cn/wave-speed"
 ```
 
 ## Examples
@@ -122,15 +96,6 @@ Narrow the speed range for a more focused control, e.g. podcast listening speeds
 
 <ComponentPreviewWrapper name="wave-speed-podcast" />
 
-```tsx
-<WaveSpeed
-  url="/audio/podcast.mp3"
-  minSpeed={0.5}
-  maxSpeed={2}
-  defaultSpeed={1}
-  step={0.25}
-/>
-```
 
 ### Custom Colors
 
@@ -138,16 +103,6 @@ Narrow the speed range for a more focused control, e.g. podcast listening speeds
 
 <ComponentPreviewWrapper name="wave-speed-custom-wave" />
 
-```tsx
-<WaveSpeed
-  url="/coastline.mp3"
-  waveColor="var(--chart-1)"
-  progressColor="var(--chart-2)"
-  barWidth={4}
-  barGap={3}
-  barRadius={8}
-/>
-```
 
 ## API Reference
 

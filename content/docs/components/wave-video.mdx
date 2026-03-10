@@ -18,31 +18,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
 </TabsList>
 <TabsContent value="cli">
 
-<Steps>
-
-<Step>
-
-Install the required shadcn/ui primitives.
-
 ```bash
-npx shadcn@latest add button skeleton
+npx shadcn@latest add https://waves-cn.vercel.app/r/wave-video.json
 ```
-
-</Step>
-
-<Step>
-
-Add the component via jsrepo.
-
-```bash
-npx jsrepo add @waves-cn/ui/wave-video
-```
-
-This will automatically install `wave-cn`, `wavesurfer.js` and `lucide-react`.
-
-</Step>
-
-</Steps>
 
 </TabsContent>
 <TabsContent value="manual">
@@ -117,7 +95,7 @@ import { WaveVideo } from "@/registry/components/wave-video"
 
 ## How the sync works
 
-`WaveVideo` passes the mounted `<video>` element directly to `WavesurferPlayer` via the `media` prop. wavesurfer.js then uses it as its audio/video source instead of fetching a URL — so both the native video controls and the waveform share the exact same `HTMLVideoElement`:
+`WaveVideo` passes the mounted `<video>` element directly to `WavesurferPlayer` via the `media` prop. wavesurfer.js then uses it as its wave/video source instead of fetching a URL — so both the native video controls and the waveform share the exact same `HTMLVideoElement`:
 
 ```tsx
 // Simplified internals

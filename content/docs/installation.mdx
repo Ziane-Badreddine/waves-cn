@@ -17,104 +17,69 @@ waves-cn components are not a package — you copy the source into your project 
 ---
 
 ## Install a component
+You can now start adding components to your project.
 
 <Tabs defaultValue="cli">
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
+  <TabsList>
+    <TabsTrigger value="cli">CLI</TabsTrigger>
+    <TabsTrigger value="manual">Manual</TabsTrigger>
+  </TabsList>
 
-<TabsContent value="cli">
-
-<Steps>
-
-<Step>
-
-**Install the shadcn/ui primitives**
-
-Each component requires specific shadcn primitives. Check the component page for the exact list.
+  <TabsContent value="cli">
 
 ```bash
-npx shadcn@latest add button slider skeleton
+npx shadcn@latest add https://waves-cn.vercel.app/r/wave-player.json
 ```
 
-</Step>
+  </TabsContent>
 
-<Step>
+  <TabsContent value="manual">
+    <Steps>
+      <Step>
+        **Install the dependencies**
 
-**Add the component**
+        ```bash
+        npm install wavesurfer.js lucide-react
+        ```
+      </Step>
 
-```bash
-npx jsrepo add @waves-cn/ui/wave-player
-```
+      <Step>
+        **Install the shadcn/ui primitives**
 
-`wave-cn` (core), `wavesurfer.js` and `lucide-react` are installed automatically.
+        Check the component page for the exact list required.
 
-</Step>
+        ```bash
+        npx shadcn@latest add button slider skeleton
+        ```
+      </Step>
 
-</Steps>
+      <Step>
+        **Copy `wave-cn.tsx` into your project**
 
-</TabsContent>
+        Every component depends on `wave-cn`. Copy it into `src/lib/wave-cn.tsx`.
+      </Step>
 
-<TabsContent value="manual">
+      <Step>
+        **Copy the component file**
 
-<Steps>
+        Copy the component source from its doc page into `src/components/ui/`.
+      </Step>
 
-<Step>
+      <Step>
+        **Update the import paths**
 
-**Install the dependencies**
-
-```bash
-npm install wavesurfer.js lucide-react
-```
-
-</Step>
-
-<Step>
-
-**Install the shadcn/ui primitives**
-
-```bash
-npx shadcn@latest add button slider skeleton
-```
-
-</Step>
-
-<Step>
-
-**Copy `wave-cn.tsx` into your project**
-
-Every component depends on `wave-cn`. Copy it into `src/lib/wave-cn.tsx`.
-
-</Step>
-
-<Step>
-
-**Copy the component file**
-
-Copy the component source from its doc page into `src/components/ui/`.
-
-</Step>
-
-<Step>
-
-**Update the import paths**
-
-Adjust any `@/` aliases to match your project structure.
-
-</Step>
-
-</Steps>
-
-</TabsContent>
+        Adjust any `@/` aliases to match your project structure.
+      </Step>
+    </Steps>
+  </TabsContent>
 </Tabs>
 
 ---
 
-## Shadcn primitives per component
+## shadcn/ui primitives per component
 
 | Component | Required primitives |
-|---|---|
+| --- | --- |
 | `wave-player` | `card button slider skeleton` |
 | `wave-recorder` | `button skeleton` |
 | `wave-speed` | `button slider switch label skeleton` |

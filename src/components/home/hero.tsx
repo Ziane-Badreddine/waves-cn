@@ -58,7 +58,7 @@ export function Hero() {
       <aside className="my-16 relative text-center justify-center flex flex-col items-center self-center  xl:flex-1 ">
         <WaveHero />
         <p className="my-8 text-center text-2xl md:text-3xl ">
-          <span className="font-semibold">@waves/cn</span> a collection of
+          <span className="font-semibold">waves-cn</span> a collection of
           waveform components
           <br />
           built with <span className="font-semibold">

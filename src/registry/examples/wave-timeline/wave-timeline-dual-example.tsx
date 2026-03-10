@@ -1,6 +1,6 @@
 import WaveTimeline from "@/registry/components/wave-timeline";
 
-export default function AudioTimelineDualDemo() {
+export default function WaveTimelineDualDemo() {
   return (
     <div className="w-full  mx-auto p-6">
       <WaveTimeline

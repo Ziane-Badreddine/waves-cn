@@ -1,6 +1,6 @@
 import WavePlayer from "@/registry/components/wave-player";
 
-export default function AudioPlayerCustomDemo() {
+export default function WavePlayerCustomDemo() {
   return (
     <div className="w-full  mx-auto p-6">
       <WavePlayer

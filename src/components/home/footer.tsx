@@ -13,7 +13,7 @@ export function Footer() {
       <nav className="container px-4 md:px-6">
         <div className="grid gap-12 lg:grid-cols-3">
           <div className="space-y-4">
-            <h1 className='text-3xl'>@waves/cn</h1>
+            <h1 className='text-3xl'>waves-cn</h1>
             <p className="text-sm text-zinc-500">
               Made by{' '}
               <a

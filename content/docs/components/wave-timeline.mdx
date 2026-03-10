@@ -14,31 +14,9 @@ import { Steps, Step } from "fumadocs-ui/components/steps"
 <Tabs items={["CLI", "Manual"]}>
   <Tab value="CLI">
 
-<Steps>
-
-<Step>
-
-Install the required shadcn/ui primitives.
-
 ```bash
-npx shadcn@latest add button slider card skeleton
+npx shadcn@latest add https://waves-cn.vercel.app/r/wave-timeline.json
 ```
-
-</Step>
-
-<Step>
-
-Add the component via jsrepo.
-
-```bash
-npx jsrepo add @waves-cn/ui/wave-timeline
-```
-
-This will automatically install `wave-cn`, `wavesurfer.js` and `lucide-react`.
-
-</Step>
-
-</Steps>
 
   </Tab>
   <Tab value="Manual">
@@ -98,17 +76,17 @@ Update the import paths to match your project setup.
 - **Zoom** — three-way zoom control: step buttons (×1.5) and a precise slider, all calling `ws.zoom()` at runtime.
 - **Seek bar** — a shadcn `Slider` synced to playback progress; click or drag the waveform directly thanks to `dragToSeek`.
 - **Volume & mute** — slider-based volume with a mute toggle that preserves the last set level.
-- **Loading state** — a spinner overlays the waveform while audio is being fetched and decoded.
+- **Loading state** — a spinner overlays the waveform while wave is being fetched and decoded.
 - **Shadcn theming** — `waveColor` and `progressColor` accept any CSS value including `var(--*)` tokens, resolved at runtime for the Canvas API via `useCssVar`.
 
 ## Usage
 
 ```tsx
-import { AudioTimeline } from "@/components/ui/wave-timeline"
+import { WaveTimeline } from "@/components/waves-cn/wave-timeline"
 ```
 
 ```tsx
-<AudioTimeline url="/coastline.mp3" />
+<WaveTimeline url="/coastline.mp3" />
 ```
 
 ## Examples
@@ -128,7 +106,7 @@ Pass `topTimeline={false}` to render the waveform and zoom controls without any 
 ### Custom zoom range
 
 ```tsx
-<AudioTimeline
+<WaveTimeline 
   url="/coastline.mp3"
   defaultZoom={100}
   minZoom={20}
@@ -138,14 +116,14 @@ Pass `topTimeline={false}` to render the waveform and zoom controls without any 
 
 ## API Reference
 
-### AudioTimeline
+### WaveTimeline 
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `url` | `string` | — | **(Required)** Audio file URL to load. |
-| `waveColor` | `string` | `var(--muted-foreground)` | Audio bar color. Accepts any CSS value including `var(--*)` tokens. |
+| `url` | `string` | — | **(Required)** Wave file URL to load. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Wave bar color. Accepts any CSS value including `var(--*)` tokens. |
 | `progressColor` | `string` | `var(--primary)` | Progress bar color. Accepts any CSS value including `var(--*)` tokens. |
-| `waveHeight` | `number` | `80` | Audio canvas height in px. |
+| `waveHeight` | `number` | `80` | Wave canvas height in px. |
 | `barWidth` | `number` | `2` | Bar width in px. |
 | `barGap` | `number` | `1` | Gap between bars in px. |
 | `barRadius` | `number` | `2` | Bar border radius in px. |

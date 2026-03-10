@@ -1,6 +1,6 @@
 ---
 title: Wave Player
-description: A shadcn-styled waveform audio player built on wavesurfer.js.
+description: A shadcn-styled waveform wave player built on wavesurfer.js.
 ---
 
 import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
@@ -13,32 +13,9 @@ import { Steps, Step } from "fumadocs-ui/components/steps"
 
 <Tabs items={["CLI", "Manual"]}>
   <Tab value="CLI">
-
-<Steps>
-
-<Step>
-
-Install the required shadcn/ui primitives.
-
-```bash
-npx shadcn@latest add card button slider skeleton
-```
-
-</Step>
-
-<Step>
-
-Add the component via jsrepo.
-
-```bash
-npx jsrepo add @waves-cn/ui/wave-player
-```
-
-This will automatically install `wave-cn` (the core hook) and `wavesurfer.js` + `lucide-react`.
-
-</Step>
-
-</Steps>
+  ```bash
+  npx shadcn@latest add https://waves-cn.vercel.app/r/wave-player.json
+        ```
 
   </Tab>
   <Tab value="Manual">
@@ -98,17 +75,17 @@ Update the import paths to match your project setup.
 - **Seek bar** — a shadcn `Slider` below the waveform gives precise scrubbing independently of the waveform.
 - **Volume & mute** — slider-based volume control with a mute toggle that preserves the last set level.
 - **Restart** — jumps back to 0 and resumes playback instantly via `ws.setTime(0)`.
-- **Loading state** — a spinner overlays the waveform while the audio is being fetched and decoded.
+- **Loading state** — a spinner overlays the waveform while the wave is being fetched and decoded.
 - **Shadcn theming** — colors are resolved at runtime from Tailwind utility classes so the component inherits your active theme, including dark mode, without any extra configuration.
 
 ## Usage
 
 ```tsx
-import { AudioPlayer } from "@/components/ui/wave-player"
+import { WavePlayer } from "@/components/waves-cn/wave-player"
 ```
 
 ```tsx
-<AudioPlayer src="/coastline.mp3" />
+<WavePlayer src="/coastline.mp3" />
 ```
 
 ## Examples
@@ -134,11 +111,11 @@ Because `onPlay`, `onPause`, `onFinish`, and `onTimeUpdate` are functions, they 
 ```tsx
 "use client"
 
-import { AudioPlayer } from "@/components/ui/wave-player"
+import { WavePlayer } from "@/components/waves-cn/wave-player"
 
 export function MyPlayer() {
   return (
-    <AudioPlayer
+    <WavePlayer
       src="/coastline.mp3"
       onPlay={()  => console.log("Playing")}
       onPause={() => console.log("Paused")}
@@ -153,14 +130,14 @@ export function MyPlayer() {
 
 ## API Reference
 
-### AudioPlayer
+### WavePlayer
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `src` | `string` | — | **(Required)** Audio URL. Changing it destroys and reinitializes WaveSurfer. |
+| `src` | `string` | — | **(Required)** Wave URL. Changing it destroys and reinitializes WaveSurfer. |
 | `title` | `string` | — | Track title displayed above the waveform. |
 | `defaultVolume` | `number` | `0.8` | Initial volume `0`–`1`. |
-| `autoPlay` | `boolean` | `false` | Start playing as soon as audio is ready. |
+| `autoPlay` | `boolean` | `false` | Start playing as soon as wave is ready. |
 | `onPlay` | `() => void` | — | Fired when playback starts. |
 | `onPause` | `() => void` | — | Fired when playback pauses. |
 | `onFinish` | `() => void` | — | Fired when the track ends. |

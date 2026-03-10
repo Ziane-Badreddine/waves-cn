@@ -18,31 +18,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
 </TabsList>
 <TabsContent value="cli">
 
-<Steps>
-
-<Step>
-
-Install the required shadcn/ui primitives.
-
 ```bash
-npx shadcn@latest add button slider skeleton
+npx shadcn@latest add https://waves-cn.vercel.app/r/wave-zoom.json
 ```
-
-</Step>
-
-<Step>
-
-Add the component via jsrepo.
-
-```bash
-npx jsrepo add @waves-cn/ui/wave-zoom
-```
-
-This will automatically install `wave-cn`, `wavesurfer.js` and `lucide-react`.
-
-</Step>
-
-</Steps>
 
 </TabsContent>
 <TabsContent value="manual">
@@ -107,12 +85,9 @@ Update the import paths to match your project setup.
 ## Usage
 
 ```tsx
-import { WaveZoom } from "@/components/ui/wave-zoom"
+import { WaveZoom } from "@/components/waves-cn/wave-zoom"
 ```
 
-```tsx
-<WaveZoom url="/coastline.mp3" />
-```
 
 ## Examples
 
@@ -122,16 +97,7 @@ import { WaveZoom } from "@/components/ui/wave-zoom"
 
 <ComponentPreviewWrapper name="wave-zoom-custom-wave" />
 
-```tsx
-<WaveZoom
-  url="/coastline.mp3"
-  waveColor="var(--chart-1)"
-  progressColor="var(--chart-2)"
-  barWidth={4}
-  barGap={3}
-  barRadius={8}
-/>
-```
+
 
 ### Custom Zoom Range
 
@@ -139,14 +105,6 @@ Control how fast and how far the user can zoom.
 
 <ComponentPreviewWrapper name="wave-zoom-custom-range" />
 
-```tsx
-<WaveZoom
-  url="/coastline.mp3"
-  zoomScale={0.25}
-  maxZoom={500}
-  defaultZoom={50}
-/>
-```
 
 ## API Reference
 

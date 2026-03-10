@@ -11,8 +11,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | @wave/cn",
-    default: "@wave/cn",
+    template: "%s | waves-cn",
+    default: "waves-cn",
   },
 };
 

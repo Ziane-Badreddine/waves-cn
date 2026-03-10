@@ -14,7 +14,7 @@ export const gitConfig = {
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: "@waves/cn",
+      title: "waves-cn",
     },
     githubUrl: `https://github.com/Ziane-Badreddine/waves-cn`,
 

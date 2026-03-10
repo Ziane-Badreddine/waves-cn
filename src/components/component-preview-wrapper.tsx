@@ -9,7 +9,10 @@ interface ComponentPreviewWrapperProps {
   hideCode?: boolean;
 }
 const parseCode = (code: string) =>
-  code.replace(/@\/registry\//g, "@/").replace(/^["']use client["'];?\n?/m, "");
+  code
+    .replace(/^["']use client["'];?\n?/m, "")
+    .replace(/@\/registry\//g, "@/")
+    .replace(/@\/components\/(wave-[\w-]+)/g, "@/components/waves-cn/$1");
 
 export function ComponentPreviewWrapper({
   name,

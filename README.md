@@ -43,11 +43,7 @@ Audio rendering is powered by [wavesurfer.js](https://wavesurfer.xyz) — a batt
 ## Quick Start
 
 ```bash
-# 1. Install shadcn primitives for the component you want
-npx shadcn@latest add button slider skeleton
-
-# 2. Add the component via jsrepo (auto-installs wave-cn + wavesurfer.js)
-npx jsrepo add @waves-cn/ui/wave-player
+npx shadcn@latest add https://waves-cn.vercel.appr/wave-video.json
 ```
 
 ### Prerequisites

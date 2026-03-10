@@ -98,7 +98,7 @@ wavesurfer?.seekTo(0.5) // 0–1 normalized
 | Option | Type | Default | Description |
 | ------ | ---- | ------- | ----------- |
 | `container` | `RefObject<HTMLDivElement>` | — | **Required.** Ref to the container element. |
-| `url` | `string` | — | Audio file URL. |
+| `url` | `string` | — | Wave file URL. |
 | `waveColor` | `string` | `var(--muted-foreground)` | Accepts CSS vars, hex, hsl, oklch. |
 | `progressColor` | `string` | `var(--primary)` | Same formats as `waveColor`. |
 | `height` | `number` | `64` | Canvas height in px. |
@@ -115,6 +115,6 @@ wavesurfer?.seekTo(0.5) // 0–1 normalized
 | -------- | ---- | ----------- |
 | `wavesurfer` | `WaveSurfer \| null` | The live instance. `null` until mounted. |
 | `isReady` | `boolean` | `true` after the `ready` event fires. |
-| `isPlaying` | `boolean` | `true` while audio is playing. |
+| `isPlaying` | `boolean` | `true` while wave is playing. |
 | `hasFinished` | `boolean` | `true` after the `finish` event fires. |
 | `currentTime` | `number` | Current playback position in seconds. |
