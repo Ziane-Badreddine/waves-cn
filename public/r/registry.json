@@ -1,6 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "waves-cn",
+  "name": "@waves-cn",
   "homepage": "https://waves-cn.vercel.app",
   "repository": "https://github.com/Ziane-Badreddine/waves-cn",
   "items": [
