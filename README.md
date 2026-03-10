@@ -43,7 +43,7 @@ Audio rendering is powered by [wavesurfer.js](https://wavesurfer.xyz) — a batt
 ## Quick Start
 
 ```bash
-npx shadcn@latest add https://waves-cn.vercel.appr/wave-video.json
+npx shadcn@latest add https://waves-cn.vercel.appr/{name}.json
 ```
 
 ### Prerequisites
