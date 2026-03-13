@@ -8,7 +8,7 @@
     "lucide-react"
   ],
   "registryDependencies": [
-    "@waves-cn"
+    "https://waves-cn.vercel.app/r/wave-cn.json"
   ],
   "files": [
     {

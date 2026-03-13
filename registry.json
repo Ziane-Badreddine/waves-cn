@@ -23,7 +23,7 @@
       "description": "Full-featured wave player with play/pause, volume control, seek bar and optional title.",
       "type": "registry:component",
       "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn"],
+      "registryDependencies": ["https://waves-cn.vercel.app/r/wave-cn.json"],
       "files": [
         {
           "type": "registry:component",
@@ -38,7 +38,7 @@
       "description": "Voice message recorder with live waveform, pause/resume, discard and auto-stop.",
       "type": "registry:component",
       "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn"],
+      "registryDependencies": ["https://waves-cn.vercel.app/r/wave-cn.json"],
       "files": [
         {
           "type": "registry:component",
@@ -53,7 +53,7 @@
       "description": "wave player with continuous playback speed control and preserve-pitch toggle.",
       "type": "registry:component",
       "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn"],
+      "registryDependencies": ["https://waves-cn.vercel.app/r/wave-cn.json"],
       "files": [
         {
           "type": "registry:component",
@@ -68,7 +68,7 @@
       "description": "wave player with mouse-wheel zoom via wavesurfer.js ZoomPlugin.",
       "type": "registry:component",
       "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn"],
+      "registryDependencies": ["https://waves-cn.vercel.app/r/wave-cn.json"],
       "files": [
         {
           "type": "registry:component",
@@ -83,7 +83,7 @@
       "description": "Waveform player synced to a video element via the wavesurfer.js media prop.",
       "type": "registry:component",
       "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn"],
+      "registryDependencies": ["https://waves-cn.vercel.app/r/wave-cn.json"],
       "files": [
         {
           "type": "registry:component",
@@ -98,7 +98,7 @@
       "description": "wave player with timeline ruler, zoom slider and volume control powered by wavesurfer.js TimelinePlugin.",
       "type": "registry:component",
       "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn"],
+      "registryDependencies": ["https://waves-cn.vercel.app/r/wave-cn.json"],
       "files": [
         {
           "type": "registry:component",
