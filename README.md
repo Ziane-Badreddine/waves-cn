@@ -43,7 +43,7 @@ Audio rendering is powered by [wavesurfer.js](https://wavesurfer.xyz) — a batt
 ## Quick Start
 
 ```bash
-npx shadcn@latest add https://.vercel.appr/{name}.json
+npx shadcn@latest add @waves-cn/{name}
 ```
 
 ### Prerequisites
@@ -52,7 +52,7 @@ npx shadcn@latest add https://.vercel.appr/{name}.json
 - Tailwind CSS
 - [shadcn/ui](https://ui.shadcn.com/docs/installation) initialized in your project
 
-→ Full installation guide at [.vercel.app/docs/installation](https://.vercel.app/docs/installation)
+→ Full installation guide at [[https://waves-cn.vercel.app/docs/installation)](https://waves-cn.vercel.app/docs/installation)
 
 ## Contributors
 
