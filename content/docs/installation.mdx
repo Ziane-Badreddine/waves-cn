@@ -1,88 +1,75 @@
 ---
 title: Installation
-description: Add waves-cn components to your project.
+description: Add waves-cn components to your project using the shadcn/ui registry.
 ---
 
-import { Steps, Step } from "@/components/steps"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+import { Tab, Tabs } from "fumadocs-ui/components/tabs"
 
-waves-cn components are not a package — you copy the source into your project and own it.
+## Quick Start
+
+waves-cn is a trusted registry for shadcn/ui. You can start adding components right away!
+
+<Tabs items={["pnpm", "npm", "yarn", "bun"]}>
+  <Tab value="pnpm">
+    ```bash
+    pnpm dlx shadcn@latest add @waves-cn/wave-player
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npx shadcn@latest add @waves-cn/wave-player
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn dlx shadcn@latest add @waves-cn/wave-player
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bunx --bun shadcn@latest add @waves-cn/wave-player
+    ```
+  </Tab>
+</Tabs>
+
+This will add the waves-cn registry to your `components.json`:
+
+```json
+{
+  "registries": {
+    "@waves-cn": "/{name}.json"
+  }
+}
+```
 
 ## Prerequisites
 
-- React 18+
-- Tailwind CSS
-- [shadcn/ui initialized](https://ui.shadcn.com/docs/installation) in your project
+Before adding any component, make sure you have shadcn/ui initialized in your project:
 
----
-
-## Install a component
-You can now start adding components to your project.
-
-<Tabs defaultValue="cli">
-  <TabsList>
-    <TabsTrigger value="cli">CLI</TabsTrigger>
-    <TabsTrigger value="manual">Manual</TabsTrigger>
-  </TabsList>
-
-  <TabsContent value="cli">
-
-```bash
-npx shadcn@latest add https://waves-cn.vercel.app/r/{name}.json
-```
-
-  </TabsContent>
-
-  <TabsContent value="manual">
-    <Steps>
-      <Step>
-        **Install the dependencies**
-
-        ```bash
-        npm install wavesurfer.js lucide-react
-        ```
-      </Step>
-
-      <Step>
-        **Install the shadcn/ui primitives**
-
-        Check the component page for the exact list required.
-
-        ```bash
-        npx shadcn@latest add button slider skeleton
-        ```
-      </Step>
-
-      <Step>
-        **Copy `wave-cn.tsx` into your project**
-
-        Every component depends on `wave-cn`. Copy it into `src/lib/wave-cn.tsx`.
-      </Step>
-
-      <Step>
-        **Copy the component file**
-
-        Copy the component source from its doc page into `src/components/ui/`.
-      </Step>
-
-      <Step>
-        **Update the import paths**
-
-        Adjust any `@/` aliases to match your project structure.
-      </Step>
-    </Steps>
-  </TabsContent>
+<Tabs items={["pnpm", "npm", "yarn", "bun"]}>
+  <Tab value="pnpm">
+    ```bash
+    pnpm dlx shadcn@latest init
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npx shadcn@latest init
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn dlx shadcn@latest init
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bunx --bun shadcn@latest init
+    ```
+  </Tab>
 </Tabs>
 
----
+## Need Help?
 
-## shadcn/ui primitives per component
-
-| Component | Required primitives |
-| --- | --- |
-| `wave-player` | `card button slider skeleton` |
-| `wave-recorder` | `button skeleton` |
-| `wave-speed` | `button slider switch label skeleton` |
-| `wave-zoom` | `button slider skeleton` |
-| `wave-video` | `button skeleton` |
-| `wave-timeline` | `button slider card skeleton` |
+- [GitHub Repository](https://github.com/Ziane-Badreddine/waves-cn)
+- [Introduction](/docs)

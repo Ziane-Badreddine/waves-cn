@@ -55,6 +55,23 @@ const icons = [
 export function Hero() {
   return (
     <section className="relative isolate overflow-hidden rounded-4xl bg-background py-8 sm:py-12 md:py-16 lg:py-24">
+
+  {/* <div
+     className="absolute inset-0 -z-10 opacity-50"
+    style={{
+      backgroundImage: `
+        linear-gradient(45deg, transparent 49%, var(--foreground) 49%, var(--foreground) 51%, transparent 51%),
+        linear-gradient(-45deg, transparent 49%, var(--foreground) 49%, var(--foreground) 51%, transparent 51%)
+      `,
+      backgroundSize: "40px 40px",
+         WebkitMaskImage:
+            "radial-gradient(ellipse 80% 80% at 100% 100%, var(--background) 50%, transparent 90%)",
+          maskImage:
+            "radial-gradient(ellipse 80% 80% at 100% 100%, var(--background) 50%, transparent 90%)",
+    }}
+  /> */}
+
+       
       <aside className="my-16 relative text-center justify-center flex flex-col items-center self-center  xl:flex-1 ">
         <WaveHero />
         <p className="my-8 text-center text-2xl md:text-3xl ">
