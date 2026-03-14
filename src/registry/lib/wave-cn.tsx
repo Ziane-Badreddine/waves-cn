@@ -1,23 +1,7 @@
 "use client";
 
-/**
- * A React component for wavesurfer.js
- *
- * Usage:
- *
- * import WavesurferPlayer from '@wavesurfer/react'
- *
- * <WavesurferPlayer
- *   url="/my-server/audio.ogg"
- *   waveColor="purple"
- *   height={100}
- *   onReady={(wavesurfer) => console.log('Ready!', wavesurfer)}
- * />
- */
-
 import {
   useState,
-  useMemo,
   useEffect,
   useRef,
   memo,
@@ -42,19 +26,11 @@ type OnWavesurferEvents = {
 
 type PartialWavesurferOptions = Omit<WaveSurferOptions, "container">;
 
-/**
- * Props for the Wavesurfer component
- * @public
- */
 export type WavesurferProps = PartialWavesurferOptions &
   OnWavesurferEvents & {
     className?: string;
   };
 
-/**
- * Shared waveform defaults applied to every useWavesurfer instance.
- * Override any of these by passing the corresponding option explicitly.
- */
 export const WAVESURFER_DEFAULTS = {
   waveColor: "var(--muted-foreground)",
   progressColor: "var(--primary)",
@@ -66,117 +42,6 @@ export const WAVESURFER_DEFAULTS = {
   cursorWidth: 0,
 } as const satisfies Partial<WaveSurferOptions>;
 
-/**
- * Use wavesurfer instance
- */
-function useWavesurferInstance(
-  containerRef: RefObject<HTMLDivElement | null>,
-  options: Partial<WaveSurferOptions>,
-): WaveSurfer | null {
-  const [wavesurfer, setWavesurfer] = useState<WaveSurfer | null>(null);
-
-  // Flatten options object to an array of keys and values to compare them deeply in the hook deps
-  // Exclude plugins from deep comparison since they are mutated during initialization
-  const optionsWithoutPlugins = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { plugins, ...rest } = options;
-    return rest;
-  }, [options]);
-  const flatOptions = useMemo(
-    () => Object.entries(optionsWithoutPlugins).flat(),
-    [optionsWithoutPlugins],
-  );
-
-  // Create a wavesurfer instance
-  useEffect(() => {
-    if (!containerRef?.current) return;
-
-    const ws = WaveSurfer.create({
-      ...optionsWithoutPlugins,
-      plugins: options.plugins,
-      container: containerRef.current,
-    });
-
-    setWavesurfer(ws);
-
-    return () => {
-      ws.destroy();
-    };
-    // Only recreate if plugins array reference changes (not on mutation)
-    // Users should memoize the plugins array to prevent unnecessary re-creation
-  }, [containerRef, options.plugins, ...flatOptions]);
-
-  return wavesurfer;
-}
-
-/**
- * Use wavesurfer state
- */
-function useWavesurferState(wavesurfer: WaveSurfer | null): {
-  isReady: boolean;
-  isPlaying: boolean;
-  currentTime: number;
-} {
-  const [isReady, setIsReady] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [hasFinished, setHasFinished] = useState<boolean>(false);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-
-  useEffect(() => {
-    if (!wavesurfer) return;
-
-    const unsubscribeFns = [
-      wavesurfer.on("load", () => {
-        setIsReady(false);
-        setIsPlaying(false);
-        setCurrentTime(0);
-      }),
-
-      wavesurfer.on("ready", () => {
-        setIsReady(true);
-        setIsPlaying(false);
-        setHasFinished(false);
-        setCurrentTime(0);
-      }),
-
-      wavesurfer.on("finish", () => {
-        setHasFinished(true);
-      }),
-
-      wavesurfer.on("play", () => {
-        setIsPlaying(true);
-      }),
-
-      wavesurfer.on("pause", () => {
-        setIsPlaying(false);
-      }),
-
-      wavesurfer.on("timeupdate", () => {
-        setCurrentTime(wavesurfer.getCurrentTime());
-      }),
-
-      wavesurfer.on("destroy", () => {
-        setIsReady(false);
-        setIsPlaying(false);
-      }),
-    ];
-
-    return () => {
-      unsubscribeFns.forEach((fn) => fn());
-    };
-  }, [wavesurfer]);
-
-  return useMemo(
-    () => ({
-      isReady,
-      isPlaying,
-      hasFinished,
-      currentTime,
-    }),
-    [isPlaying, hasFinished, currentTime, isReady],
-  );
-}
-
 const EVENT_PROP_RE = /^on([A-Z])/;
 const isEventProp = (key: string) => EVENT_PROP_RE.test(key);
 const getEventName = (key: string) =>
@@ -184,134 +49,189 @@ const getEventName = (key: string) =>
     $1.toLowerCase(),
   ) as keyof WaveSurferEvents;
 
-/**
- * Parse props into wavesurfer options and events
- */
-function useWavesurferProps(
-  props: WavesurferProps,
-): [PartialWavesurferOptions, OnWavesurferEvents] {
-  // Props starting with `on` are wavesurfer events, e.g. `onReady`
-  // The rest of the props are wavesurfer options
-  return useMemo<[PartialWavesurferOptions, OnWavesurferEvents]>(() => {
-    const allOptions = { ...props };
-    const allEvents = { ...props };
+// ─── Component ───────────────────────────────────────────────────────────────
+const WavesurferPlayer = memo(
+  (props: WavesurferProps): ReactElement => {
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const wsRef = useRef<WaveSurfer | null>(null);
+    const { className, ...rest } = props;
 
-    for (const key in allOptions) {
-      if (isEventProp(key)) {
-        delete allOptions[key as keyof WavesurferProps];
-      } else {
-        delete allEvents[key as keyof WavesurferProps];
-      }
+    // ── Separate options from event handlers
+    const options: Partial<WaveSurferOptions> = {};
+    const eventProps: OnWavesurferEvents = {};
+    for (const key in rest) {
+      if (isEventProp(key))
+        eventProps[key as keyof OnWavesurferEvents] = rest[
+          key as keyof typeof rest
+        ] as never;
+      else
+        options[key as keyof PartialWavesurferOptions] = rest[
+          key as keyof typeof rest
+        ] as never;
     }
-    return [allOptions, allEvents];
-  }, [props]);
-}
 
-/**
- * Subscribe to wavesurfer events
- */
-function useWavesurferEvents(
-  wavesurfer: WaveSurfer | null,
-  events: OnWavesurferEvents,
-) {
-  const flatEvents = useMemo(() => Object.entries(events).flat(), [events]);
+    // ── Resolve CSS vars
+    const waveColor =
+      (options.waveColor as string | undefined) ??
+      WAVESURFER_DEFAULTS.waveColor;
+    const progressColor =
+      (options.progressColor as string | undefined) ??
+      WAVESURFER_DEFAULTS.progressColor;
+    const resolvedWaveColor = useCssVar(waveColor);
+    const resolvedProgressColor = useCssVar(progressColor);
 
-  // Subscribe to events
-  useEffect(() => {
-    if (!wavesurfer) return;
+    // ── Keep event handlers in a ref — changes never cause re-subscription
+    const eventsRef = useRef(eventProps);
+    eventsRef.current = eventProps;
 
-    const eventEntries = Object.entries(events);
-    if (!eventEntries.length) return;
+    // ── Keep non-url options in a ref — changes applied imperatively
+    const optionsRef = useRef(options);
+    optionsRef.current = options;
 
-    const unsubscribeFns = eventEntries.map(([name, handler]) => {
-      const event = getEventName(name);
-      return wavesurfer.on(event, (...args) =>
-        (handler as WavesurferEventHandler<WaveSurferEvents[typeof event]>)(
-          wavesurfer,
-          ...args,
-        ),
-      );
-    });
+    // ── Create instance only when url or structural options change
+    const url = options.url as string | undefined;
+    const height =
+      (options.height as number | undefined) ?? WAVESURFER_DEFAULTS.height;
+    const barWidth =
+      (options.barWidth as number | undefined) ?? WAVESURFER_DEFAULTS.barWidth;
+    const barGap =
+      (options.barGap as number | undefined) ?? WAVESURFER_DEFAULTS.barGap;
+    const barRadius =
+      (options.barRadius as number | undefined) ??
+      WAVESURFER_DEFAULTS.barRadius;
+    const minPxPerSec =
+      (options.minPxPerSec as number | undefined) ??
+      WAVESURFER_DEFAULTS.minPxPerSec;
+    const cursorWidth =
+      (options.cursorWidth as number | undefined) ??
+      WAVESURFER_DEFAULTS.cursorWidth;
+    const dragToSeek = options.dragToSeek as boolean | undefined;
+    const media = options.media as HTMLMediaElement | undefined;
 
-    return () => {
-      unsubscribeFns.forEach((fn) => fn());
-    };
-  }, [wavesurfer, ...flatEvents]);
-}
+    useEffect(() => {
+      if (!containerRef.current) return;
 
-/**
- * Wavesurfer player component
- * @see https://wavesurfer.xyz/docs/modules/wavesurfer
- * @public
- */
-const WavesurferPlayer = memo((props: WavesurferProps): ReactElement => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const { className, ...propsWithoutClassName } = props;
-  const [rawOptions, events] = useWavesurferProps(propsWithoutClassName);
+      const ws = WaveSurfer.create({
+        ...WAVESURFER_DEFAULTS,
+        url,
+        height,
+        barWidth,
+        barGap,
+        barRadius,
+        minPxPerSec,
+        cursorWidth,
+        dragToSeek,
+        media,
+        plugins: optionsRef.current.plugins,
+        waveColor: resolvedWaveColor,
+        progressColor: resolvedProgressColor,
+        container: containerRef.current,
+      });
 
-  // Apply WAVESURFER_DEFAULTS and resolve CSS var() tokens — same logic as
-  // useWavesurfer — so WavesurferPlayer benefits from shared defaults too.
-  const waveColor =
-    (rawOptions.waveColor as string | undefined) ??
-    WAVESURFER_DEFAULTS.waveColor;
-  const progressColor =
-    (rawOptions.progressColor as string | undefined) ??
-    WAVESURFER_DEFAULTS.progressColor;
-  const resolvedWaveColor = useCssVar(waveColor);
-  const resolvedProgressColor = useCssVar(progressColor);
+      wsRef.current = ws;
 
-  const options = useMemo(() => {
-    const { waveColor: _wc, progressColor: _pc, ...rest } = rawOptions;
-    const cleanOptions = Object.fromEntries(
-      Object.entries(rest).filter(([, v]) => v !== undefined),
-    ) as PartialWavesurferOptions;
+      // Subscribe to all events via ref — always calls latest handler
+      const eventEntries = Object.keys(eventsRef.current);
+      const unsubs = eventEntries.map((name) => {
+        const event = getEventName(name);
+        return ws.on(event, (...args) =>
+          (
+            eventsRef.current[
+              name as keyof OnWavesurferEvents
+            ] as WavesurferEventHandler<WaveSurferEvents[typeof event]>
+          )?.(ws, ...args),
+        );
+      });
 
-    return {
-      ...WAVESURFER_DEFAULTS,
-      ...cleanOptions,
-      waveColor: resolvedWaveColor,
-      progressColor: resolvedProgressColor,
-    } as PartialWavesurferOptions;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resolvedWaveColor, resolvedProgressColor, ...Object.values(rawOptions)]);
+      return () => {
+        unsubs.forEach((fn) => fn());
+        ws.destroy();
+        wsRef.current = null;
+      };
+      // Only remount when these primitive options change — NOT handlers, NOT colors
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+      url,
+      height,
+      barWidth,
+      barGap,
+      barRadius,
+      minPxPerSec,
+      cursorWidth,
+      dragToSeek,
+    ]);
 
-  const wavesurfer = useWavesurferInstance(containerRef, options);
-  useWavesurferEvents(wavesurfer, events);
+    // ── Apply color changes imperatively — zero remount on theme switch
+    useEffect(() => {
+      wsRef.current?.setOptions({
+        waveColor: resolvedWaveColor,
+        progressColor: resolvedProgressColor,
+      });
+    }, [resolvedWaveColor, resolvedProgressColor]);
 
-  // Create a container div
-  return <div ref={containerRef} className={className} />;
-});
+    // ── Skeleton
+    const [isReady, setIsReady] = useState(false);
+    useEffect(() => {
+      const ws = wsRef.current;
+      if (!ws) return;
 
-/**
- * @public
- */
+      // Sync immediately with current instance — avoids skeleton flash on re-render
+      // when the instance already exists and audio is already decoded
+      setIsReady(ws.getDuration() > 0);
+
+      const unsubs = [
+        ws.on("ready", () => setIsReady(true)),
+        ws.on("load", () => setIsReady(false)),
+        ws.on("destroy", () => setIsReady(false)),
+      ];
+      return () => unsubs.forEach((fn) => fn());
+      // Re-attach when instance changes (url change creates new instance)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [wsRef.current]);
+
+    return (
+      <div className={className} style={{ position: "relative" }}>
+        {!isReady && (
+          <div
+            style={{
+              height,
+              width: "100%",
+              position: "absolute",
+              inset: 0,
+              borderRadius: 4,
+              background: "hsl(var(--muted))",
+              animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
+            }}
+          />
+        )}
+        <div ref={containerRef} style={!isReady ? { opacity: 0 } : undefined} />
+      </div>
+    );
+  },
+  (prev, next) => {
+    // Only remount when structural audio options change — ignore handlers and className
+    const STRUCTURAL_KEYS = [
+      "url",
+      "height",
+      "barWidth",
+      "barGap",
+      "barRadius",
+      "minPxPerSec",
+      "cursorWidth",
+      "dragToSeek",
+      "waveColor",
+      "progressColor",
+    ];
+    return STRUCTURAL_KEYS.every(
+      (k) =>
+        prev[k as keyof WavesurferProps] === next[k as keyof WavesurferProps],
+    );
+  },
+);
+
 export default WavesurferPlayer;
 
-/**
- * React hook for wavesurfer.js
- *
- * Automatically applies shared defaults (colors, height, bar shape, volume).
- * Any option passed explicitly will override the defaults.
- * CSS var() tokens in waveColor and progressColor are resolved at runtime
- * so they work correctly with the Canvas API.
- *
- * ```
- * import { useWavesurfer } from '@/components/cors/wavesurfer-player'
- *
- * const App = () => {
- *   const containerRef = useRef<HTMLDivElement | null>(null)
- *
- *   const { wavesurfer, isReady, isPlaying, currentTime } = useWavesurfer({
- *     container: containerRef,
- *     url: '/my-server/audio.ogg',
- *   })
- *
- *   return <div ref={containerRef} />
- * }
- * ```
- *
- * @public
- */
+// ─── Hook ────────────────────────────────────────────────────────────────────
 export function useWavesurfer({
   container,
   waveColor = WAVESURFER_DEFAULTS.waveColor,
@@ -319,54 +239,104 @@ export function useWavesurfer({
   ...options
 }: Omit<WaveSurferOptions, "container"> & {
   container: RefObject<HTMLDivElement | null>;
-}): ReturnType<typeof useWavesurferState> & {
-  wavesurfer: ReturnType<typeof useWavesurferInstance>;
-} {
-  // Resolve CSS var() tokens so the Canvas API receives actual color values
+}) {
   const resolvedWaveColor = useCssVar(waveColor as string);
   const resolvedProgressColor = useCssVar(progressColor as string);
+  const [wavesurfer, setWavesurfer] = useState<WaveSurfer | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
 
-  // Memoize mergedOptions so useWavesurferInstance gets a stable object reference.
-  // Without this, a new object is created every render → flatOptions changes →
-  // the instance is destroyed and recreated on every render, wiping spread props.
-  // Also strip undefined values so they don't silently override WAVESURFER_DEFAULTS.
-  const mergedOptions = useMemo(() => {
-    const cleanOptions = Object.fromEntries(
-      Object.entries(options).filter(([, v]) => v !== undefined),
-    ) as Partial<WaveSurferOptions>;
+  const url = options.url as string | undefined;
+  const height =
+    (options.height as number | undefined) ?? WAVESURFER_DEFAULTS.height;
+  const barWidth =
+    (options.barWidth as number | undefined) ?? WAVESURFER_DEFAULTS.barWidth;
+  const barGap =
+    (options.barGap as number | undefined) ?? WAVESURFER_DEFAULTS.barGap;
+  const barRadius =
+    (options.barRadius as number | undefined) ?? WAVESURFER_DEFAULTS.barRadius;
+  const minPxPerSec =
+    (options.minPxPerSec as number | undefined) ??
+    WAVESURFER_DEFAULTS.minPxPerSec;
 
-    return {
+  useEffect(() => {
+    if (!container.current) return;
+    const ws = WaveSurfer.create({
       ...WAVESURFER_DEFAULTS,
-      ...cleanOptions,
+      ...options,
       waveColor: resolvedWaveColor,
       progressColor: resolvedProgressColor,
-    } as Partial<WaveSurferOptions>;
+      container: container.current,
+    });
+    setWavesurfer(ws);
+    const unsubs = [
+      ws.on("load", () => {
+        setIsReady(false);
+        setIsPlaying(false);
+        setCurrentTime(0);
+      }),
+      ws.on("ready", () => {
+        setIsReady(true);
+      }),
+      ws.on("play", () => {
+        setIsPlaying(true);
+      }),
+      ws.on("pause", () => {
+        setIsPlaying(false);
+      }),
+      ws.on("timeupdate", () => {
+        setCurrentTime(ws.getCurrentTime());
+      }),
+      ws.on("destroy", () => {
+        setIsReady(false);
+        setIsPlaying(false);
+      }),
+    ];
+    return () => {
+      unsubs.forEach((fn) => fn());
+      ws.destroy();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resolvedWaveColor, resolvedProgressColor, ...Object.values(options)]);
+  }, [url, height, barWidth, barGap, barRadius, minPxPerSec]);
 
-  const wavesurfer = useWavesurferInstance(container, mergedOptions);
-  const state = useWavesurferState(wavesurfer);
-  return useMemo(() => ({ ...state, wavesurfer }), [state, wavesurfer]);
+  useEffect(() => {
+    wavesurfer?.setOptions({
+      waveColor: resolvedWaveColor,
+      progressColor: resolvedProgressColor,
+    });
+  }, [wavesurfer, resolvedWaveColor, resolvedProgressColor]);
+
+  return { wavesurfer, isReady, isPlaying, currentTime };
 }
 
+// ─── CSS var resolver ────────────────────────────────────────────────────────
 export function useCssVar(value: string): string {
   const [resolved, setResolved] = useState(value);
 
   useEffect(() => {
-    // Only resolve if the value looks like a CSS variable
     const match = value.match(/^var\((--[^)]+)\)$/);
     if (!match) {
       setResolved(value);
       return;
     }
+
     const varName = match[1];
-    const raw = getComputedStyle(document.documentElement)
-      .getPropertyValue(varName)
-      .trim();
-    // shadcn stores values as bare HSL channels e.g. "222.2 47.4% 11.2%"
-    // Canvas needs a full color string — wrap in hsl() if needed
-    const isHslChannels = /^[\d.]+ [\d.]+% [\d.]+%$/.test(raw);
-    setResolved(raw ? (isHslChannels ? `hsl(${raw})` : raw) : value);
+    const resolve = () => {
+      const raw = getComputedStyle(document.documentElement)
+        .getPropertyValue(varName)
+        .trim();
+      const isHsl = /^[\d.]+ [\d.]+% [\d.]+%$/.test(raw);
+      setResolved(raw ? (isHsl ? `hsl(${raw})` : raw) : value);
+    };
+
+    resolve();
+    const observer = new MutationObserver(resolve);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style", "data-theme"],
+    });
+    return () => observer.disconnect();
   }, [value]);
 
   return resolved;
