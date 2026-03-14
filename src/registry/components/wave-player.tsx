@@ -116,8 +116,6 @@ export function WavePlayer({
     [isReady],
   );
 
-  // ── WavesurferPlayer event handlers
-
   const handleReady = React.useCallback(
     (ws: WaveSurfer) => {
       wavesurferRef.current = ws;
