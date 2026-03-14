@@ -87,7 +87,7 @@ export function CodeBlock({
       {...props}
       tabIndex={-1}
       className={cn(
-        inTab ? 'bg-fd-secondary -mx-px -mb-px last:rounded-b-xl' : 'my-4 bg-fd-card rounded-xl',
+        inTab ? 'bg-fd-secondary -mx-px -mb-px last:rounded-b-xl' : 'my-4 bg-fd-card rounded',
         keepBackground && 'bg-(--shiki-light-bg) dark:bg-(--shiki-dark-bg)',
 
         'shiki relative border shadow-sm not-prose overflow-hidden text-sm',
@@ -172,6 +172,7 @@ function CopyButton({
         buttonVariants({
           className: 'hover:text-fd-accent-foreground data-checked:text-fd-accent-foreground',
           size: 'icon-xs',
+          variant: "outline"
         }),
         className,
       )}
@@ -192,7 +193,7 @@ export function CodeBlockTabs({ ref, ...props }: ComponentProps<typeof Tabs>) {
     <Tabs
       ref={mergeRefs(containerRef, ref)}
       {...props}
-      className={cn('bg-fd-card rounded-xl border', !nested && 'my-4', props.className)}
+      className={cn('bg-fd-card rounded border', !nested && 'my-4', props.className)}
     >
       <TabsContext
         value={useMemo(

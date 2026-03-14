@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 
 export default function WaveHero() {
   const [isReady, setIsReady] = useState(false);
-
   return (
     <div className="relative bottom-1/2 left-0 w-full px-4 md:px-6">
       {!isReady && (
@@ -24,7 +23,6 @@ export default function WaveHero() {
         onInteraction={(ws) => ws.play()}
         dragToSeek={true}
         onFinish={(ws) => ws.setTime(0)}
-        className={cn(isReady ? "opacity-100" : "opacity-0")}
       />
     </div>
   );

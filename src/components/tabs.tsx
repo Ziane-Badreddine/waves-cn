@@ -95,7 +95,7 @@ export function Tabs({
     <Unstyled.Tabs
       ref={ref}
       className={cn(
-        'flex flex-col overflow-hidden rounded-xl border bg-fd-secondary my-4',
+        'flex flex-col overflow-hidden rounded border bg-secondary my-4',
         className,
       )}
       value={value}
@@ -157,7 +157,7 @@ export function TabsContent({
       value={value}
       forceMount
       className={cn(
-        'p-4 text-[0.9375rem] bg-fd-background rounded-xl outline-none prose-no-margin data-[state=inactive]:hidden [&>figure:only-child]:-m-4 [&>figure:only-child]:border-none',
+        'p-4 text-[0.9375rem] bg-background rounded outline-none prose-no-margin data-[state=inactive]:hidden [&>figure:only-child]:-m-4 [&>figure:only-child]:border-none',
         className,
       )}
       {...props}

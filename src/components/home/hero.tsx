@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ChevronDown, Github, Library } from "lucide-react";
+import { ArrowUpRightIcon, ChevronDown, Github, Library } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
@@ -18,6 +18,12 @@ import { SiGithub, SiReadthedocs } from "react-icons/si";
 import { GiWaveSurfer } from "react-icons/gi";
 import WavesurferPlayer from "../cors/wavesurfer-player";
 import WaveHero from "./wave-hero";
+import Grid from "../grid";
+import {
+  Announcement,
+  AnnouncementTag,
+  AnnouncementTitle,
+} from "@/components/kibo-ui/announcement";
 
 const icons = [
   {
@@ -55,8 +61,8 @@ const icons = [
 export function Hero() {
   return (
     <section className="relative isolate overflow-hidden rounded-4xl bg-background py-8 sm:py-12 md:py-16 lg:py-24">
-
-  {/* <div
+      <Grid size={5 * 5 + 10} />
+      {/* <div
      className="absolute inset-0 -z-10 opacity-50"
     style={{
       backgroundImage: `
@@ -71,8 +77,18 @@ export function Hero() {
     }}
   /> */}
 
-       
       <aside className="my-16 relative text-center justify-center flex flex-col items-center self-center  xl:flex-1 ">
+        <Announcement className="mb-6">
+          <AnnouncementTag>Latest update</AnnouncementTag>
+          <Link href={"/docs/instalation"}>
+          <AnnouncementTitle>
+            waves-cn on shadcn/ui registry
+            <ArrowUpRightIcon
+              className="shrink-0 text-muted-foreground"
+              size={16}
+            />
+          </AnnouncementTitle></Link>
+        </Announcement>
         <WaveHero />
         <p className="my-8 text-center text-2xl md:text-3xl ">
           <span className="font-semibold">waves-cn</span> a collection of

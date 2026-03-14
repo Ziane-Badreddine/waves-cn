@@ -36,20 +36,14 @@ Any contributions are welcome! Open an issue or a PR on [GitHub](https://github.
   {[
     { name: "Badreddine Ziane", username: "Ziane-Badreddine", url: "https://github.com/Ziane-Badreddine" },
     { name: "Mouad Sadik",      username: "MouadSadik",       url: "https://github.com/MouadSadik"       },
-  ].map((c) => (
+  ].map((c,i) => (
     <div
       key={c.username}
-       className={cn(
-                " flex items-center justify-center p-4",
-                "relative flex size-full flex-col items-center justify-center  overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)] bg-card",
-              )}
+      	className="relative bg-linear-to-b  dark:from-neutral-900 from-secondary dark:to-neutral-950 to-white px-6 py-2 overflow-hidden flex flex-col items-center border "
     >
-      <div className="-translate-y-px absolute top-8 right-0 left-0 border border-primary border-dashed" />
-      <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-primary border-dashed" />
-      <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-primary border-dashed" />
-      <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-primary border-dashed" />
+     <Grid size={i * 5 + 10} />
 
-      <Avatar className="size-20 mt-6 relative mb-0 ">
+      <Avatar className="size-24 mt-6 relative mb-0 outline-4 outline-primary ">
         <AvatarImage className=" self-center " src={`https://github.com/${c.username}.png`} />
         <AvatarFallback>{c.name.charAt(0)}</AvatarFallback>
       </Avatar>

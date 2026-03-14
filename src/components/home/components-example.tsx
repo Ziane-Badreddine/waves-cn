@@ -11,6 +11,7 @@ import WaveSpeed from "@/registry/components/wave-speed";
 import WaveTimeline from "@/registry/components/wave-timeline";
 import WaveVideo from "@/registry/components/wave-video";
 import WaveZoom from "@/registry/components/wave-zoom";
+import Grid from "@/components/grid";
 
 // ─── Source pages ─────────────────────────────────────────────────────────────
 const wavePlayer = source.getPage(["components", "wave-player"]);
@@ -34,7 +35,7 @@ const examples = [
       <WavePlayer
         src={DEMO_AUDIO}
         title="Demo Track"
-        className="px-6 pb-6 my-auto"
+        className="px-6 pb-6 my-auto shadow-none"
       />
     ),
   },
@@ -60,7 +61,7 @@ const examples = [
       <WaveTimeline
         src={DEMO_AUDIO}
         title="Demo Track"
-        className="px-6 pb-6 my-auto"
+        className="px-6 pb-6 my-auto shadow-none"
       />
     ),
   },
@@ -89,12 +90,14 @@ const ExampleCard = ({
   description,
   component: Component,
   className,
+  index
 }: {
   icon: string | undefined;
   name: string | undefined;
   description: string | undefined;
   component: ComponentType;
   className?: string;
+  index: number
 }) => {
   const Icon =
     icon && icon in icons
@@ -105,15 +108,11 @@ const ExampleCard = ({
   return (
     <div
       className={cn(
-        "flex h-full flex-col gap-8  bg-card  ",
-        "relative flex size-full flex-col items-center gap-4 overflow-hidden md:p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)] bg-card",
+        className="relative bg-linear-to-b  dark:from-neutral-900 from-secondary dark:to-neutral-950 to-white  py-2 overflow-hidden flex flex-col items-center border gap-4 ",
         className,
       )}
     >
-      <div className="-translate-y-px absolute top-0 md:top-8 right-0 left-0 border border-primary  border-dashed" />
-      <div className="absolute right-0 bottom-0 md:bottom-8 left-0 translate-y-px border border-primary border-dashed" />
-      <div className="-translate-x-px absolute top-0 bottom-0 left-0 md:left-8 border border-primary border-dashed" />
-      <div className="absolute top-0 right-0 md:right-8 bottom-0 translate-x-px border border-primary border-dashed" />
+      <Grid size={index * 5 + 10} />
       <div className="grid gap-2 px-6 pt-6">
         <div className="flex items-center gap-2">
           {Icon && <Icon className="text-muted-foreground" size={16} />}
@@ -149,8 +148,8 @@ export const ComponentsExample = () => (
       </Button>
     </div>
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {examples.map((example) => (
-        <ExampleCard key={example.name} {...example} />
+      {examples.map((example,i) => (
+        <ExampleCard index={i} key={example.name} {...example} />
       ))}
     </div>
   </div>

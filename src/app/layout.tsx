@@ -24,20 +24,6 @@ export default function Layout({ children }: LayoutProps<"/">) {
       <body className="flex flex-col min-h-screen">
         <RootProvider>
           <TooltipProvider>
-            <Banner
-              variant="rainbow"
-              className="bg-background text-foreground w-full mx-auto"
-            >
-              <div>
-                @waves-cn is now available on the shadcn/ui registry —{" "}
-                <Link
-                  href="/docs/installation"
-                  className="inline! font-semibold underline underline-offset-4 hover:opacity-80 transition-opacity"
-                >
-                  Read more
-                </Link>
-              </div>
-            </Banner>
             {children}
           </TooltipProvider>
           <Toaster />

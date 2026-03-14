@@ -55,7 +55,20 @@ export function ComponentPreview({
   if (variant === "codesource" && codeString) {
     return (
       <div className={cn("my-4", className)} {...props}>
-        <DynamicCodeBlock lang="tsx" code={codeString} />
+        <DynamicCodeBlock
+          options={{
+            themes: {
+              light: "github-light",
+              dark: "github-dark",
+            },
+            components: {
+              // override components (e.g. `pre` and `code`)
+            },
+            // other Shiki options
+          }}
+          lang="tsx"
+          code={codeString}
+        />
       </div>
     );
   }
@@ -68,15 +81,15 @@ export function ComponentPreview({
       <div
         className={cn(
           "my-4 flex items-center justify-center p-4",
-          "relative flex size-full flex-col items-center justify-center gap-4 overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)]",
+          "relative flex size-full flex-col items-center justify-center gap-4 overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)] bg-fd-card",
           className,
         )}
         {...props}
       >
-        <div className="-translate-y-px absolute top-8 right-0 left-0 border border-primary  border-dashed" />
-        <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-primary border-dashed" />
-        <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-primary border-dashed" />
-        <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-primary border-dashed" />
+        <div className="-translate-y-px absolute top-8 right-0 left-0 border border-primary/10  border-dashed" />
+        <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-primary/10 border-dashed" />
+        <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-primary/10 border-dashed" />
+        <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-primary/10 border-dashed" />
         <React.Suspense
           fallback={
             <div
@@ -132,13 +145,13 @@ export function ComponentPreview({
               align === "center" && "justify-center",
               align === "start" && "justify-start",
               align === "end" && "justify-end",
-              "relative flex size-full flex-col items-center justify-center gap-4 overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)]",
+              "relative flex size-full flex-col items-center justify-center gap-4 overflow-hidden p-8 [--primary-foreground:oklch(0.985_0_0)] [--primary:oklch(0.205_0_0)] dark:[--primary-foreground:oklch(0.205_0_0)] dark:[--primary:oklch(0.985_0_0)] bg-fd-card",
             )}
           >
-            <div className="-translate-y-px absolute top-8 right-0 left-0 border border-primary border-dashed" />
-            <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-primary border-dashed" />
-            <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-primary border-dashed" />
-            <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-primary border-dashed" />
+            <div className="-translate-y-px absolute top-8 right-0 left-0 border border-primary/10 border-dashed" />
+            <div className="absolute right-0 bottom-8 left-0 translate-y-px border border-primary/10 border-dashed" />
+            <div className="-translate-x-px absolute top-0 bottom-0 left-8 border border-primary/10 border-dashed" />
+            <div className="absolute top-0 right-8 bottom-0 translate-x-px border border-primary/10 border-dashed" />
             <React.Suspense
               fallback={
                 <div
@@ -160,7 +173,17 @@ export function ComponentPreview({
         {/* CODE */}
         {codeString && (
           <TabsContent value="code" className="pb-0 ">
-            <DynamicCodeBlock lang="tsx" code={codeString} />
+            <DynamicCodeBlock
+              options={{
+                components: {
+
+                },
+                // other Shiki options
+              }}
+              lang="tsx"
+              code={codeString}
+              
+            />
           </TabsContent>
         )}
       </Tabs>
