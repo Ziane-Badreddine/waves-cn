@@ -83,7 +83,6 @@ export function WavePlayer({
   const [duration, setDuration] = React.useState(0);
   const [currentTime, setCurrentTime] = React.useState(0);
 
-  // ── Controls
   const togglePlay = React.useCallback(
     () => wavesurferRef.current?.playPause(),
     [],
