@@ -4,10 +4,10 @@ name: Build Registry
 on:
   push:
     paths:
-      - 'registry/**'
+      - 'src/registry/**'
   pull_request:
     paths:
-      - 'registry/**'
+      - 'src/registry/**'
 
 jobs:
   build:
