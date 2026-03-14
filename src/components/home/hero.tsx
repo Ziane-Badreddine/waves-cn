@@ -80,7 +80,7 @@ export function Hero() {
       <aside className="my-16 relative text-center justify-center flex flex-col items-center self-center  xl:flex-1 ">
         <Announcement className="mb-6">
           <AnnouncementTag>Latest update</AnnouncementTag>
-          <Link href={"/docs/instalation"}>
+          <Link href={"/docs/installation"}>
           <AnnouncementTitle>
             waves-cn on shadcn/ui registry
             <ArrowUpRightIcon
