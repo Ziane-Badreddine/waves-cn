@@ -1,7 +1,7 @@
 {
-  "name": "@",
-  "version": "0.0.0",
-  "private": true,
+  "name": "waves-cn",
+  "version": "1.0.0",
+  "private": false,
   "scripts": {
     "build": "next build",
     "dev": "next dev",
@@ -9,8 +9,7 @@
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
     "lint": "eslint",
-    "registry:build": "jsrepo build",
-    "registry:dev": "jsrepo build --watch"
+    "registry:build": "npx shadcn build"
   },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^13.11.2",
