@@ -20,7 +20,6 @@
     "hooks": "@/hooks"
   },
   "registries": {
-    "@waves-cn": "/{name}.json",
     "@kibo-ui": "https://www.kibo-ui.com/r/{name}.json"
   }
 }
