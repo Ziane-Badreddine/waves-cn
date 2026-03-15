@@ -11,8 +11,10 @@
   <sub>Drop-in audio & video waveform primitives. Copy, own, customize.</sub>
 	<br>
 	<br>
-  <a href="https://github.com/Ziane-Badreddine//stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Ziane-Badreddine/"></a>
-  <a href="https://github.com/Ziane-Badreddine//blob/main/LICENSE.md"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue"></a>
+	<a href="https://github.com/Ziane-Badreddine/waves-cn/stargazers">
+	  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Ziane-Badreddine/waves-cn" />
+	</a>  
+	<a href="https://github.com/Ziane-Badreddine//blob/main/LICENSE.md"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue"></a>
   <a href="https://.vercel.app/"><img alt="docs" src="https://img.shields.io/badge/docs-waves--cn.vercel.app-black"></a>
   <br>
   <br>
