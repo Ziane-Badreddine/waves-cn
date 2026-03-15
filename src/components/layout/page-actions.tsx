@@ -47,7 +47,7 @@ export function MarkdownCopyButton({
       {...props}
       className={cn(
         buttonVariants({
-          color: 'secondary',
+          variant: 'secondary',
           size: 'sm',
           className: 'gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground',
         }),
@@ -223,7 +223,7 @@ export function ViewOptionsPopover({
         {...props}
         className={cn(
           buttonVariants({
-            color: 'secondary',
+            variant: 'secondary',
             size: 'sm',
           }),
           'gap-2 data-[state=open]:bg-fd-accent data-[state=open]:text-fd-accent-foreground',

@@ -363,7 +363,7 @@ function DocsNavbar({
               )}
             />
           ))}
-        <div className="flex flex-1 items-center justify-end md:gap-2">
+        <div className="flex flex-1 items-center justify-end md:gap-1.5">
           <div className="flex items-center gap-1.5 empty:hidden max-lg:hidden">
             {links
               .filter((item) => item.type !== "icon")
@@ -390,7 +390,7 @@ function DocsNavbar({
             </SidebarTrigger>
           </div>
 
-          <div className="flex items-center gap-2 max-md:hidden">
+          <div className="flex items-center gap-1.5 max-md:hidden">
             {themeSwitch.enabled !== false &&
               (themeSwitch.component ?? <ThemeToggle />)}
             {links

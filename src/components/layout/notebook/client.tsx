@@ -162,18 +162,27 @@ export function NavbarLinkItem({
   className,
   ...props
 }: { item: LinkItemType } & HTMLAttributes<HTMLElement>) {
+  const pathname = usePathname();
   if (item.type === 'custom') return item.children;
 
   if (item.type === 'menu') {
     return <NavbarLinkItemMenu item={item} className={className} {...props} />;
   }
 
+  const isActive =
+    item.type !== 'icon' &&
+    item.url != null &&
+    (item.url === '/'
+      ? pathname === '/'
+      : pathname.startsWith(item.url)); 
+
   return (
-    <LinkItem
+<LinkItem
       item={item}
       className={cn(
-        'text-sm text-fd-muted-foreground transition-colors hover:text-fd-accent-foreground data-[active=true]:dark:bg-input/50! data-[active=true]:bg-accent! data-[active=true]:text-accent-foreground! rounded-full!',
-         buttonVariants({ size: "default", variant: "ghost" }),
+        'text-sm  transition-colors  rounded-full!',
+        buttonVariants({ size: "default", variant: "ghost" }),
+        isActive && 'dark:bg-input/50! bg-accent! text-accent-foreground!',
         className,
       )}
       {...props}

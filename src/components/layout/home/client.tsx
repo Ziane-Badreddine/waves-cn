@@ -34,7 +34,7 @@ export const navItemVariants = cva("[&_svg]:size-4", {
       button: buttonVariants({
         variant: "ghost",
         className:
-          "text-sm text-fd-muted-foreground transition-colors hover:text-fd-accent-foreground data-[active=true]:dark:bg-input/50! data-[active=true]:bg-accent! data-[active=true]:text-accent-foreground! rounded-full! ",
+          "text-sm transition-colors hover:text-fd-accent-foreground rounded-full! ",
       }),
       icon: buttonVariants({
         variant: "ghost",
