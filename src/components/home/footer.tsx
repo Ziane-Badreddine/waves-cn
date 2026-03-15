@@ -4,7 +4,7 @@ import Link from "next/link"
 export function Footer() {
   return (
     <footer className="border-t px-4 md:px-6">
-      <div className=" flex flex-col md:flex-row md:h-14 items-center justify-between text-sm text-muted-foreground">
+      <div className=" flex flex-col gap-4 py-4 md:flex-row  md:h-14 items-center justify-between text-sm text-muted-foreground">
         
         <p>
           Built by{" "}

@@ -3,6 +3,8 @@ import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { BookIcon } from "lucide-react";
 import { SiReadthedocs } from "react-icons/si";
 import { ImBlog } from "react-icons/im";
+import Link from "next/link";
+import { Logo } from "@/components/layout/navbar/logo";
 
 // fill this with your actual GitHub info, for example:
 export const gitConfig = {
@@ -14,7 +16,7 @@ export const gitConfig = {
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: "waves-cn",
+      title: <Logo />,
     },
     githubUrl: `https://github.com/Ziane-Badreddine/waves-cn`,
 

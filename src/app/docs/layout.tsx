@@ -1,5 +1,5 @@
 import { source } from "@/lib/source";
-import { DocsLayout } from "fumadocs-ui/layouts/notebook";
+import { DocsLayout } from "@/components/layout/notebook";
 import { baseOptions } from "@/lib/layout.shared";
 
 export default function Layout({ children }: LayoutProps<"/docs">) {
