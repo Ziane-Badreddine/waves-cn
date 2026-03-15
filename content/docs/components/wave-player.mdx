@@ -11,11 +11,33 @@ import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
 
 ## Installation
 
+## Installation
+
 <Tabs items={["CLI", "Manual"]}>
   <Tab value="CLI">
-  ```bash
-  npx shadcn@latest add @waves-cn/wave-player
-        ```
+
+    <Tabs items={["pnpm", "npm", "yarn", "bun"]}>
+      <Tab value="pnpm">
+```bash
+        pnpm dlx shadcn@latest add @waves-cn/wave-player
+```
+      </Tab>
+      <Tab value="npm">
+```bash
+        npx shadcn@latest add @waves-cn/wave-player
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+        yarn dlx shadcn@latest add @waves-cn/wave-player
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+        bunx --bun shadcn@latest add @waves-cn/wave-player
+```
+      </Tab>
+    </Tabs>
 
   </Tab>
   <Tab value="Manual">
@@ -25,7 +47,6 @@ import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
 <Step>
 
 Install the peer dependency.
-
 ```bash
 npm install wavesurfer.js
 ```
@@ -35,7 +56,6 @@ npm install wavesurfer.js
 <Step>
 
 Install the required shadcn primitives.
-
 ```bash
 npx shadcn@latest add card button slider skeleton
 ```

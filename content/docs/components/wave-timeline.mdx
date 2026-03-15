@@ -14,9 +14,28 @@ import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
 <Tabs items={["CLI", "Manual"]}>
   <Tab value="CLI">
 
+    <Tabs items={["pnpm", "npm", "yarn", "bun"]}>
+      <Tab value="pnpm">
 ```bash
-npx shadcn@latest add @waves-cn/wave-timeline
+        pnpm dlx shadcn@latest add @waves-cn/wave-timeline
 ```
+      </Tab>
+      <Tab value="npm">
+```bash
+        npx shadcn@latest add @waves-cn/wave-timeline
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+        yarn dlx shadcn@latest add @waves-cn/wave-timeline
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+        bunx --bun shadcn@latest add @waves-cn/wave-timeline
+```
+      </Tab>
+    </Tabs>
 
   </Tab>
   <Tab value="Manual">

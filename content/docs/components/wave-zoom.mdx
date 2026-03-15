@@ -18,9 +18,34 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
 </TabsList>
 <TabsContent value="cli">
 
+<Tabs defaultValue="pnpm">
+  <TabsList>
+    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+    <TabsTrigger value="npm">npm</TabsTrigger>
+    <TabsTrigger value="yarn">yarn</TabsTrigger>
+    <TabsTrigger value="bun">bun</TabsTrigger>
+  </TabsList>
+  <TabsContent value="pnpm">
 ```bash
-npx shadcn@latest add @waves-cn/wave-zoom
+    pnpm dlx shadcn@latest add @waves-cn/wave-zoom
 ```
+  </TabsContent>
+  <TabsContent value="npm">
+```bash
+    npx shadcn@latest add @waves-cn/wave-zoom
+```
+  </TabsContent>
+  <TabsContent value="yarn">
+```bash
+    yarn dlx shadcn@latest add @waves-cn/wave-zoom
+```
+  </TabsContent>
+  <TabsContent value="bun">
+```bash
+    bunx --bun shadcn@latest add @waves-cn/wave-zoom
+```
+  </TabsContent>
+</Tabs>
 
 </TabsContent>
 <TabsContent value="manual">
