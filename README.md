@@ -15,10 +15,10 @@
 	  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Ziane-Badreddine/waves-cn" />
 	</a>  
 	<a href="https://github.com/Ziane-Badreddine//blob/main/LICENSE.md"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue"></a>
-  <a href="https://.vercel.app/"><img alt="docs" src="https://img.shields.io/badge/docs-waves--cn.vercel.app-black"></a>
+  <a href="https://.zianebadreddine.me/"><img alt="docs" src="https://img.shields.io/badge/docs-waves--cn.zianebadreddine.me-black"></a>
   <br>
   <br>
-  <a href="https://.vercel.app/">📖 Documentation</a> · <a href="https://.vercel.app/docs/installation">⚡ Quick Start</a> · <a href="https://.vercel.app/docs/components/wave-player">🎵 Components</a>
+  <a href="https://.zianebadreddine.me/">📖 Documentation</a> · <a href="https://.zianebadreddine.me/docs/installation">⚡ Quick Start</a> · <a href="https://.zianebadreddine.me/docs/components/wave-player">🎵 Components</a>
 </div>
 
 <br />
@@ -54,7 +54,7 @@ npx shadcn@latest add @waves-cn/{name}
 - Tailwind CSS
 - [shadcn/ui](https://ui.shadcn.com/docs/installation) initialized in your project
 
-→ Full installation guide at [[https://waves-cn.vercel.app/docs/installation)](https://waves-cn.vercel.app/docs/installation)
+→ Full installation guide at [[https://waves-cn.zianebadreddine.me/docs/installation)](https://waves-cn.zianebadreddine.me/docs/installation)
 
 ## Contributors
 
