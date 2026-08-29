@@ -15,10 +15,10 @@
 	  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Ziane-Badreddine/waves-cn" />
 	</a>  
 	<a href="https://github.com/Ziane-Badreddine//blob/main/LICENSE.md"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue"></a>
-  <a href="https://.zianebadreddine.me/"><img alt="docs" src="https://img.shields.io/badge/docs-waves--cn.zianebadreddine.me-black"></a>
+  <a href="https://waves-cn.zianebadreddine.me/"><img alt="docs" src="https://img.shields.io/badge/docs-waves-cn.zianebadreddine.me-black"></a>
   <br>
   <br>
-  <a href="https://.zianebadreddine.me/">📖 Documentation</a> · <a href="https://.zianebadreddine.me/docs/installation">⚡ Quick Start</a> · <a href="https://.zianebadreddine.me/docs/components/wave-player">🎵 Components</a>
+  <a href="https://waves-cn.zianebadreddine.me/">📖 Documentation</a> · <a href="https://waves-cn.zianebadreddine.me/docs/installation">⚡ Quick Start</a> · <a href="https://waves-cn.zianebadreddine.me/docs/components/wave-player">🎵 Components</a>
 </div>
 
 <br />
