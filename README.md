@@ -54,7 +54,7 @@ npx shadcn@latest add @waves-cn/{name}
 - Tailwind CSS
 - [shadcn/ui](https://ui.shadcn.com/docs/installation) initialized in your project
 
-→ Full installation guide at [[https://waves-cn.zianebadreddine.me/docs/installation)](https://waves-cn.zianebadreddine.me/docs/installation)
+→ Full installation guide at [[https://waves-cn.zianebadreddine.me/docs/installation)](https://waves-cn.vercel.app/docs/installation)
 
 ## Contributors
 
