@@ -18,7 +18,7 @@
   <a href="https://waves-cn.zianebadreddine.me/"><img alt="docs" src="https://img.shields.io/badge/docs-waves-cn.zianebadreddine.me-black"></a>
   <br>
   <br>
-  <a href="https://waves-cn.zianebadreddine.me/">📖 Documentation</a> · <a href="https://waves-cn.zianebadreddine.me/docs/installation">⚡ Quick Start</a> · <a href="https://waves-cn.zianebadreddine.me/docs/components/wave-player">🎵 Components</a>
+  <a href="https://waves-cn.vercel.app/">📖 Documentation</a> · <a href="https://waves-cn.vercel.app/docs/installation">⚡ Quick Start</a> · <a href="https://waves-cn.vercel.app/docs/components/wave-player">🎵 Components</a>
 </div>
 
 <br />
