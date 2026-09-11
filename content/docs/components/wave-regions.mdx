@@ -1,0 +1,124 @@
+---
+title: Wave Regions
+description: A shadcn-styled waveform player with draggable and resizable region markers built on wavesurfer.js RegionsPlugin.
+---
+
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+import { Steps, Step } from "@/components/steps"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+
+<ComponentPreviewWrapper name="wave-regions-demo" />
+
+## Installation
+
+<Tabs defaultValue="cli">
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+<Tabs defaultValue="pnpm">
+  <TabsList>
+    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+    <TabsTrigger value="npm">npm</TabsTrigger>
+    <TabsTrigger value="yarn">yarn</TabsTrigger>
+    <TabsTrigger value="bun">bun</TabsTrigger>
+  </TabsList>
+  <TabsContent value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @waves-cn/wave-regions
+```
+  </TabsContent>
+  <TabsContent value="npm">
+```bash
+npx shadcn@latest add @waves-cn/wave-regions
+```
+  </TabsContent>
+  <TabsContent value="yarn">
+```bash
+yarn dlx shadcn@latest add @waves-cn/wave-regions
+```
+  </TabsContent>
+  <TabsContent value="bun">
+```bash
+bunx --bun shadcn@latest add @waves-cn/wave-regions
+```
+  </TabsContent>
+</Tabs>
+
+</TabsContent>
+<TabsContent value="manual">
+<Steps>
+
+<Step>
+
+Install the peer dependency.
+
+```bash
+npm install wavesurfer.js
+```
+
+</Step>
+
+<Step>
+
+Install the required shadcn primitives.
+
+```bash
+npx shadcn@latest add card button slider skeleton
+```
+
+</Step>
+
+<Step>
+
+Copy `wave-cn.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-cn" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Copy `wave-regions.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-regions" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Update the import paths to match your project setup.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+</Tabs>
+
+## Features
+
+- **Interactive Regions** — allows creating regions by dragging on the waveform.
+- **Resize & Move** — region handles allow modifying boundaries interactively.
+- **Looping** — select a region and click the repeat button to loop play it.
+- **Events** — fires callbacks when regions are created, updated, deleted, or clicked.
+
+## Usage
+
+```tsx
+import { WaveRegions } from "@/components/waves-cn/wave-regions"
+```
+
+```tsx
+<WaveRegions src="/coastline.mp3" />
+```
+
+## Examples
+
+### Readonly Regions
+
+You can disable region creation and editing.
+
+<ComponentPreviewWrapper name="wave-regions-readonly" />
