@@ -16,10 +16,11 @@ const bars = Array.from({ length: COUNT }, (_, i) => {
   const t = i / (COUNT - 1);
   const envelope = Math.exp(-((t - 0.5) ** 2) / 0.06);
   const height = 14 + rand() * 46 * envelope + envelope * 30;
+  // Round so server/client serialisation matches exactly (avoids hydration warnings).
   return {
-    height,
-    duration: 2 + rand() * 2.2,
-    delay: -rand() * 4,
+    height: Math.round(height * 100) / 100,
+    duration: Math.round((2 + rand() * 2.2) * 100) / 100,
+    delay: -Math.round(rand() * 400) / 100,
   };
 });
 
