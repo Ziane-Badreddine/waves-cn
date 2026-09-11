@@ -4,9 +4,14 @@ on:
   push:
     paths:
       - 'src/registry/**'
+      - 'registry.json'
   pull_request:
     paths:
       - 'src/registry/**'
+      - 'registry.json'
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -15,24 +20,42 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # On push events, check out the actual branch so we can commit back.
+          ref: ${{ github.event_name == 'push' && github.ref_name || '' }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build registry
-        id: build
         run: npm run registry:build
 
-      - name: Commit generated files
-        if: success()
+      # Pull requests are checked out at a detached merge commit (refs/pull/N/merge),
+      # so there is no branch to push to. Only verify the build there.
+      - name: Check generated files are up to date (PR)
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git diff --quiet -- public/r; then
+            echo "::error::public/r is out of date. Run 'npm run registry:build' and commit the result."
+            git --no-pager diff --stat -- public/r
+            exit 1
+          fi
+
+      - name: Commit generated files (push)
+        if: github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git diff --staged --quiet || git commit -m "chore: auto-build registry"
-          git push
+          git add public/r
+          if git diff --staged --quiet; then
+            echo "Registry already up to date."
+            exit 0
+          fi
+          git commit -m "chore: auto-build registry"
+          git push origin HEAD:${{ github.ref_name }}

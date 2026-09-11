@@ -213,3 +213,27 @@
 
 
 
+
+/* ── Homepage hero ─────────────────────────────────────────────── */
+@keyframes hero-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.hero-bar {
+  transform-origin: center;
+  animation: hero-bar var(--bar-duration, 2.4s) ease-in-out infinite;
+  animation-delay: var(--bar-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bar {
+    animation: none;
+    transform: scaleY(0.6);
+  }
+}

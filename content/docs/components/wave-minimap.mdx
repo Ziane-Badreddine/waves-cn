@@ -1,0 +1,121 @@
+---
+title: Wave Minimap
+description: A shadcn-styled waveform player with a minimap overview built on wavesurfer.js MinimapPlugin.
+---
+
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+import { Steps, Step } from "@/components/steps"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+
+<ComponentPreviewWrapper name="wave-minimap-demo" />
+
+## Installation
+
+<Tabs defaultValue="cli">
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+<Tabs defaultValue="pnpm">
+  <TabsList>
+    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+    <TabsTrigger value="npm">npm</TabsTrigger>
+    <TabsTrigger value="yarn">yarn</TabsTrigger>
+    <TabsTrigger value="bun">bun</TabsTrigger>
+  </TabsList>
+  <TabsContent value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @waves-cn/wave-minimap
+```
+  </TabsContent>
+  <TabsContent value="npm">
+```bash
+npx shadcn@latest add @waves-cn/wave-minimap
+```
+  </TabsContent>
+  <TabsContent value="yarn">
+```bash
+yarn dlx shadcn@latest add @waves-cn/wave-minimap
+```
+  </TabsContent>
+  <TabsContent value="bun">
+```bash
+bunx --bun shadcn@latest add @waves-cn/wave-minimap
+```
+  </TabsContent>
+</Tabs>
+
+</TabsContent>
+<TabsContent value="manual">
+<Steps>
+
+<Step>
+
+Install the peer dependency.
+
+```bash
+npm install wavesurfer.js
+```
+
+</Step>
+
+<Step>
+
+Install the required shadcn primitives.
+
+```bash
+npx shadcn@latest add card button slider skeleton
+```
+
+</Step>
+
+<Step>
+
+Copy `wave-cn.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-cn" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Copy `wave-minimap.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-minimap" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Update the import paths to match your project setup.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+</Tabs>
+
+## Features
+
+- **Overview Minimap** — a small overview of the full waveform to easily navigate.
+- **Viewport Indicator** — highlights the currently zoomed visible area.
+- **Zoom Controls** — perfectly paired with zoom so you can focus on details while keeping the full context.
+
+## Usage
+
+```tsx
+import { WaveMinimap } from "@/components/waves-cn/wave-minimap"
+```
+
+```tsx
+<WaveMinimap src="/coastline.mp3" />
+```
+
+## Examples
+
+### Custom Colors
+
+<ComponentPreviewWrapper name="wave-minimap-custom" />

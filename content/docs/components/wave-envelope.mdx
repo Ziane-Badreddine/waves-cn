@@ -1,0 +1,123 @@
+---
+title: Wave Envelope
+description: A shadcn-styled waveform player with volume automation editing built on wavesurfer.js EnvelopePlugin.
+---
+
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+import { Steps, Step } from "@/components/steps"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+
+<ComponentPreviewWrapper name="wave-envelope-demo" />
+
+## Installation
+
+<Tabs defaultValue="cli">
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+<Tabs defaultValue="pnpm">
+  <TabsList>
+    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+    <TabsTrigger value="npm">npm</TabsTrigger>
+    <TabsTrigger value="yarn">yarn</TabsTrigger>
+    <TabsTrigger value="bun">bun</TabsTrigger>
+  </TabsList>
+  <TabsContent value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @waves-cn/wave-envelope
+```
+  </TabsContent>
+  <TabsContent value="npm">
+```bash
+npx shadcn@latest add @waves-cn/wave-envelope
+```
+  </TabsContent>
+  <TabsContent value="yarn">
+```bash
+yarn dlx shadcn@latest add @waves-cn/wave-envelope
+```
+  </TabsContent>
+  <TabsContent value="bun">
+```bash
+bunx --bun shadcn@latest add @waves-cn/wave-envelope
+```
+  </TabsContent>
+</Tabs>
+
+</TabsContent>
+<TabsContent value="manual">
+<Steps>
+
+<Step>
+
+Install the peer dependency.
+
+```bash
+npm install wavesurfer.js
+```
+
+</Step>
+
+<Step>
+
+Install the required shadcn primitives.
+
+```bash
+npx shadcn@latest add card button slider skeleton
+```
+
+</Step>
+
+<Step>
+
+Copy `wave-cn.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-cn" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Copy `wave-envelope.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-envelope" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Update the import paths to match your project setup.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+</Tabs>
+
+## Features
+
+- **Volume Automation** — overlay a volume gain curve onto the waveform.
+- **Interactive Points** — add, remove, and drag points to adjust the volume.
+- **Fade Utilities** — props to automatically generate fade in/out curves on initialization.
+
+## Usage
+
+```tsx
+import { WaveEnvelope } from "@/components/waves-cn/wave-envelope"
+```
+
+```tsx
+<WaveEnvelope src="/coastline.mp3" />
+```
+
+## Examples
+
+### Pre-configured Fades
+
+You can pass `fadeInEnd` and `fadeOutStart` to automatically insert volume envelope points for fades.
+
+<ComponentPreviewWrapper name="wave-envelope-fade" />
