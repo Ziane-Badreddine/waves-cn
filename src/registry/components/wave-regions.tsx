@@ -125,7 +125,7 @@ export function WaveRegions({
 
   // ── Memoized plugin ──────────────────────────────────────────────────────
   const plugins = React.useMemo(
-    () => [RegionsPlugin.create()],
+    () => (typeof document === "undefined" ? [] : [RegionsPlugin.create()]),
     [],
   );
 
