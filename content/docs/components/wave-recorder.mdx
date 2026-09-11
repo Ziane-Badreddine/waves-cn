@@ -157,31 +157,32 @@ Auto-stop after N seconds using `maxDuration`.
 
 ## API Reference
 
-### WaveRecorder
-
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | `onRecordEnd` | `(blob: Blob) => void` | — | Fires on successful stop. Not fired on discard. |
 | `onRecordStart` | `() => void` | — | Fires when recording starts. |
 | `onRecordPause` | `() => void` | — | Fires when recording is paused. |
 | `onRecordResume` | `() => void` | — | Fires when recording resumes. |
-| `onDiscard` | `() => void` | — | Fires when user discards. |
-| `onError` | `(error: Error) => void` | — | Fires on mic / MediaRecorder error. |
+| `onDiscard` | `() => void` | — | Fires when the user discards the take. |
+| `onError` | `(error: Error) => void` | — | Fires on microphone / MediaRecorder errors. |
 | `maxDuration` | `number` | — | Auto-stop after N seconds. |
-| `mimeType` | `string` | browser default | e.g. `"audio/webm;codecs=opus"` |
-| `audioBitsPerSecond` | `number` | — | Bitrate passed to `MediaRecorder`. |
-| `deviceId` | `string` | — | Specific mic device ID to use. |
+| `mimeType` | `string` | browser default | e.g. `"audio/webm;codecs=opus"`. |
+| `audioBitsPerSecond` | `number` | `128000` | Bitrate passed to `MediaRecorder`. |
+| `deviceId` | `string` | — | Specific microphone device id. |
 | `disabled` | `boolean` | `false` | Disables all controls. |
-| `showWaveform` | `boolean` | `true` | Show live waveform during recording. |
-| `showTimer` | `boolean` | `true` | Show duration counter. |
-| `waveColor` | `string` | `var(--primary)` | Accepts CSS vars, hex, hsl, oklch. |
-| `progressColor` | `string` | `var(--primary-foreground)` | Same formats as `waveColor`. |
+| `showWaveform` | `boolean` | `true` | Show the live waveform while recording. |
+| `showTimer` | `boolean` | `true` | Show the elapsed-time counter. |
+| `waveColor` | `string` | `var(--primary)` | Live waveform color. |
+| `progressColor` | `string` | `var(--background)` | Progress color of the live waveform. |
 | `waveformHeight` | `number` | `64` | Waveform height in px. |
 | `barWidth` | `number` | `3` | Bar width in px. |
 | `barGap` | `number` | `2` | Gap between bars in px. |
 | `barRadius` | `number` | `2` | Bar border radius in px. |
-| `barHeight` | `number` | `0.8` | Bar height multiplier (0–2). |
+| `barHeight` | `number` | — | Bar height multiplier passed to wavesurfer. |
 | `className` | `string` | — | Root element class. |
+| `style` | `CSSProperties` | — | Root element inline style. |
 | `waveformClassName` | `string` | — | Waveform container class. |
 | `timerClassName` | `string` | — | Timer element class. |
 | `controlsClassName` | `string` | — | Controls row class. |
+
+The microphone stream and the record plugin are released when the component unmounts, including mid-recording.

@@ -22,6 +22,7 @@ import { WAVESURFER_DEFAULTS } from "@/lib/wave-cn"
 | `barGap` | `2` | Gap between bars in px. |
 | `barRadius` | `2` | Border radius of each bar. |
 | `minPxPerSec` | `1` | Minimum pixels per second — controls the initial zoom level. |
+| `cursorWidth` | `0` | Playhead width in px. `0` hides the cursor line. |
 
 ## How overrides work
 
@@ -69,6 +70,7 @@ export const WAVESURFER_DEFAULTS = {
   barGap: 3,        // ← changed
   barRadius: 4,     // ← changed
   minPxPerSec: 1,
+  cursorWidth: 0,
 } as const satisfies Partial<WaveSurferOptions>
 ```
 

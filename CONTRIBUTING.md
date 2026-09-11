@@ -22,7 +22,7 @@ content/docs/meta.json        Sidebar order for the docs
 src/components/home/          Homepage sections
 ```
 
-Two copies of the core exist on purpose: `src/lib/wave-cn.tsx` powers the docs site, `src/registry/lib/wave-cn.tsx` is what users install. Keep behaviour changes in sync between them.
+`src/lib/wave-cn.tsx` only re-exports `src/registry/lib/wave-cn.tsx`, so the docs site always runs the exact file users install. Edit the registry copy only.
 
 ## Getting started
 
@@ -50,9 +50,9 @@ Useful scripts:
 1. **Write the component** in `src/registry/components/wave-<name>.tsx`.
    - Import the core from `@/lib/wave-cn` (the CLI rewrites this path on install).
    - Export both a named export and a default export.
-   - Accept `src` (or `url` for media-based players), optional `title`, `className`, and forward the rest to wavesurfer.
+   - Accept `src`, optional `title`, `className`, `waveHeight`, and the `onPlay/onPause/onFinish/onTimeUpdate` callbacks. Build on `useWavePlayer()` from the core and spread `player.handlers` onto `<WavesurferPlayer>`.
    - Use shadcn primitives from `@/components/ui/*` and Tailwind tokens only. No hard-coded colours.
-   - Memoise plugin creation with `useMemo` and guard `typeof document === "undefined"` when the plugin touches the DOM at construction time.
+   - Memoise plugin creation with `useMemo` (plugin option props in the deps) and guard with `typeof document === "undefined"`. Register plugin listeners in a `useEffect` keyed on the live plugin instance, never inside `onReady`.
 2. **Add examples** in `src/registry/examples/wave-<name>/`. At minimum a `wave-<name>-demo.tsx`. Add one more showing a non-default option.
 3. **Register the examples** in `src/__registry__/index.tsx` so the docs can preview them.
 4. **Add the registry entry** in `registry.json`. Copy an existing block and update `name`, `title`, `description` and `files[].path` / `target`.
@@ -66,7 +66,6 @@ Optionally add it to the homepage showcase in `src/components/home/components-ex
 
 Edits to `src/registry/lib/wave-cn.tsx` affect every component. After a change:
 
-- Mirror it in `src/lib/wave-cn.tsx`.
 - Run `npm run registry:build` so `public/r/wave-cn.json` picks it up.
 - Smoke-test at least one plugin component (Regions or Timeline) and one plain one (Player) in the dev site.
 

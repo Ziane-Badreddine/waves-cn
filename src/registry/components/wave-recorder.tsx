@@ -2,7 +2,6 @@
 
 import {
   useRef,
-  useMemo,
   useState,
   useEffect,
   useCallback,
@@ -14,9 +13,8 @@ import RecordPlugin, {
   type RecordPluginOptions,
   type RecordPluginDeviceOptions,
 } from "wavesurfer.js/dist/plugins/record.esm.js";
-import { cn, formatDuration } from "@/lib/utils";
-import { useCssVar } from "@/hooks/use-css-var";
-import { useWavesurfer } from "@/lib/wave-cn";
+import { cn } from "@/lib/utils";
+import { formatTime, useCssVar, useWavesurfer } from "@/lib/wave-cn";
 
 // Types
 
@@ -34,7 +32,7 @@ export type WaveRecorderProps = {
   // Behaviour
   maxDuration?: number;
   mimeType?: RecordPluginOptions["mimeType"];
-  audioBitsPerSecond?: RecordPluginOptions["audioBitsPerSecond"];
+  audioBitsPerSecond?: RecordPluginOptions["audioBitsPerSecond"]; // default: 128000
   deviceId?: string;
   disabled?: boolean;
 
@@ -57,6 +55,8 @@ export type WaveRecorderProps = {
   controlsClassName?: string;
 };
 
+type RecordPluginInstance = InstanceType<typeof RecordPlugin>;
+
 export function WaveRecorder({
   onRecordEnd,
   onRecordStart,
@@ -66,7 +66,7 @@ export function WaveRecorder({
   onError,
   maxDuration,
   mimeType,
-  audioBitsPerSecond = 1,
+  audioBitsPerSecond = 128000,
   deviceId,
   disabled = false,
   showWaveform = true,
@@ -85,14 +85,33 @@ export function WaveRecorder({
   controlsClassName,
 }: WaveRecorderProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [recordPlugin, setRecordPlugin] = useState<InstanceType<
-    typeof RecordPlugin
-  > | null>(null);
+  // Live plugin instance. Kept in a ref (not state): it is only read from
+  // event handlers, and the plugin effect must not call setState synchronously.
+  const recordRef = useRef<RecordPluginInstance | null>(null);
   const [recordState, setRecordState] = useState<RecordState>("idle");
   const [duration, setDuration] = useState(0);
 
   const isDiscarding = useRef(false);
   const maxDurationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Latest callback props, read at event time so the plugin effect never
+  // needs to re-run when a parent passes a new inline function.
+  const callbacks = useRef({
+    onRecordEnd,
+    onRecordStart,
+    onRecordPause,
+    onRecordResume,
+    onDiscard,
+  });
+  useEffect(() => {
+    callbacks.current = {
+      onRecordEnd,
+      onRecordStart,
+      onRecordPause,
+      onRecordResume,
+      onDiscard,
+    };
+  });
 
   const resolvedWaveColor = useCssVar(waveColor);
   const resolvedProgressColor = useCssVar(progressColor);
@@ -108,11 +127,18 @@ export function WaveRecorder({
     barHeight,
   });
 
-  // Plugin events
+  const clearMaxDurationTimer = useCallback(() => {
+    if (maxDurationTimer.current) {
+      clearTimeout(maxDurationTimer.current);
+      maxDurationTimer.current = null;
+    }
+  }, []);
+
+  // Plugin lifecycle + events
   useEffect(() => {
     if (!wavesurfer) return;
 
-    wavesurfer.registerPlugin(
+    const record = wavesurfer.registerPlugin(
       RecordPlugin.create({
         renderRecordedAudio: false,
         continuousWaveform: false,
@@ -122,33 +148,30 @@ export function WaveRecorder({
         mediaRecorderTimeslice: 100,
       }),
     );
-
-    const record = wavesurfer
-      .getActivePlugins()
-      .find((p) => p instanceof RecordPlugin) as
-      | InstanceType<typeof RecordPlugin>
-      | undefined;
-
-    if (!record) return;
-    setRecordPlugin(record);
+    recordRef.current = record;
 
     const unsubs = [
-      record.on("record-progress", (ms) => setDuration(ms)),
+      // Only re-render when the displayed second changes.
+      record.on("record-progress", (ms) => {
+        setDuration((prev) =>
+          Math.floor(ms / 1000) === Math.floor(prev / 1000) ? prev : ms,
+        );
+      }),
 
       record.on("record-start", () => {
         setRecordState("recording");
         setDuration(0);
-        onRecordStart?.();
+        callbacks.current.onRecordStart?.();
       }),
 
       record.on("record-pause", () => {
         setRecordState("paused");
-        onRecordPause?.();
+        callbacks.current.onRecordPause?.();
       }),
 
       record.on("record-resume", () => {
         setRecordState("recording");
-        onRecordResume?.();
+        callbacks.current.onRecordResume?.();
       }),
 
       record.on("record-end", (blob: Blob) => {
@@ -157,10 +180,10 @@ export function WaveRecorder({
           maxDurationTimer.current = null;
         }
         if (!isDiscarding.current) {
-          onRecordEnd?.(blob);
+          callbacks.current.onRecordEnd?.(blob);
           setRecordState("done");
         } else {
-          onDiscard?.();
+          callbacks.current.onDiscard?.();
           setRecordState("idle");
         }
         isDiscarding.current = false;
@@ -169,55 +192,63 @@ export function WaveRecorder({
       }),
     ];
 
-    return () => unsubs.forEach((fn) => fn());
-  }, [wavesurfer]);
+    return () => {
+      unsubs.forEach((fn) => fn());
+      if (maxDurationTimer.current) {
+        clearTimeout(maxDurationTimer.current);
+        maxDurationTimer.current = null;
+      }
+      if (record.isActive()) record.stopRecording();
+      record.stopMic();
+      record.destroy();
+      if (recordRef.current === record) recordRef.current = null;
+    };
+  }, [wavesurfer, mimeType, audioBitsPerSecond]);
 
   // Actions
 
   const start = useCallback(async () => {
-    if (!recordPlugin || disabled) return;
+    const record = recordRef.current;
+    if (!record || disabled) return;
     try {
       const deviceOptions: RecordPluginDeviceOptions = deviceId
         ? { deviceId: { exact: deviceId } }
         : {};
-      await recordPlugin.startRecording(deviceOptions);
+      await record.startRecording(deviceOptions);
       if (maxDuration && maxDuration > 0) {
         maxDurationTimer.current = setTimeout(
-          () => recordPlugin.stopRecording(),
+          () => record.stopRecording(),
           maxDuration * 1000,
         );
       }
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error(String(err)));
     }
-  }, [recordPlugin, disabled, deviceId, maxDuration, onError]);
+  }, [disabled, deviceId, maxDuration, onError]);
 
   const stop = useCallback(() => {
-    if (maxDurationTimer.current) {
-      clearTimeout(maxDurationTimer.current);
-      maxDurationTimer.current = null;
-    }
-    recordPlugin?.stopRecording();
-  }, [recordPlugin]);
+    clearMaxDurationTimer();
+    recordRef.current?.stopRecording();
+  }, [clearMaxDurationTimer]);
 
   const togglePause = useCallback(() => {
-    if (!recordPlugin) return;
-    recordState === "paused"
-      ? recordPlugin.resumeRecording()
-      : recordPlugin.pauseRecording();
-  }, [recordPlugin, recordState]);
+    const record = recordRef.current;
+    if (!record) return;
+    if (recordState === "paused") {
+      record.resumeRecording();
+    } else {
+      record.pauseRecording();
+    }
+  }, [recordState]);
 
   const discard = useCallback(() => {
-    if (maxDurationTimer.current) {
-      clearTimeout(maxDurationTimer.current);
-      maxDurationTimer.current = null;
-    }
+    clearMaxDurationTimer();
     isDiscarding.current = true;
-    recordPlugin?.stopRecording();
+    recordRef.current?.stopRecording();
     wavesurfer?.empty();
     setRecordState("idle");
     setDuration(0);
-  }, [recordPlugin, wavesurfer]);
+  }, [clearMaxDurationTimer, wavesurfer]);
 
   // Derived
 
@@ -260,7 +291,7 @@ export function WaveRecorder({
             timerClassName,
           )}
         >
-          {formatDuration(duration)}
+          {formatTime(duration / 1000)}
         </p>
       )}
       <div

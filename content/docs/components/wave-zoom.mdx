@@ -130,23 +130,26 @@ Control how fast and how far the user can zoom.
 
 <ComponentPreviewWrapper name="wave-zoom-custom-range" />
 
-
 ## API Reference
-
-### WaveZoom
 
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| `url` | `string` | — | Wave file URL to load. |
-| `waveColor` | `string` | `var(--muted-foreground)` | Wave bar color. Accepts CSS vars, hex, hsl, oklch. |
-| `progressColor` | `string` | `var(--primary)` | Progress bar color. Same formats as `waveColor`. |
-| `audioHeight` | `number` | `64` | Wave canvas height in px. |
+| `src` | `string` | — | **(Required)** Audio URL. Changing it recreates the wavesurfer instance. |
+| `url` | `string` | — | **Deprecated.** Alias of `src`, kept for v1 compatibility. |
+| `title` | `string` | — | Track title displayed above the waveform. |
+| `zoomScale` | `number` | `0.5` | Zoom magnification per mouse-wheel step. |
+| `maxZoom` | `number` | `1000` | Maximum zoom level in px/s. |
+| `defaultZoom` | `number` | `100` | Initial zoom level in px/s. |
+| `skipSeconds` | `number` | `5` | Seconds skipped by the back / forward buttons. |
+| `onPlay` | `() => void` | — | Fired when playback starts. |
+| `onPause` | `() => void` | — | Fired when playback pauses. |
+| `onFinish` | `() => void` | — | Fired when the track ends. |
+| `onTimeUpdate` | `(currentTime: number, duration: number) => void` | — | Fired on every playback tick. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Waveform bar color. Accepts any CSS value including `var(--*)` tokens. |
+| `progressColor` | `string` | `var(--primary)` | Progress overlay color. Same formats as `waveColor`. |
+| `waveHeight` | `number` | `64` | Waveform canvas height in px. |
 | `barWidth` | `number` | `3` | Bar width in px. |
 | `barGap` | `number` | `2` | Gap between bars in px. |
-| `barRadius` | `number` | `2` | Bar border radius in px. |
-| `zoomScale` | `number` | `0.5` | Magnification per scroll step (0–1). |
-| `maxZoom` | `number` | `1000` | Maximum zoom level in px/s. |
-| `defaultZoom` | `number` | `100` | Initial zoom level in px/s (`minPxPerSec`). |
-| `skipSeconds` | `number` | `5` | Seconds to skip on forward/backward. |
-| `className` | `string` | — | Root element class. |
-| `style` | `CSSProperties` | — | Root element inline style. |
+| `barRadius` | `number` | `2` | Border radius of each bar. |
+| `className` | `string` | — | Extra classes on the root element. |
+| `style` | `CSSProperties` | — | Inline style on the root element. |

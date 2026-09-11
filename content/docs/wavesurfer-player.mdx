@@ -3,13 +3,11 @@ title: WavesurferPlayer
 description: A declarative, memoized React component that renders a wavesurfer.js waveform. The simplest way to drop a player into any component.
 ---
 
-import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
-
 ## Overview
 
-`WavesurferPlayer` (exported as default from `wave-cn.tsx`) is a thin wrapper around `useWavesurfer`. It owns its container `<div>`, applies `WAVESURFER_DEFAULTS`, resolves CSS variables automatically, and exposes every wavesurfer.js event as an `on`-prefixed prop.
+`WavesurferPlayer` (default export of `wave-cn.tsx`) is a thin wrapper around `WaveSurfer.create()`. It owns its container `<div>`, applies `WAVESURFER_DEFAULTS`, resolves CSS variables for the canvas, renders a skeleton while the audio decodes, and exposes every wavesurfer.js event as an `on`-prefixed prop.
 
-Use it when you want a **declarative** player and don't need to manage the wavesurfer instance yourself.
+Use it when you want a **declarative** player. Pair it with [`useWavePlayer`](/docs/use-wave-player) for state and controls.
 
 ## Usage
 
@@ -20,33 +18,38 @@ import WavesurferPlayer from "@/lib/wave-cn"
   url="/coastline.mp3"
   waveColor="var(--primary)"
   height={80}
-  onReady={(ws) => console.log("ready", ws)}
+  onReady={(ws, duration) => console.log("ready", duration)}
   onFinish={() => console.log("finished")}
 />
 ```
 
+## What recreates the instance
+
+Every `WaveSurferOptions` key is accepted as a prop. They fall into two groups:
+
+| Group | Props | Behaviour |
+| ----- | ----- | --------- |
+| Structural | `url`, `media`, `plugins`, `peaks`, `duration`, `sampleRate`, `backend`, `mediaControls` | Changing one destroys the instance and creates a new one (re-fetch and re-decode). |
+| Everything else | `height`, `barWidth`, `waveColor`, `dragToSeek`, `normalize`, `minPxPerSec`, … | Applied in place through `wavesurfer.setOptions()`. No re-decode. |
+
+`plugins` and `peaks` are compared **by reference**. Memoize them with `useMemo`, otherwise a new array on every render recreates the player on every render.
+
 ## Getting the instance
 
-Pass `onReady` to receive the live `WaveSurfer` instance and store it in a ref for imperative calls:
+`onReady` receives the live `WaveSurfer` instance. Store it in a ref for imperative calls, or let [`useWavePlayer`](/docs/use-wave-player) do it for you:
 
 ```tsx
-import { useRef, useCallback } from "react"
+import { useRef } from "react"
 import WavesurferPlayer from "@/lib/wave-cn"
 import type WaveSurfer from "wavesurfer.js"
 
 export function MyPlayer() {
   const wsRef = useRef<WaveSurfer | null>(null)
 
-  const handleReady = useCallback((ws: WaveSurfer) => {
-    wsRef.current = ws
-  }, [])
-
   return (
     <WavesurferPlayer
       url="/coastline.mp3"
-      onReady={handleReady}
-      onPlay={() => console.log("playing")}
-      onPause={() => console.log("paused")}
+      onReady={(ws) => { wsRef.current = ws }}
       onDestroy={() => { wsRef.current = null }}
     />
   )
@@ -55,7 +58,7 @@ export function MyPlayer() {
 
 ## Injecting plugins
 
-Pass a **memoized** `plugins` array. The player compares array references — not deep equality — so a new array on every render will recreate the instance on every render.
+Pass a memoized `plugins` array. The instances you create act as **templates**: wavesurfer.js destroys plugins together with the instance, so the player clones each template every time it (re)creates the instance. Never keep a reference to the template expecting it to be live; look the live plugin up after `ready`:
 
 ```tsx
 import { useMemo } from "react"
@@ -68,51 +71,76 @@ const plugins = useMemo(() => [
   TimelinePlugin.create(),
 ], [])
 
-<WavesurferPlayer url="/coastline.mp3" plugins={plugins} />
+<WavesurferPlayer
+  url="/coastline.mp3"
+  plugins={plugins}
+  onReady={(ws) => {
+    const zoom = ws.getActivePlugins().find((p) => p instanceof ZoomPlugin)
+  }}
+/>
 ```
 
-For plugins that need to be registered **after** the instance exists (e.g. `RecordPlugin`), use `onReady` instead:
+Because `plugins` is structural, put plugin option props in the `useMemo` deps and the player recreates itself with the new options when they change.
+
+For plugins that must be registered **after** the instance exists (e.g. `RecordPlugin`), register them in `onReady`:
 
 ```tsx
 <WavesurferPlayer
-  url=""
   onReady={(ws) => {
     ws.registerPlugin(RecordPlugin.create({ scrollingWaveform: true }))
   }}
 />
 ```
 
+## Instant render with precomputed peaks
+
+Pass `peaks` and `duration` to draw the waveform immediately, without downloading and decoding the audio up front. Generate peaks at build time or on upload (for example with `audiowaveform` or `ffmpeg`) and serve them as JSON:
+
+```tsx
+const peaks = useMemo(() => [track.peaks], [track.peaks])
+
+<WavesurferPlayer url={track.url} peaks={peaks} duration={track.duration} />
+```
+
+The audio is still fetched lazily when playback starts.
+
 ## Events
 
-Every wavesurfer.js event is available as an `on`-prefixed prop. The handler receives the `WaveSurfer` instance as the first argument, followed by the event's own arguments.
+Every wavesurfer.js event is available as an `on`-prefixed prop. The handler receives the `WaveSurfer` instance first, then the event's own arguments. Handlers are read through a ref, so inline functions never cause re-subscription.
 
 ```tsx
 <WavesurferPlayer
   url="/coastline.mp3"
-  onReady={(ws) => {}}
+  onReady={(ws, duration) => {}}
   onPlay={(ws) => {}}
   onPause={(ws) => {}}
   onFinish={(ws) => {}}
-  onTimeupdate={(ws) => console.log(ws.getCurrentTime())}
+  onTimeupdate={(ws, currentTime) => {}}
   onSeeking={(ws, currentTime) => {}}
   onDestroy={(ws) => {}}
 />
 ```
 
-See the full event list at [wavesurfer.js docs](https://wavesurfer.xyz/docs/types/wavesurfer.WaveSurferEvents).
+Only handlers present when the instance is created are subscribed. See the full event list at [wavesurfer.js docs](https://wavesurfer.xyz/docs/types/wavesurfer.WaveSurferEvents).
 
 ## API Reference
 
-Accepts all `WaveSurferOptions` (except `container` — the player owns it) plus every `on{Event}` handler.
+Accepts all `WaveSurferOptions` (except `container`, which the player owns) plus every `on{Event}` handler and `className`.
 
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| `url` | `string` | — | Wave file URL to load. |
+| `url` | `string` | — | Audio file URL. Structural. |
+| `media` | `HTMLMediaElement` | — | Use an existing `<audio>`/`<video>` as the source. Structural. |
+| `peaks` | `Array<Float32Array \| number[]>` | — | Precomputed peaks. Structural, memoize. |
+| `duration` | `number` | — | Duration in seconds, used with `peaks`. Structural. |
+| `plugins` | `GenericPlugin[]` | `[]` | Memoized plugin templates. Structural. |
 | `waveColor` | `string` | `var(--muted-foreground)` | Accepts CSS vars, hex, hsl, oklch. |
 | `progressColor` | `string` | `var(--primary)` | Same formats as `waveColor`. |
 | `height` | `number` | `64` | Canvas height in px. |
 | `barWidth` | `number` | `3` | Bar width in px. |
 | `barGap` | `number` | `2` | Gap between bars in px. |
 | `barRadius` | `number` | `2` | Bar border radius. |
-| `plugins` | `GenericPlugin[]` | `[]` | Memoized plugin array. |
+| `minPxPerSec` | `number` | `1` | Minimum pixels per second (zoom level). |
+| `cursorWidth` | `number` | `0` | Playhead width in px. |
+| `className` | `string` | — | Class on the wrapper `<div>`. |
 | `on{Event}` | `(ws, ...args) => void` | — | Any wavesurfer.js event handler. |

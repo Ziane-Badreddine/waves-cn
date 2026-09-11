@@ -5,6 +5,8 @@ import { Footer } from "@/components/home/footer";
 import { GetStarted } from "@/components/home/get-started";
 import { Hero } from "@/components/home/hero";
 
+export const metadata = { alternates: { canonical: "/" } };
+
 export default function HomePage() {
   return (
     <div className="mx-auto w-full">

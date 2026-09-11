@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useRef,
   useState,
   useCallback,
   type CSSProperties,
@@ -10,15 +9,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";
-import WavesurferPlayer from "@/lib/wave-cn";
-import type WaveSurfer from "wavesurfer.js";
+import WavesurferPlayer, { useWavePlayer } from "@/lib/wave-cn";
 
 /**
  * Props for the WaveVideo component
  */
 export type WaveVideoProps = {
-  /** Video file URL to load */
-  url: string;
+  /** Video source URL */
+  src?: string;
+  /** @deprecated use `src` */
+  url?: string;
+  /** Optional title shown above the video */
+  title?: string;
   /** Wave bar color. Accepts any CSS value including var(--*) tokens @default "var(--muted-foreground)" */
   waveColor?: string;
   /** Progress bar color. Accepts any CSS value including var(--*) tokens @default "var(--primary)" */
@@ -33,6 +35,14 @@ export type WaveVideoProps = {
   barRadius?: number;
   /** Show the native video element @default true */
   showVideo?: boolean;
+  /** Called when playback starts */
+  onPlay?: () => void;
+  /** Called when playback pauses */
+  onPause?: () => void;
+  /** Called when playback finishes */
+  onFinish?: () => void;
+  /** Called with current time on every audio process tick */
+  onTimeUpdate?: (currentTime: number, duration: number) => void;
   /** Root element class */
   className?: string;
   /** Root element inline style */
@@ -54,7 +64,9 @@ export type WaveVideoProps = {
  * as its media source via the `media` prop so playback stays in sync.
  */
 export function WaveVideo({
+  src,
   url,
+  title,
   waveColor,
   progressColor,
   waveHeight,
@@ -62,6 +74,10 @@ export function WaveVideo({
   barGap,
   barRadius,
   showVideo = true,
+  onPlay,
+  onPause,
+  onFinish,
+  onTimeUpdate,
   className,
   style,
   videoClassName,
@@ -70,7 +86,9 @@ export function WaveVideo({
   waveClassName,
   videoProps,
 }: WaveVideoProps) {
-  const wavesurferRef = useRef<WaveSurfer | null>(null);
+  const source = src ?? url;
+
+  const player = useWavePlayer({ onPlay, onPause, onFinish, onTimeUpdate });
 
   // Callback ref — triggers a re-render the moment the <video> mounts
   // so WavesurferPlayer receives the actual HTMLVideoElement, not null.
@@ -79,21 +97,20 @@ export function WaveVideo({
     setVideoEl(el);
   }, []);
 
-  const [isReady, setIsReady] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const togglePlay = useCallback(() => wavesurferRef.current?.playPause(), []);
-
   return (
     <div className={cn("w-full space-y-2 max-w-2xl", className)} style={style}>
+      {title && (
+        <p className="text-sm font-medium text-foreground truncate">{title}</p>
+      )}
+
       {/* Video element — wavesurfer uses it as media source via the `media` prop */}
       {showVideo && (
         <video
           ref={videoCallbackRef}
-          src={url}
+          src={source}
           controls={false}
           playsInline
-          className={cn("w-full mx-auto bg-black", videoClassName)}
+          className={cn("w-full mx-auto bg-muted", videoClassName)}
           style={videoStyle}
           {...videoProps}
         />
@@ -109,11 +126,11 @@ export function WaveVideo({
         >
           <Button
             size="icon"
-            onClick={togglePlay}
-            disabled={!isReady}
-            aria-label={isPlaying ? "Pause" : "Play"}
+            onClick={player.togglePlay}
+            disabled={!player.isReady}
+            aria-label={player.isPlaying ? "Pause" : "Play"}
           >
-            {isPlaying ? (
+            {player.isPlaying ? (
               <Pause className="size-4" />
             ) : (
               <Play className="size-4" />
@@ -121,7 +138,6 @@ export function WaveVideo({
           </Button>
 
           <WavesurferPlayer
-            url=""
             media={videoEl}
             waveColor={waveColor}
             progressColor={progressColor}
@@ -131,17 +147,7 @@ export function WaveVideo({
             barRadius={barRadius}
             dragToSeek
             className={cn("w-full", waveClassName)}
-            onReady={(ws) => {
-              wavesurferRef.current = ws;
-              setIsReady(true);
-            }}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            onFinish={() => setIsPlaying(false)}
-            onDestroy={() => {
-              wavesurferRef.current = null;
-              setIsReady(false);
-            }}
+            {...player.handlers}
           />
         </div>
       )}

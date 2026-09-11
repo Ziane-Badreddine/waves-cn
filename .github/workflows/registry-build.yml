@@ -2,27 +2,30 @@ name: Build Registry
 
 on:
   push:
+    branches: ["**"]
     paths:
-      - 'src/registry/**'
-      - 'registry.json'
+      - "src/registry/**"
+      - "registry.json"
   pull_request:
     paths:
-      - 'src/registry/**'
-      - 'registry.json'
+      - "src/registry/**"
+      - "registry.json"
+
+# One run per branch at a time so two quick pushes never race on the auto-commit.
+concurrency:
+  group: registry-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build:
+  verify:
+    name: Lint, type-check, build registry
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # On push events, check out the actual branch so we can commit back.
-          ref: ${{ github.event_name == 'push' && github.ref_name || '' }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,11 +36,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint registry sources
+        run: npx eslint src/registry src/lib
+
+      - name: Type check
+        run: npm run types:check
+
       - name: Build registry
         run: npm run registry:build
 
       # Pull requests are checked out at a detached merge commit (refs/pull/N/merge),
-      # so there is no branch to push to. Only verify the build there.
+      # so there is no branch to push to. Only verify the output there.
       - name: Check generated files are up to date (PR)
         if: github.event_name == 'pull_request'
         run: |
@@ -47,8 +56,34 @@ jobs:
             exit 1
           fi
 
-      - name: Commit generated files (push)
+      - name: Upload generated registry
         if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry
+          path: public/r
+          retention-days: 1
+
+  commit:
+    name: Commit generated files
+    needs: verify
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Download generated registry
+        uses: actions/download-artifact@v4
+        with:
+          name: registry
+          path: public/r
+
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
