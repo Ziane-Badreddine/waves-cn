@@ -13,12 +13,11 @@ import {
   Pause,
   Volume2,
   VolumeX,
-  Loader2,
   RotateCcw,
   Repeat,
   Trash2,
 } from "lucide-react";
-import WavesurferPlayer from "@/lib/wave-cn";
+import WavesurferPlayer, { formatTime, useWavePlayer } from "@/lib/wave-cn";
 import type WaveSurfer from "wavesurfer.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -40,9 +39,9 @@ export interface WaveRegionsProps {
   defaultVolume?: number;
   /** Allow creating and editing regions */
   editable?: boolean;
-  /** Default color for new regions */
+  /** Default color for new regions @default "color-mix(in oklab, var(--primary) 25%, transparent)" */
   regionColor?: string;
-  /** Color for the active (looping) region */
+  /** Color for the active (looping) region @default "color-mix(in oklab, var(--primary) 45%, transparent)" */
   activeRegionColor?: string;
   /** Audio bar color. Accepts any CSS value including var(--*) tokens @default "var(--muted-foreground)" */
   waveColor?: string;
@@ -64,16 +63,20 @@ export interface WaveRegionsProps {
   onRegionRemoved?: (id: string) => void;
   /** Called when a region is clicked */
   onRegionClicked?: (region: RegionData) => void;
+  /** Called when playback starts */
+  onPlay?: () => void;
+  /** Called when playback pauses */
+  onPause?: () => void;
+  /** Called when playback finishes */
+  onFinish?: () => void;
+  /** Called with current time on every audio process tick */
+  onTimeUpdate?: (currentTime: number, duration: number) => void;
   className?: string;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+type RegionsPluginInstance = InstanceType<typeof RegionsPlugin>;
 
-function formatTime(t: number): string {
-  const m = Math.floor(t / 60);
-  const s = Math.floor(t % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function toRegionData(r: Region): RegionData {
   return {
@@ -92,8 +95,8 @@ export function WaveRegions({
   title,
   defaultVolume = 0.8,
   editable = true,
-  regionColor = "rgba(59, 130, 246, 0.3)",
-  activeRegionColor = "rgba(59, 130, 246, 0.5)",
+  regionColor = "color-mix(in oklab, var(--primary) 25%, transparent)",
+  activeRegionColor = "color-mix(in oklab, var(--primary) 45%, transparent)",
   waveColor,
   progressColor,
   barWidth,
@@ -104,24 +107,41 @@ export function WaveRegions({
   onRegionUpdated,
   onRegionRemoved,
   onRegionClicked,
+  onPlay,
+  onPause,
+  onFinish,
+  onTimeUpdate,
   className,
 }: WaveRegionsProps) {
-  const wavesurferRef = React.useRef<WaveSurfer | null>(null);
-  const regionsRef = React.useRef<InstanceType<typeof RegionsPlugin> | null>(
-    null,
-  );
-
-  const [isReady, setIsReady] = React.useState(false);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [volume, setVolume] = React.useState(defaultVolume);
-  const [isMuted, setIsMuted] = React.useState(false);
-  const [duration, setDuration] = React.useState(0);
-  const [currentTime, setCurrentTime] = React.useState(0);
+  const [regionsPlugin, setRegionsPlugin] =
+    React.useState<RegionsPluginInstance | null>(null);
   const [regions, setRegions] = React.useState<RegionData[]>([]);
   const [activeRegionId, setActiveRegionId] = React.useState<string | null>(
     null,
   );
   const [isLooping, setIsLooping] = React.useState(false);
+
+  // Latest props/state readable from plugin listeners without re-subscribing.
+  const latest = React.useRef({
+    editable,
+    regionColor,
+    activeRegionId,
+    onRegionCreated,
+    onRegionUpdated,
+    onRegionRemoved,
+    onRegionClicked,
+  });
+  React.useEffect(() => {
+    latest.current = {
+      editable,
+      regionColor,
+      activeRegionId,
+      onRegionCreated,
+      onRegionUpdated,
+      onRegionRemoved,
+      onRegionClicked,
+    };
+  });
 
   // ── Memoized plugin ──────────────────────────────────────────────────────
   const plugins = React.useMemo(
@@ -129,32 +149,55 @@ export function WaveRegions({
     [],
   );
 
-  // ── Event handlers ───────────────────────────────────────────────────────
-
-  const handleReady = React.useCallback(
-    (ws: WaveSurfer) => {
-      wavesurferRef.current = ws;
-      ws.setVolume(defaultVolume);
-      setDuration(ws.getDuration());
-      setIsReady(true);
-
-      // Get the regions plugin instance
-      const rp = ws.getActivePlugins().find((p) => p instanceof RegionsPlugin) as
-        | InstanceType<typeof RegionsPlugin>
+  // ── Player ───────────────────────────────────────────────────────────────
+  const player = useWavePlayer({
+    defaultVolume,
+    onPlay,
+    onPause,
+    onFinish,
+    onTimeUpdate,
+    onReady: (ws) => {
+      const live = ws
+        .getActivePlugins()
+        .find((p) => p instanceof RegionsPlugin) as
+        | RegionsPluginInstance
         | undefined;
-      if (!rp) return;
-      regionsRef.current = rp;
+      setRegionsPlugin(live ?? null);
+    },
+  });
 
-      if (editable) {
-        rp.enableDragSelection({
-          color: regionColor,
-          resize: true,
-          drag: true,
-        });
-      }
+  const handlers = React.useMemo(
+    () => ({
+      ...player.handlers,
+      onDestroy: (ws: WaveSurfer) => {
+        player.handlers.onDestroy?.(ws);
+        setRegionsPlugin(null);
+        setRegions([]);
+        setActiveRegionId(null);
+        setIsLooping(false);
+      },
+    }),
+    [player.handlers],
+  );
 
-      // Region events
+  // ── Drag selection ───────────────────────────────────────────────────────
+  React.useEffect(() => {
+    if (!regionsPlugin || !editable) return;
+    return regionsPlugin.enableDragSelection({
+      color: regionColor,
+      resize: true,
+      drag: true,
+    });
+  }, [regionsPlugin, editable, regionColor]);
+
+  // ── Region events ────────────────────────────────────────────────────────
+  React.useEffect(() => {
+    const rp = regionsPlugin;
+    if (!rp) return;
+
+    const unsubs = [
       rp.on("region-created", (region: Region) => {
+        const { editable, regionColor, onRegionCreated } = latest.current;
         if (editable) {
           region.setOptions({ color: regionColor, resize: true, drag: true });
         }
@@ -164,134 +207,69 @@ export function WaveRegions({
           return [...prev, data];
         });
         onRegionCreated?.(data);
-      });
+      }),
 
       rp.on("region-updated", (region: Region) => {
         const data = toRegionData(region);
         setRegions((prev) =>
           prev.map((r) => (r.id === data.id ? data : r)),
         );
-        onRegionUpdated?.(data);
-      });
+        latest.current.onRegionUpdated?.(data);
+      }),
 
       rp.on("region-removed", (region: Region) => {
         setRegions((prev) => prev.filter((r) => r.id !== region.id));
-        if (activeRegionId === region.id) {
-          setActiveRegionId(null);
-          setIsLooping(false);
-        }
-        onRegionRemoved?.(region.id);
-      });
+        setActiveRegionId((prev) => (prev === region.id ? null : prev));
+        if (latest.current.activeRegionId === region.id) setIsLooping(false);
+        latest.current.onRegionRemoved?.(region.id);
+      }),
 
       rp.on("region-clicked", (region: Region, e: MouseEvent) => {
         e.stopPropagation();
         setActiveRegionId(region.id);
-        onRegionClicked?.(toRegionData(region));
-      });
-    },
-    [
-      defaultVolume,
-      editable,
-      regionColor,
-      activeRegionId,
-      onRegionCreated,
-      onRegionUpdated,
-      onRegionRemoved,
-      onRegionClicked,
-    ],
-  );
+        latest.current.onRegionClicked?.(toRegionData(region));
+      }),
+    ];
+
+    return () => unsubs.forEach((u) => u());
+  }, [regionsPlugin]);
 
   // ── Loop active region ───────────────────────────────────────────────────
   React.useEffect(() => {
-    const ws = wavesurferRef.current;
-    if (!ws || !isLooping || !activeRegionId) return;
+    const ws = player.wavesurfer.current;
+    const rp = regionsPlugin;
+    if (!ws || !rp || !isLooping || !activeRegionId) return;
 
-    const rp = regionsRef.current;
-    if (!rp) return;
-
-    const allRegions = rp.getRegions();
-    const active = allRegions.find((r) => r.id === activeRegionId);
+    const active = rp.getRegions().find((r) => r.id === activeRegionId);
     if (!active) return;
 
     // Play the active region
     active.play();
 
     const unsub = rp.on("region-out", (region) => {
-      if (region.id === active.id && isLooping) active.play();
+      if (region.id === active.id) active.play();
     });
 
     return () => unsub();
-  }, [isLooping, activeRegionId]);
+  }, [player.wavesurfer, regionsPlugin, isLooping, activeRegionId]);
 
   // ── Highlight active region ──────────────────────────────────────────────
   React.useEffect(() => {
-    const rp = regionsRef.current;
-    if (!rp) return;
-
-    const allRegions = rp.getRegions();
-    allRegions.forEach((r) => {
+    if (!regionsPlugin) return;
+    regionsPlugin.getRegions().forEach((r) => {
       r.setOptions({
         color: r.id === activeRegionId ? activeRegionColor : regionColor,
       });
     });
-  }, [activeRegionId, regionColor, activeRegionColor]);
-
-  const handlePlay = React.useCallback(() => setIsPlaying(true), []);
-  const handlePause = React.useCallback(() => setIsPlaying(false), []);
-  const handleFinish = React.useCallback(() => setIsPlaying(false), []);
-
-  const handleTimeupdate = React.useCallback((ws: WaveSurfer) => {
-    setCurrentTime(ws.getCurrentTime());
-  }, []);
-
-  const handleSeeking = React.useCallback((ws: WaveSurfer) => {
-    setCurrentTime(ws.getCurrentTime());
-  }, []);
-
-  const handleDestroy = React.useCallback(() => {
-    wavesurferRef.current = null;
-    regionsRef.current = null;
-    setIsReady(false);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-    setRegions([]);
-    setActiveRegionId(null);
-  }, []);
+  }, [regionsPlugin, activeRegionId, regionColor, activeRegionColor]);
 
   // ── Controls ─────────────────────────────────────────────────────────────
 
-  const togglePlay = React.useCallback(
-    () => wavesurferRef.current?.playPause(),
-    [],
-  );
-
-  const restart = React.useCallback(() => {
-    if (!wavesurferRef.current || !isReady) return;
-    wavesurferRef.current.setTime(0);
-    wavesurferRef.current.play();
-  }, [isReady]);
-
-  const handleVolume = React.useCallback((v: number[]) => {
-    const value = v[0];
-    setVolume(value);
-    setIsMuted(value === 0);
-    wavesurferRef.current?.setVolume(value);
-  }, []);
-
-  const toggleMute = React.useCallback(() => {
-    if (!wavesurferRef.current) return;
-    const next = !isMuted;
-    setIsMuted(next);
-    wavesurferRef.current.setVolume(next ? 0 : volume);
-  }, [isMuted, volume]);
-
-  const handleSeek = React.useCallback(
-    ([v]: number[]) => {
-      if (!wavesurferRef.current || !isReady) return;
-      wavesurferRef.current.seekTo(v);
-    },
-    [isReady],
+  const { seek, setVolume } = player;
+  const handleSeek = React.useCallback(([v]: number[]) => seek(v), [seek]);
+  const handleVolume = React.useCallback(
+    ([v]: number[]) => setVolume(v),
+    [setVolume],
   );
 
   const toggleLoop = React.useCallback(() => {
@@ -299,21 +277,19 @@ export function WaveRegions({
   }, []);
 
   const removeActiveRegion = React.useCallback(() => {
-    if (!activeRegionId || !regionsRef.current) return;
-    const allRegions = regionsRef.current.getRegions();
-    const active = allRegions.find((r) => r.id === activeRegionId);
+    if (!activeRegionId || !regionsPlugin) return;
+    const active = regionsPlugin
+      .getRegions()
+      .find((r) => r.id === activeRegionId);
     active?.remove();
-  }, [activeRegionId]);
-
-  const clearAllRegions = React.useCallback(() => {
-    regionsRef.current?.clearRegions();
-    setRegions([]);
-    setActiveRegionId(null);
-    setIsLooping(false);
-  }, []);
+  }, [regionsPlugin, activeRegionId]);
 
   // ── Derived ──────────────────────────────────────────────────────────────
-  const progress = duration > 0 ? currentTime / duration : 0;
+  const { isReady, isPlaying, isMuted, volume, currentTime, duration, progress } =
+    player;
+  const activeRegion = activeRegionId
+    ? regions.find((r) => r.id === activeRegionId)
+    : undefined;
 
   // ── Render ─────────────────────────────────────────────────────────────
   return (
@@ -332,14 +308,6 @@ export function WaveRegions({
 
         {/* Waveform with regions */}
         <div className="relative w-full rounded-sm overflow-hidden bg-muted/40">
-          {!isReady && (
-            <div
-              className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-[2px]"
-              style={{ height: waveHeight ?? 64 }}
-            >
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            </div>
-          )}
           <WavesurferPlayer
             url={src}
             waveColor={waveColor}
@@ -350,13 +318,7 @@ export function WaveRegions({
             barRadius={barRadius}
             dragToSeek
             plugins={plugins}
-            onReady={handleReady}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onFinish={handleFinish}
-            onTimeupdate={handleTimeupdate}
-            onSeeking={handleSeeking}
-            onDestroy={handleDestroy}
+            {...handlers}
           />
         </div>
 
@@ -368,8 +330,8 @@ export function WaveRegions({
               <>
                 {" · "}
                 <span className="font-medium text-foreground">
-                  Active: {formatTime(regions.find((r) => r.id === activeRegionId)?.start ?? 0)}–
-                  {formatTime(regions.find((r) => r.id === activeRegionId)?.end ?? 0)}
+                  Active: {formatTime(activeRegion?.start ?? 0)}–
+                  {formatTime(activeRegion?.end ?? 0)}
                 </span>
               </>
             )}
@@ -389,6 +351,7 @@ export function WaveRegions({
             step={0.001}
             disabled={!isReady}
             onValueChange={handleSeek}
+            aria-label="Seek"
           />
           <span className="text-[11px] tabular-nums text-muted-foreground w-10 shrink-0">
             {formatTime(duration)}
@@ -403,7 +366,7 @@ export function WaveRegions({
               variant="ghost"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
               disabled={!isReady}
-              onClick={restart}
+              onClick={player.restart}
               aria-label="Restart"
             >
               <RotateCcw size={15} />
@@ -413,7 +376,7 @@ export function WaveRegions({
               variant="secondary"
               className="h-9 w-9"
               disabled={!isReady}
-              onClick={togglePlay}
+              onClick={player.togglePlay}
               aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? <Pause size={17} /> : <Play size={17} />}
@@ -451,7 +414,7 @@ export function WaveRegions({
               size="icon"
               variant="ghost"
               className="h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
-              onClick={toggleMute}
+              onClick={player.toggleMute}
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
               {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}

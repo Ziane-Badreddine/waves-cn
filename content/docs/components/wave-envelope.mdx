@@ -121,3 +121,32 @@ import { WaveEnvelope } from "@/components/waves-cn/wave-envelope"
 You can pass `fadeInEnd` and `fadeOutStart` to automatically insert volume envelope points for fades.
 
 <ComponentPreviewWrapper name="wave-envelope-fade" />
+
+## API Reference
+
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `src` | `string` | — | **(Required)** Audio URL. Changing it recreates the wavesurfer instance. |
+| `title` | `string` | — | Track title displayed above the waveform. |
+| `defaultVolume` | `number` | `0.8` | Initial envelope volume `0`–`1`. Also the volume of generated fade points. |
+| `lineColor` | `string` | `var(--primary)` | Envelope line color. |
+| `lineWidth` | `number` | `2` | Envelope line width in px. |
+| `dragPointSize` | `number` | `10` | Radius of the draggable points in px. |
+| `dragPointFill` | `string` | `var(--primary)` | Fill color of the points. |
+| `dragPointStroke` | `string` | `var(--background)` | Stroke color of the points. |
+| `fadeInEnd` | `number` | — | Seconds. When set, adds points for a fade-in from `0` to `defaultVolume` ending here. |
+| `fadeOutStart` | `number` | — | Seconds. When set, adds a point at `defaultVolume` here so you can drag the end down. |
+| `onVolumeChange` | `(volume: number) => void` | — | Fired as the envelope changes the volume during playback. |
+| `onPlay` | `() => void` | — | Fired when playback starts. |
+| `onPause` | `() => void` | — | Fired when playback pauses. |
+| `onFinish` | `() => void` | — | Fired when the track ends. |
+| `onTimeUpdate` | `(currentTime: number, duration: number) => void` | — | Fired on every playback tick. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Waveform bar color. Accepts any CSS value including `var(--*)` tokens. |
+| `progressColor` | `string` | `var(--primary)` | Progress overlay color. Same formats as `waveColor`. |
+| `waveHeight` | `number` | `64` | Waveform canvas height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Border radius of each bar. |
+| `className` | `string` | — | Extra classes on the outer `<Card>`. |
+
+Colors that end up on SVG attributes (`lineColor`, `dragPointFill`, `dragPointStroke`) are resolved from CSS variables at runtime and follow theme changes.

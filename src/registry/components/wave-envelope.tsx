@@ -6,15 +6,12 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Loader2,
-  RotateCcw,
-} from "lucide-react";
-import WavesurferPlayer from "@/lib/wave-cn";
+import { Play, Pause, Volume2, VolumeX, RotateCcw } from "lucide-react";
+import WavesurferPlayer, {
+  formatTime,
+  useCssVar,
+  useWavePlayer,
+} from "@/lib/wave-cn";
 import type WaveSurfer from "wavesurfer.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -70,13 +67,7 @@ export interface WaveEnvelopeProps {
   className?: string;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function formatTime(t: number): string {
-  const m = Math.floor(t / 60);
-  const s = Math.floor(t % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
+type EnvelopePluginInstance = InstanceType<typeof EnvelopePlugin>;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -104,14 +95,20 @@ export function WaveEnvelope({
   onTimeUpdate,
   className,
 }: WaveEnvelopeProps) {
-  const wavesurferRef = React.useRef<WaveSurfer | null>(null);
-
-  const [isReady, setIsReady] = React.useState(false);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [isMuted, setIsMuted] = React.useState(false);
-  const [duration, setDuration] = React.useState(0);
-  const [currentTime, setCurrentTime] = React.useState(0);
+  const [envelopePlugin, setEnvelopePlugin] =
+    React.useState<EnvelopePluginInstance | null>(null);
   const [envelopeVolume, setEnvelopeVolume] = React.useState(defaultVolume);
+
+  // Latest callback readable from the plugin listener without re-subscribing.
+  const latest = React.useRef({ onVolumeChange });
+  React.useEffect(() => {
+    latest.current = { onVolumeChange };
+  });
+
+  // The envelope is drawn as SVG: resolve tokens to concrete colors.
+  const resolvedLineColor = useCssVar(lineColor);
+  const resolvedDragPointFill = useCssVar(dragPointFill);
+  const resolvedDragPointStroke = useCssVar(dragPointStroke);
 
   // ── Build initial points from fade config ─────────────────────────────────
   const initialPoints = React.useMemo(() => {
@@ -128,120 +125,76 @@ export function WaveEnvelope({
 
   // ── Memoized plugins ──────────────────────────────────────────────────────
   const plugins = React.useMemo(
-    () => [
-      EnvelopePlugin.create({
-        volume: defaultVolume,
-        lineColor,
-        lineWidth: `${lineWidth}px`,
-        dragPointSize,
-        dragPointFill,
-        dragPointStroke,
-        points: initialPoints.length > 0 ? initialPoints : undefined,
-      }),
-    ],
+    () =>
+      typeof document === "undefined"
+        ? []
+        : [
+            EnvelopePlugin.create({
+              volume: defaultVolume,
+              lineColor: resolvedLineColor,
+              lineWidth: `${lineWidth}px`,
+              dragPointSize,
+              dragPointFill: resolvedDragPointFill,
+              dragPointStroke: resolvedDragPointStroke,
+              points: initialPoints.length > 0 ? initialPoints : undefined,
+            }),
+          ],
     [
       defaultVolume,
-      lineColor,
+      resolvedLineColor,
       lineWidth,
       dragPointSize,
-      dragPointFill,
-      dragPointStroke,
+      resolvedDragPointFill,
+      resolvedDragPointStroke,
       initialPoints,
     ],
   );
 
-  // ── Event handlers ────────────────────────────────────────────────────────
-
-  const handleReady = React.useCallback(
-    (ws: WaveSurfer) => {
-      wavesurferRef.current = ws;
-      setDuration(ws.getDuration());
-      setIsReady(true);
-
-      // Listen for envelope volume changes
-      const ep = ws.getActivePlugins().find(
-        (p) => p instanceof EnvelopePlugin,
-      ) as InstanceType<typeof EnvelopePlugin> | undefined;
-
-      if (ep) {
-        ep.on("volume-change", (vol: number) => {
-          setEnvelopeVolume(vol);
-          onVolumeChange?.(vol);
-        });
-      }
+  // ── Player ────────────────────────────────────────────────────────────────
+  const player = useWavePlayer({
+    defaultVolume,
+    onPlay,
+    onPause,
+    onFinish,
+    onTimeUpdate,
+    onReady: (ws) => {
+      const live = ws
+        .getActivePlugins()
+        .find((p) => p instanceof EnvelopePlugin) as
+        | EnvelopePluginInstance
+        | undefined;
+      setEnvelopePlugin(live ?? null);
     },
-    [onVolumeChange],
+  });
+
+  const handlers = React.useMemo(
+    () => ({
+      ...player.handlers,
+      onDestroy: (ws: WaveSurfer) => {
+        player.handlers.onDestroy?.(ws);
+        setEnvelopePlugin(null);
+      },
+    }),
+    [player.handlers],
   );
 
-  const handlePlay = React.useCallback(() => {
-    setIsPlaying(true);
-    onPlay?.();
-  }, [onPlay]);
-
-  const handlePause = React.useCallback(() => {
-    setIsPlaying(false);
-    onPause?.();
-  }, [onPause]);
-
-  const handleFinish = React.useCallback(
-    (_ws: WaveSurfer) => {
-      setIsPlaying(false);
-      onFinish?.();
-    },
-    [onFinish],
-  );
-
-  const handleTimeupdate = React.useCallback(
-    (ws: WaveSurfer) => {
-      const t = ws.getCurrentTime();
-      setCurrentTime(t);
-      onTimeUpdate?.(t, ws.getDuration());
-    },
-    [onTimeUpdate],
-  );
-
-  const handleSeeking = React.useCallback((ws: WaveSurfer) => {
-    setCurrentTime(ws.getCurrentTime());
-  }, []);
-
-  const handleDestroy = React.useCallback(() => {
-    wavesurferRef.current = null;
-    setIsReady(false);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-  }, []);
+  // ── Envelope volume events ────────────────────────────────────────────────
+  React.useEffect(() => {
+    if (!envelopePlugin) return;
+    const unsub = envelopePlugin.on("volume-change", (vol: number) => {
+      setEnvelopeVolume(vol);
+      latest.current.onVolumeChange?.(vol);
+    });
+    return () => unsub();
+  }, [envelopePlugin]);
 
   // ── Controls ──────────────────────────────────────────────────────────────
-
-  const togglePlay = React.useCallback(
-    () => wavesurferRef.current?.playPause(),
-    [],
-  );
-
-  const restart = React.useCallback(() => {
-    if (!wavesurferRef.current || !isReady) return;
-    wavesurferRef.current.setTime(0);
-    wavesurferRef.current.play();
-  }, [isReady]);
-
-  const toggleMute = React.useCallback(() => {
-    if (!wavesurferRef.current) return;
-    const next = !isMuted;
-    setIsMuted(next);
-    wavesurferRef.current.setMuted(next);
-  }, [isMuted]);
-
-  const handleSeek = React.useCallback(
-    ([v]: number[]) => {
-      if (!wavesurferRef.current || !isReady) return;
-      wavesurferRef.current.seekTo(v);
-    },
-    [isReady],
-  );
+  const { seek } = player;
+  const handleSeek = React.useCallback(([v]: number[]) => seek(v), [seek]);
 
   // ── Derived ───────────────────────────────────────────────────────────────
-  const progress = duration > 0 ? currentTime / duration : 0;
+  const { isReady, isPlaying, isMuted, currentTime, duration, progress } =
+    player;
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -260,14 +213,6 @@ export function WaveEnvelope({
 
         {/* Waveform with envelope overlay */}
         <div className="relative w-full rounded-sm overflow-hidden bg-muted/40">
-          {!isReady && (
-            <div
-              className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-[2px]"
-              style={{ height: waveHeight ?? 64 }}
-            >
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            </div>
-          )}
           <WavesurferPlayer
             url={src}
             waveColor={waveColor}
@@ -278,18 +223,12 @@ export function WaveEnvelope({
             barRadius={barRadius}
             dragToSeek
             plugins={plugins}
-            onReady={handleReady}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onFinish={handleFinish}
-            onTimeupdate={handleTimeupdate}
-            onSeeking={handleSeeking}
-            onDestroy={handleDestroy}
+            {...handlers}
           />
         </div>
 
         {/* Volume indicator */}
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground" aria-live="polite">
           Envelope volume:{" "}
           <span className="tabular-nums font-medium text-foreground">
             {Math.round(envelopeVolume * 100)}%
@@ -310,6 +249,7 @@ export function WaveEnvelope({
             step={0.001}
             disabled={!isReady}
             onValueChange={handleSeek}
+            aria-label="Seek"
           />
           <span className="text-[11px] tabular-nums text-muted-foreground w-10 shrink-0">
             {formatTime(duration)}
@@ -324,7 +264,7 @@ export function WaveEnvelope({
               variant="ghost"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
               disabled={!isReady}
-              onClick={restart}
+              onClick={player.restart}
               aria-label="Restart"
             >
               <RotateCcw size={15} />
@@ -334,7 +274,7 @@ export function WaveEnvelope({
               variant="secondary"
               className="h-9 w-9"
               disabled={!isReady}
-              onClick={togglePlay}
+              onClick={player.togglePlay}
               aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? <Pause size={17} /> : <Play size={17} />}
@@ -347,7 +287,7 @@ export function WaveEnvelope({
               size="icon"
               variant="ghost"
               className="h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
-              onClick={toggleMute}
+              onClick={player.toggleMute}
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
               {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}

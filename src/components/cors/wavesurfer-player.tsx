@@ -29,7 +29,7 @@ import WaveSurfer, {
   type WaveSurferOptions,
 } from "wavesurfer.js";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCssVar } from "@/hooks/use-css-var";
+import { useCssVar } from "@/lib/wave-cn";
 
 type WavesurferEventHandler<T extends unknown[]> = (
   wavesurfer: WaveSurfer,
