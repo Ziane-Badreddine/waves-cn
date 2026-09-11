@@ -11,6 +11,16 @@
     "wave-defaults.mdx",
     "plugins",
     "---Components---",
-    "...components"
+    "components/wave-player.mdx",
+    "components/wave-recorder.mdx",
+    "components/wave-timeline.mdx",
+    "components/wave-speed.mdx",
+    "components/wave-zoom.mdx",
+    "components/wave-video.mdx",
+    "components/wave-regions.mdx",
+    "components/wave-minimap.mdx",
+    "components/wave-spectrogram.mdx",
+    "components/wave-hover.mdx",
+    "components/wave-envelope.mdx"
   ]
 }

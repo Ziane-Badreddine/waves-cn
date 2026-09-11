@@ -1,0 +1,121 @@
+---
+title: Wave Hover
+description: A shadcn-styled waveform player with a hover cursor and time tooltip built on wavesurfer.js HoverPlugin.
+---
+
+import { ComponentPreviewWrapper } from "@/components/component-preview-wrapper"
+import { Steps, Step } from "@/components/steps"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/tabs"
+
+<ComponentPreviewWrapper name="wave-hover-demo" />
+
+## Installation
+
+<Tabs defaultValue="cli">
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+<Tabs defaultValue="pnpm">
+  <TabsList>
+    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+    <TabsTrigger value="npm">npm</TabsTrigger>
+    <TabsTrigger value="yarn">yarn</TabsTrigger>
+    <TabsTrigger value="bun">bun</TabsTrigger>
+  </TabsList>
+  <TabsContent value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @waves-cn/wave-hover
+```
+  </TabsContent>
+  <TabsContent value="npm">
+```bash
+npx shadcn@latest add @waves-cn/wave-hover
+```
+  </TabsContent>
+  <TabsContent value="yarn">
+```bash
+yarn dlx shadcn@latest add @waves-cn/wave-hover
+```
+  </TabsContent>
+  <TabsContent value="bun">
+```bash
+bunx --bun shadcn@latest add @waves-cn/wave-hover
+```
+  </TabsContent>
+</Tabs>
+
+</TabsContent>
+<TabsContent value="manual">
+<Steps>
+
+<Step>
+
+Install the peer dependency.
+
+```bash
+npm install wavesurfer.js
+```
+
+</Step>
+
+<Step>
+
+Install the required shadcn primitives.
+
+```bash
+npx shadcn@latest add card button slider skeleton
+```
+
+</Step>
+
+<Step>
+
+Copy `wave-cn.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-cn" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Copy `wave-hover.tsx` into your project.
+
+<ComponentPreviewWrapper name="wave-hover" variant="codesource" />
+
+</Step>
+
+<Step>
+
+Update the import paths to match your project setup.
+
+</Step>
+
+</Steps>
+
+</TabsContent>
+</Tabs>
+
+## Features
+
+- **Hover Line** — renders a vertical cursor tracking your mouse over the waveform.
+- **Time Tooltip** — shows the exact time under your cursor to allow precise seeking.
+- **Customizable Styling** — line color, width, and tooltip background/text color are customizable.
+
+## Usage
+
+```tsx
+import { WaveHover } from "@/components/waves-cn/wave-hover"
+```
+
+```tsx
+<WaveHover src="/coastline.mp3" />
+```
+
+## Examples
+
+### Custom Colors
+
+<ComponentPreviewWrapper name="wave-hover-custom" />

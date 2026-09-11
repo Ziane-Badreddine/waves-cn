@@ -25,6 +25,20 @@ type OnWavesurferEvents = {
 };
 
 type PartialWavesurferOptions = Omit<WaveSurferOptions, "container">;
+type WavesurferPlugin = NonNullable<WaveSurferOptions["plugins"]>[number];
+
+function createPluginInstances(
+  plugins: WaveSurferOptions["plugins"],
+): WaveSurferOptions["plugins"] {
+  return plugins?.map((plugin) => {
+    const Plugin = plugin.constructor as new (
+      options: unknown,
+    ) => WavesurferPlugin;
+    const options = (plugin as unknown as { options: unknown }).options;
+
+    return new Plugin(options);
+  });
+}
 
 export type WavesurferProps = PartialWavesurferOptions &
   OnWavesurferEvents & {
@@ -122,7 +136,7 @@ const WavesurferPlayer = memo(
         cursorWidth,
         dragToSeek,
         media,
-        plugins: optionsRef.current.plugins,
+        plugins: createPluginInstances(optionsRef.current.plugins),
         waveColor: resolvedWaveColor,
         progressColor: resolvedProgressColor,
         container: containerRef.current,

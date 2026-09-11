@@ -106,6 +106,81 @@
           "target": "components/waves-cn/wave-timeline.tsx"
         }
       ]
+    },
+    {
+      "name": "wave-regions",
+      "title": "Wave Regions",
+      "description": "Wave player with interactive region markers for audio segments.",
+      "type": "registry:component",
+      "dependencies": ["wavesurfer.js", "lucide-react"],
+      "registryDependencies": ["@waves-cn/wave-cn"],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "src/registry/components/wave-regions.tsx",
+          "target": "components/waves-cn/wave-regions.tsx"
+        }
+      ]
+    },
+    {
+      "name": "wave-minimap",
+      "title": "Wave Minimap",
+      "description": "Wave player with a smaller overview minimap.",
+      "type": "registry:component",
+      "dependencies": ["wavesurfer.js", "lucide-react"],
+      "registryDependencies": ["@waves-cn/wave-cn"],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "src/registry/components/wave-minimap.tsx",
+          "target": "components/waves-cn/wave-minimap.tsx"
+        }
+      ]
+    },
+    {
+      "name": "wave-spectrogram",
+      "title": "Wave Spectrogram",
+      "description": "Wave player paired with a frequency spectrogram.",
+      "type": "registry:component",
+      "dependencies": ["wavesurfer.js", "lucide-react"],
+      "registryDependencies": ["@waves-cn/wave-cn"],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "src/registry/components/wave-spectrogram.tsx",
+          "target": "components/waves-cn/wave-spectrogram.tsx"
+        }
+      ]
+    },
+    {
+      "name": "wave-hover",
+      "title": "Wave Hover",
+      "description": "Wave player with a hover cursor and time tooltip.",
+      "type": "registry:component",
+      "dependencies": ["wavesurfer.js", "lucide-react"],
+      "registryDependencies": ["@waves-cn/wave-cn"],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "src/registry/components/wave-hover.tsx",
+          "target": "components/waves-cn/wave-hover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "wave-envelope",
+      "title": "Wave Envelope",
+      "description": "Wave player with interactive volume automation points.",
+      "type": "registry:component",
+      "dependencies": ["wavesurfer.js", "lucide-react"],
+      "registryDependencies": ["@waves-cn/wave-cn"],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "src/registry/components/wave-envelope.tsx",
+          "target": "components/waves-cn/wave-envelope.tsx"
+        }
+      ]
     }
   ]
 }
