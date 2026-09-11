@@ -1,8 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowRightIcon, icons, type LucideProps } from "lucide-react";
+import {
+  ArrowRightIcon,
+  ArrowUpRight,
+  AudioLines,
+  AudioWaveform,
+  Blend,
+  Film,
+  Gauge,
+  Map,
+  Mic,
+  MousePointer2,
+  Ruler,
+  Scissors,
+  ZoomIn,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
-import { type ComponentType, createElement } from "react";
+import { type ComponentType } from "react";
 import { source } from "@/lib/source";
 
 import WavePlayer from "@/registry/components/wave-player";
@@ -11,146 +26,189 @@ import WaveSpeed from "@/registry/components/wave-speed";
 import WaveTimeline from "@/registry/components/wave-timeline";
 import WaveVideo from "@/registry/components/wave-video";
 import WaveZoom from "@/registry/components/wave-zoom";
-import Grid from "@/components/grid";
-
-// ─── Source pages ─────────────────────────────────────────────────────────────
-const wavePlayer = source.getPage(["components", "wave-player"]);
-const waveRecorder = source.getPage(["components", "wave-recorder"]);
-const waveSpeed = source.getPage(["components", "wave-speed"]);
-const waveTimeline = source.getPage(["components", "wave-timeline"]);
-const waveVideo = source.getPage(["components", "wave-video"]);
-const waveZoom = source.getPage(["components", "wave-zoom"]);
+import WaveRegions from "@/registry/components/wave-regions";
+import WaveMinimap from "@/registry/components/wave-minimap";
+import WaveSpectrogram from "@/registry/components/wave-spectrogram";
+import WaveHover from "@/registry/components/wave-hover";
+import WaveEnvelope from "@/registry/components/wave-envelope";
 
 // ─── Demo audio / video ───────────────────────────────────────────────────────
 const DEMO_AUDIO = "/coastline.mp3";
 const DEMO_VIDEO = "/coastline.mp4";
+const DEMO_CLASS = "my-auto w-full px-6 pb-6 shadow-none";
 
 // ─── Examples ─────────────────────────────────────────────────────────────────
-const examples = [
+type Example = {
+  slug: string;
+  icon: LucideIcon;
+  component: ComponentType;
+  span?: string;
+};
+
+const examples: Example[] = [
   {
-    icon: wavePlayer?.data.icon,
-    name: wavePlayer?.data.title,
-    description: wavePlayer?.data.description,
+    slug: "wave-player",
+    icon: AudioLines,
     component: () => (
-      <WavePlayer
-        src={DEMO_AUDIO}
-        title="Demo Track"
-        className="px-6 pb-6 my-auto shadow-none"
-      />
+      <WavePlayer src={DEMO_AUDIO} title="Demo Track" className={DEMO_CLASS} />
     ),
   },
   {
-    icon: waveRecorder?.data.icon,
-    name: waveRecorder?.data.title,
-    description: waveRecorder?.data.description,
-    component: () => <WaveRecorder className="px-6 pb-6 my-auto" />,
+    slug: "wave-recorder",
+    icon: Mic,
+    component: () => <WaveRecorder className={DEMO_CLASS} />,
   },
   {
-    icon: waveSpeed?.data.icon,
-    name: waveSpeed?.data.title,
-    description: waveSpeed?.data.description,
+    slug: "wave-regions",
+    icon: Scissors,
     component: () => (
-      <WaveSpeed url={DEMO_AUDIO} className="px-6 pb-6 my-auto" />
+      <WaveRegions src={DEMO_AUDIO} title="Demo Track" className={DEMO_CLASS} />
     ),
   },
   {
-    icon: waveTimeline?.data.icon,
-    name: waveTimeline?.data.title,
-    description: waveTimeline?.data.description,
+    slug: "wave-timeline",
+    icon: Ruler,
     component: () => (
       <WaveTimeline
         src={DEMO_AUDIO}
         title="Demo Track"
-        className="px-6 pb-6 my-auto shadow-none"
+        className={DEMO_CLASS}
       />
     ),
   },
   {
-    icon: waveVideo?.data.icon,
-    name: waveVideo?.data.title,
-    description: waveVideo?.data.description,
+    slug: "wave-minimap",
+    icon: Map,
     component: () => (
-      <WaveVideo url={DEMO_VIDEO} className="px-6 pb-6 my-auto" />
+      <WaveMinimap src={DEMO_AUDIO} title="Demo Track" className={DEMO_CLASS} />
     ),
   },
   {
-    icon: waveZoom?.data.icon,
-    name: waveZoom?.data.title,
-    description: waveZoom?.data.description,
+    slug: "wave-spectrogram",
+    icon: AudioWaveform,
     component: () => (
-      <WaveZoom url={DEMO_AUDIO} className="px-6 pb-6 my-auto" />
+      <WaveSpectrogram
+        src={DEMO_AUDIO}
+        title="Demo Track"
+        className={DEMO_CLASS}
+      />
     ),
+  },
+  {
+    slug: "wave-speed",
+    icon: Gauge,
+    component: () => <WaveSpeed url={DEMO_AUDIO} className={DEMO_CLASS} />,
+  },
+  {
+    slug: "wave-zoom",
+    icon: ZoomIn,
+    component: () => <WaveZoom url={DEMO_AUDIO} className={DEMO_CLASS} />,
+  },
+  {
+    slug: "wave-hover",
+    icon: MousePointer2,
+    component: () => (
+      <WaveHover src={DEMO_AUDIO} title="Demo Track" className={DEMO_CLASS} />
+    ),
+  },
+  {
+    slug: "wave-envelope",
+    icon: Blend,
+    component: () => (
+      <WaveEnvelope
+        src={DEMO_AUDIO}
+        title="Demo Track"
+        className={DEMO_CLASS}
+      />
+    ),
+  },
+  {
+    slug: "wave-video",
+    icon: Film,
+    component: () => <WaveVideo url={DEMO_VIDEO} className={DEMO_CLASS} />,
   },
 ];
 
 // ─── ExampleCard ──────────────────────────────────────────────────────────────
-const ExampleCard = ({
-  icon,
-  name,
-  description,
-  component: Component,
-  className,
-  index
-}: {
-  icon: string | undefined;
-  name: string | undefined;
-  description: string | undefined;
-  component: ComponentType;
-  className?: string;
-  index: number
-}) => {
-  const Icon =
-    icon && icon in icons
-      ? (props: LucideProps) =>
-          createElement(icons[icon as keyof typeof icons], { ...props })
-      : null;
+function ExampleCard({ slug, icon: Icon, component: Component, span }: Example) {
+  const page = source.getPage(["components", slug]);
+  const title = page?.data.title ?? slug;
+  const description = page?.data.description;
+  const href = page?.url ?? `/docs/components/${slug}`;
 
   return (
-    <div
+    <article
       className={cn(
-        className="relative bg-linear-to-b  dark:from-neutral-900 from-secondary dark:to-neutral-950 to-white  py-2 overflow-hidden flex flex-col items-center border gap-4 ",
-        className,
+        "group relative flex flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/25 hover:shadow-[0_18px_40px_-20px_rgba(0,0,0,0.3)]",
+        span,
       )}
     >
-      <Grid size={index * 5 + 10} />
-      <div className="grid gap-2 px-6 pt-6">
-        <div className="flex items-center gap-2">
-          {Icon && <Icon className="text-muted-foreground" size={16} />}
-          {name && <p className="font-medium">{name}</p>}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-foreground/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
+      />
+
+      <header className="flex items-start justify-between gap-3 p-6 pb-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border bg-background text-foreground shadow-xs">
+            <Icon className="size-4" />
+          </span>
+          <div className="min-w-0 space-y-1">
+            <h3 className="font-semibold leading-tight">{title}</h3>
+            {description && (
+              <p className="line-clamp-2 text-sm text-muted-foreground">
+                {description}
+              </p>
+            )}
+          </div>
         </div>
-        {description && (
-          <p className="text-balance text-muted-foreground">{description}</p>
-        )}
+        <Link
+          href={href}
+          aria-label={`${title} documentation`}
+          className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border bg-background text-muted-foreground opacity-0 transition-all group-hover:opacity-100 hover:text-foreground"
+        >
+          <ArrowUpRight className="size-4" />
+        </Link>
+      </header>
+
+      <div className="mt-auto flex flex-1 flex-col justify-end">
+        <Component />
       </div>
-      <Component />
-    </div>
+    </article>
   );
-};
+}
 
 // ─── Components ───────────────────────────────────────────────────────────────
 export const ComponentsExample = () => (
-  <div className="px-4 md:px-6 mx-2 md:mx-auto grid gap-8 md:mt-0 mt-20">
-    <div className="flex w-full flex-col items-start justify-between gap-4 md:flex-row">
-      <div className="grid gap-4">
-        <h2 className="max-w-lg font-semibold text-3xl text-start">
-          Waveform components for every use case
+  <section
+    id="components"
+    className="mx-auto max-w-6xl scroll-mt-24 px-4 pb-20 md:px-6 md:pb-28"
+  >
+    <div className="flex w-full flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+      <div className="max-w-2xl space-y-3">
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          Components
+        </p>
+        <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-4xl">
+          One for every audio use case
         </h2>
-        <p className="max-w-xl text-balance text-lg text-muted-foreground text-start">
-          waves-cn components are built on wavesurfer.js and shadcn/ui — copy
-          them into your project and own them completely.
+        <p className="text-balance text-base text-muted-foreground md:text-lg">
+          {examples.length} components, every one live below. Play, drag,
+          zoom, record. Then copy the one you need.
         </p>
       </div>
-      <Button asChild size="lg">
-        <Link href="/docs">
-          <span>Explore components</span>
+      <Button asChild size="lg" className="rounded-full">
+        <Link href="/docs/components/wave-player">
+          Browse the docs
           <ArrowRightIcon size={16} />
         </Link>
       </Button>
     </div>
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {examples.map((example,i) => (
-        <ExampleCard index={i} key={example.name} {...example} />
+
+    <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {examples.map((example) => (
+        <ExampleCard key={example.slug} {...example} />
       ))}
     </div>
-  </div>
+  </section>
 );
