@@ -160,6 +160,8 @@ export function SidebarContent({
     return !collapsed || e.pointerType === 'touch' || element.getAnimations().length > 0;
   }
 
+  // ref is forwarded into the render-prop child element, not read during render.
+  // eslint-disable-next-line react-hooks/refs
   return children({
     ref,
     collapsed,

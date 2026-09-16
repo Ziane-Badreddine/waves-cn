@@ -99,6 +99,8 @@ function Item({
   useEffect(() => {
     const hash = window.location.hash;
     if (!id || !hash) return;
+    // Read the URL hash after mount (browser-only) to auto-open the linked row.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (`#${id}` === hash) setOpen(true);
   }, [id]);
 

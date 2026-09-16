@@ -14,6 +14,8 @@ const CollapsibleContent = forwardRef<
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Enable collapse animations only after mount to avoid animating on hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

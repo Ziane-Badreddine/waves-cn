@@ -16,7 +16,7 @@
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Ziane-Badreddine/waves-cn" />
   </a>
   <a href="https://github.com/Ziane-Badreddine/waves-cn/releases">
-    <img alt="Version" src="https://img.shields.io/badge/version-2.0.0-black" />
+    <img alt="Version" src="https://img.shields.io/badge/version-2.1.0-black" />
   </a>
   <a href="https://github.com/Ziane-Badreddine/waves-cn/blob/main/LICENSE">
     <img alt="License" src="https://img.shields.io/badge/License-MIT-blue" />

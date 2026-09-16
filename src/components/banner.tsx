@@ -46,6 +46,8 @@ export function Banner({
   const globalKey = id ? `nd-banner-${id}` : null;
 
   useEffect(() => {
+    // Read dismissal state from localStorage after mount (browser-only).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (globalKey) setOpen(localStorage.getItem(globalKey) !== 'true');
   }, [globalKey]);
 

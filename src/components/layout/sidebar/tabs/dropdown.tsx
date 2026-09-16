@@ -30,6 +30,8 @@ export function SidebarTabsDropdown({
   }, [options, pathname]);
 
   const onClick = () => {
+    // Mutating the context ref inside an event handler (not during render).
+    // eslint-disable-next-line react-hooks/immutability
     closeOnRedirect.current = false;
     setOpen(false);
   };
