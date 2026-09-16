@@ -4,7 +4,7 @@ export default function WaveSpeedCustomWave() {
   return (
     <div className="w-full  mx-auto p-6">
       <WaveSpeed
-        url="/coastline.mp3"
+        src="/coastline.mp3"
         waveColor="var(--chart-1)"
         progressColor="var(--chart-2)"
         barWidth={4}

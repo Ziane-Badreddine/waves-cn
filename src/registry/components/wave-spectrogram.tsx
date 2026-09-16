@@ -6,16 +6,8 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Loader2,
-  RotateCcw,
-} from "lucide-react";
-import WavesurferPlayer from "@/lib/wave-cn";
-import type WaveSurfer from "wavesurfer.js";
+import { Play, Pause, Volume2, VolumeX, RotateCcw } from "lucide-react";
+import WavesurferPlayer, { formatTime, useWavePlayer } from "@/lib/wave-cn";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -32,6 +24,10 @@ export interface WaveSpectrogramProps {
   fftSamples?: 256 | 512 | 1024 | 2048;
   /** Show frequency axis labels @default true */
   showLabels?: boolean;
+  /** Lowest frequency (Hz) rendered on the spectrogram @default 0 */
+  frequencyMin?: number;
+  /** Highest frequency (Hz) rendered on the spectrogram @default sampleRate / 2 */
+  frequencyMax?: number;
   /** Audio bar color @default "var(--muted-foreground)" */
   waveColor?: string;
   /** Progress bar color @default "var(--primary)" */
@@ -55,14 +51,6 @@ export interface WaveSpectrogramProps {
   className?: string;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function formatTime(t: number): string {
-  const m = Math.floor(t / 60);
-  const s = Math.floor(t % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function WaveSpectrogram({
@@ -72,6 +60,8 @@ export function WaveSpectrogram({
   spectrogramHeight = 128,
   fftSamples = 512,
   showLabels = true,
+  frequencyMin,
+  frequencyMax,
   waveColor,
   progressColor,
   barWidth,
@@ -84,118 +74,51 @@ export function WaveSpectrogram({
   onTimeUpdate,
   className,
 }: WaveSpectrogramProps) {
-  const wavesurferRef = React.useRef<WaveSurfer | null>(null);
-
-  const [isReady, setIsReady] = React.useState(false);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [volume, setVolume] = React.useState(defaultVolume);
-  const [isMuted, setIsMuted] = React.useState(false);
-  const [duration, setDuration] = React.useState(0);
-  const [currentTime, setCurrentTime] = React.useState(0);
+  const player = useWavePlayer({
+    defaultVolume,
+    onPlay,
+    onPause,
+    onFinish,
+    onTimeUpdate,
+  });
+  const {
+    isReady,
+    isPlaying,
+    currentTime,
+    duration,
+    progress,
+    volume,
+    isMuted,
+    togglePlay,
+    restart,
+    toggleMute,
+    seek,
+    setVolume,
+  } = player;
 
   // ── Memoized plugins ──────────────────────────────────────────────────────
   const plugins = React.useMemo(
-      () =>
-        typeof document === "undefined"
-          ? []
-          : [
-              SpectrogramPlugin.create({
-                height: spectrogramHeight,
-                fftSamples,
-                labels: showLabels,
-              }),
-            ],
-    [spectrogramHeight, fftSamples, showLabels],
+    () =>
+      typeof document === "undefined"
+        ? []
+        : [
+            SpectrogramPlugin.create({
+              height: spectrogramHeight,
+              fftSamples,
+              labels: showLabels,
+              frequencyMin,
+              frequencyMax,
+            }),
+          ],
+    [spectrogramHeight, fftSamples, showLabels, frequencyMin, frequencyMax],
   );
-
-  // ── Event handlers ────────────────────────────────────────────────────────
-
-  const handleReady = React.useCallback(
-    (ws: WaveSurfer) => {
-      wavesurferRef.current = ws;
-      ws.setVolume(defaultVolume);
-      setDuration(ws.getDuration());
-      setIsReady(true);
-    },
-    [defaultVolume],
-  );
-
-  const handlePlay = React.useCallback(() => {
-    setIsPlaying(true);
-    onPlay?.();
-  }, [onPlay]);
-
-  const handlePause = React.useCallback(() => {
-    setIsPlaying(false);
-    onPause?.();
-  }, [onPause]);
-
-  const handleFinish = React.useCallback(
-    (_ws: WaveSurfer) => {
-      setIsPlaying(false);
-      onFinish?.();
-    },
-    [onFinish],
-  );
-
-  const handleTimeupdate = React.useCallback(
-    (ws: WaveSurfer) => {
-      const t = ws.getCurrentTime();
-      setCurrentTime(t);
-      onTimeUpdate?.(t, ws.getDuration());
-    },
-    [onTimeUpdate],
-  );
-
-  const handleSeeking = React.useCallback((ws: WaveSurfer) => {
-    setCurrentTime(ws.getCurrentTime());
-  }, []);
-
-  const handleDestroy = React.useCallback(() => {
-    wavesurferRef.current = null;
-    setIsReady(false);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-  }, []);
 
   // ── Controls ──────────────────────────────────────────────────────────────
-
-  const togglePlay = React.useCallback(
-    () => wavesurferRef.current?.playPause(),
-    [],
+  const handleSeek = React.useCallback(([v]: number[]) => seek(v), [seek]);
+  const handleVolume = React.useCallback(
+    ([v]: number[]) => setVolume(v),
+    [setVolume],
   );
-
-  const restart = React.useCallback(() => {
-    if (!wavesurferRef.current || !isReady) return;
-    wavesurferRef.current.setTime(0);
-    wavesurferRef.current.play();
-  }, [isReady]);
-
-  const handleVolume = React.useCallback((v: number[]) => {
-    const value = v[0];
-    setVolume(value);
-    setIsMuted(value === 0);
-    wavesurferRef.current?.setVolume(value);
-  }, []);
-
-  const toggleMute = React.useCallback(() => {
-    if (!wavesurferRef.current) return;
-    const next = !isMuted;
-    setIsMuted(next);
-    wavesurferRef.current.setVolume(next ? 0 : volume);
-  }, [isMuted, volume]);
-
-  const handleSeek = React.useCallback(
-    ([v]: number[]) => {
-      if (!wavesurferRef.current || !isReady) return;
-      wavesurferRef.current.seekTo(v);
-    },
-    [isReady],
-  );
-
-  // ── Derived ───────────────────────────────────────────────────────────────
-  const progress = duration > 0 ? currentTime / duration : 0;
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -214,14 +137,6 @@ export function WaveSpectrogram({
 
         {/* Waveform + spectrogram */}
         <div className="relative w-full rounded-sm overflow-hidden border border-border">
-          {!isReady && (
-            <div
-              className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-[2px]"
-              style={{ minHeight: waveHeight ?? 64 }}
-            >
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            </div>
-          )}
           <WavesurferPlayer
             url={src}
             waveColor={waveColor}
@@ -232,13 +147,7 @@ export function WaveSpectrogram({
             barRadius={barRadius}
             dragToSeek
             plugins={plugins}
-            onReady={handleReady}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onFinish={handleFinish}
-            onTimeupdate={handleTimeupdate}
-            onSeeking={handleSeeking}
-            onDestroy={handleDestroy}
+            {...player.handlers}
           />
         </div>
 
@@ -255,6 +164,7 @@ export function WaveSpectrogram({
             step={0.001}
             disabled={!isReady}
             onValueChange={handleSeek}
+            aria-label="Seek"
           />
           <span className="text-[11px] tabular-nums text-muted-foreground w-10 shrink-0">
             {formatTime(duration)}

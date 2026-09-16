@@ -77,19 +77,23 @@ useEffect(() => {
 }, [wavesurfer])
 ```
 
+## What recreates the instance
+
+Only `url`, `media`, `plugins`, `peaks`, `duration`, `sampleRate`, `backend` and `mediaControls` recreate the instance. Every other option (`height`, `barWidth`, colors, `audioRate`, …) is applied in place through `wavesurfer.setOptions()` and never re-decodes the audio.
+
+`plugins` and `peaks` are compared by reference, so keep them in `useMemo`.
+
 ## Imperative calls
 
-Speed, volume, and seek should be called imperatively — never passed as options — to avoid recreating the instance:
+Playback state (speed, volume, position) is still best driven imperatively:
 
 ```tsx
-// ❌ Recreates instance on every speed change
-useWavesurfer({ audioRate: speed })
-
-// ✅ Imperative — no re-creation
 wavesurfer?.setPlaybackRate(speed, true)
 wavesurfer?.setVolume(0.5)
 wavesurfer?.seekTo(0.5) // 0–1 normalized
 ```
+
+If you need play/pause/seek/volume state with matching actions, use [`useWavePlayer`](/docs/use-wave-player) together with `WavesurferPlayer` instead.
 
 ## API Reference
 
@@ -106,7 +110,9 @@ wavesurfer?.seekTo(0.5) // 0–1 normalized
 | `barGap` | `number` | `2` | Gap between bars in px. |
 | `barRadius` | `number` | `2` | Bar border radius. |
 | `minPxPerSec` | `number` | `1` | Minimum pixels per second (zoom level). |
-| `plugins` | `GenericPlugin[]` | `[]` | Memoized plugin array. |
+| `plugins` | `GenericPlugin[]` | `[]` | Memoized plugin templates (cloned on each create). |
+| `peaks` | `Array<Float32Array \| number[]>` | — | Precomputed peaks, memoized. |
+| `duration` | `number` | — | Duration in seconds, used with `peaks`. |
 | `...rest` | `WaveSurferOptions` | — | Any other wavesurfer.js option. |
 
 ### Returns
@@ -116,5 +122,4 @@ wavesurfer?.seekTo(0.5) // 0–1 normalized
 | `wavesurfer` | `WaveSurfer \| null` | The live instance. `null` until mounted. |
 | `isReady` | `boolean` | `true` after the `ready` event fires. |
 | `isPlaying` | `boolean` | `true` while wave is playing. |
-| `hasFinished` | `boolean` | `true` after the `finish` event fires. |
 | `currentTime` | `number` | Current playback position in seconds. |

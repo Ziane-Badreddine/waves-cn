@@ -6,16 +6,8 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Loader2,
-  RotateCcw,
-} from "lucide-react";
-import WavesurferPlayer from "@/lib/wave-cn";
-import type WaveSurfer from "wavesurfer.js";
+import { Play, Pause, Volume2, VolumeX, RotateCcw } from "lucide-react";
+import WavesurferPlayer, { formatTime, useWavePlayer } from "@/lib/wave-cn";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -61,14 +53,6 @@ export interface WaveHoverProps {
   className?: string;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function formatTime(t: number): string {
-  const m = Math.floor(t / 60);
-  const s = Math.floor(t % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function WaveHover({
@@ -93,121 +77,52 @@ export function WaveHover({
   onTimeUpdate,
   className,
 }: WaveHoverProps) {
-  const wavesurferRef = React.useRef<WaveSurfer | null>(null);
-
-  const [isReady, setIsReady] = React.useState(false);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [volume, setVolume] = React.useState(defaultVolume);
-  const [isMuted, setIsMuted] = React.useState(false);
-  const [duration, setDuration] = React.useState(0);
-  const [currentTime, setCurrentTime] = React.useState(0);
+  const player = useWavePlayer({
+    defaultVolume,
+    autoPlay,
+    onPlay,
+    onPause,
+    onFinish,
+    onTimeUpdate,
+  });
+  const {
+    isReady,
+    isPlaying,
+    currentTime,
+    duration,
+    progress,
+    volume,
+    isMuted,
+    togglePlay,
+    restart,
+    toggleMute,
+    seek,
+    setVolume,
+  } = player;
 
   // ── Memoized plugins ──────────────────────────────────────────────────────
   const plugins = React.useMemo(
-      () =>
-        typeof document === "undefined"
-          ? []
-          : [
-              HoverPlugin.create({
-                lineColor,
-                lineWidth,
-                labelBackground,
-                labelColor,
-                labelSize,
-              }),
-            ],
+    () =>
+      typeof document === "undefined"
+        ? []
+        : [
+            HoverPlugin.create({
+              lineColor,
+              lineWidth,
+              labelBackground,
+              labelColor,
+              labelSize,
+            }),
+          ],
     [lineColor, lineWidth, labelBackground, labelColor, labelSize],
   );
 
-  // ── Event handlers ────────────────────────────────────────────────────────
-
-  const handleReady = React.useCallback(
-    (ws: WaveSurfer) => {
-      wavesurferRef.current = ws;
-      ws.setVolume(defaultVolume);
-      if (autoPlay) ws.play();
-      setDuration(ws.getDuration());
-      setIsReady(true);
-    },
-    [defaultVolume, autoPlay],
-  );
-
-  const handlePlay = React.useCallback(() => {
-    setIsPlaying(true);
-    onPlay?.();
-  }, [onPlay]);
-
-  const handlePause = React.useCallback(() => {
-    setIsPlaying(false);
-    onPause?.();
-  }, [onPause]);
-
-  const handleFinish = React.useCallback(
-    (_ws: WaveSurfer) => {
-      setIsPlaying(false);
-      onFinish?.();
-    },
-    [onFinish],
-  );
-
-  const handleTimeupdate = React.useCallback(
-    (ws: WaveSurfer) => {
-      const t = ws.getCurrentTime();
-      setCurrentTime(t);
-      onTimeUpdate?.(t, ws.getDuration());
-    },
-    [onTimeUpdate],
-  );
-
-  const handleSeeking = React.useCallback((ws: WaveSurfer) => {
-    setCurrentTime(ws.getCurrentTime());
-  }, []);
-
-  const handleDestroy = React.useCallback(() => {
-    wavesurferRef.current = null;
-    setIsReady(false);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-  }, []);
-
   // ── Controls ──────────────────────────────────────────────────────────────
-
-  const togglePlay = React.useCallback(
-    () => wavesurferRef.current?.playPause(),
-    [],
+  const handleSeek = React.useCallback(([v]: number[]) => seek(v), [seek]);
+  const handleVolume = React.useCallback(
+    ([v]: number[]) => setVolume(v),
+    [setVolume],
   );
-
-  const restart = React.useCallback(() => {
-    if (!wavesurferRef.current || !isReady) return;
-    wavesurferRef.current.setTime(0);
-    wavesurferRef.current.play();
-  }, [isReady]);
-
-  const handleVolume = React.useCallback((v: number[]) => {
-    const value = v[0];
-    setVolume(value);
-    setIsMuted(value === 0);
-    wavesurferRef.current?.setVolume(value);
-  }, []);
-
-  const toggleMute = React.useCallback(() => {
-    if (!wavesurferRef.current) return;
-    const next = !isMuted;
-    setIsMuted(next);
-    wavesurferRef.current.setVolume(next ? 0 : volume);
-  }, [isMuted, volume]);
-
-  const handleSeek = React.useCallback(
-    ([v]: number[]) => {
-      if (!wavesurferRef.current || !isReady) return;
-      wavesurferRef.current.seekTo(v);
-    },
-    [isReady],
-  );
-
-  // ── Derived ───────────────────────────────────────────────────────────────
-  const progress = duration > 0 ? currentTime / duration : 0;
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -226,14 +141,6 @@ export function WaveHover({
 
         {/* Waveform with hover cursor */}
         <div className="relative w-full rounded-sm overflow-hidden bg-muted/40">
-          {!isReady && (
-            <div
-              className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-[2px]"
-              style={{ height: waveHeight ?? 64 }}
-            >
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            </div>
-          )}
           <WavesurferPlayer
             url={src}
             waveColor={waveColor}
@@ -244,13 +151,7 @@ export function WaveHover({
             barRadius={barRadius}
             dragToSeek
             plugins={plugins}
-            onReady={handleReady}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onFinish={handleFinish}
-            onTimeupdate={handleTimeupdate}
-            onSeeking={handleSeeking}
-            onDestroy={handleDestroy}
+            {...player.handlers}
           />
         </div>
 
@@ -267,6 +168,7 @@ export function WaveHover({
             step={0.001}
             disabled={!isReady}
             onValueChange={handleSeek}
+            aria-label="Seek"
           />
           <span className="text-[11px] tabular-nums text-muted-foreground w-10 shrink-0">
             {formatTime(duration)}

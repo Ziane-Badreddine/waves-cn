@@ -97,12 +97,12 @@ const examples: Example[] = [
   {
     slug: "wave-speed",
     icon: Gauge,
-    component: () => <WaveSpeed url={DEMO_AUDIO} className={DEMO_CLASS} />,
+    component: () => <WaveSpeed src={DEMO_AUDIO} className={DEMO_CLASS} />,
   },
   {
     slug: "wave-zoom",
     icon: ZoomIn,
-    component: () => <WaveZoom url={DEMO_AUDIO} className={DEMO_CLASS} />,
+    component: () => <WaveZoom src={DEMO_AUDIO} className={DEMO_CLASS} />,
   },
   {
     slug: "wave-hover",
@@ -125,7 +125,7 @@ const examples: Example[] = [
   {
     slug: "wave-video",
     icon: Film,
-    component: () => <WaveVideo url={DEMO_VIDEO} className={DEMO_CLASS} />,
+    component: () => <WaveVideo src={DEMO_VIDEO} className={DEMO_CLASS} />,
   },
 ];
 

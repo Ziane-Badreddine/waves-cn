@@ -11,13 +11,15 @@ import {
   Pause,
   Volume2,
   VolumeX,
-  Loader2,
   RotateCcw,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import WavesurferPlayer from "@/lib/wave-cn";
-import type WaveSurfer from "wavesurfer.js";
+import WavesurferPlayer, {
+  formatTime,
+  useCssVar,
+  useWavePlayer,
+} from "@/lib/wave-cn";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -34,7 +36,7 @@ export interface WaveMinimapProps {
   minimapWaveColor?: string;
   /** Minimap progress color @default "var(--primary)" */
   minimapProgressColor?: string;
-  /** Minimap overlay (viewport indicator) color @default "rgba(59,130,246,0.15)" */
+  /** Minimap overlay (viewport indicator) color @default "color-mix(in oklab, var(--primary) 15%, transparent)" */
   overlayColor?: string;
   /** Default zoom level in px/s @default 100 */
   defaultZoom?: number;
@@ -65,14 +67,6 @@ export interface WaveMinimapProps {
   className?: string;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function formatTime(t: number): string {
-  const m = Math.floor(t / 60);
-  const s = Math.floor(t % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function WaveMinimap({
@@ -82,7 +76,7 @@ export function WaveMinimap({
   minimapHeight = 30,
   minimapWaveColor = "var(--muted-foreground)",
   minimapProgressColor = "var(--primary)",
-  overlayColor = "rgba(59,130,246,0.15)",
+  overlayColor = "color-mix(in oklab, var(--primary) 15%, transparent)",
   defaultZoom = 100,
   minZoom = 10,
   maxZoom = 500,
@@ -98,140 +92,90 @@ export function WaveMinimap({
   onTimeUpdate,
   className,
 }: WaveMinimapProps) {
-  const wavesurferRef = React.useRef<WaveSurfer | null>(null);
+  const player = useWavePlayer({
+    defaultVolume,
+    onPlay,
+    onPause,
+    onFinish,
+    onTimeUpdate,
+  });
+  const {
+    isReady,
+    isPlaying,
+    currentTime,
+    duration,
+    progress,
+    volume,
+    isMuted,
+  } = player;
 
-  const [isReady, setIsReady] = React.useState(false);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [volume, setVolume] = React.useState(defaultVolume);
-  const [isMuted, setIsMuted] = React.useState(false);
-  const [duration, setDuration] = React.useState(0);
-  const [currentTime, setCurrentTime] = React.useState(0);
   const [zoom, setZoom] = React.useState(defaultZoom);
+
+  // The minimap draws on a <canvas>, so `var()` tokens must be resolved first.
+  // `overlayColor` is applied to a DOM element and can stay a CSS expression.
+  const resolvedMinimapWave = useCssVar(minimapWaveColor);
+  const resolvedMinimapProgress = useCssVar(minimapProgressColor);
 
   // ── Memoized plugins ──────────────────────────────────────────────────────
   const plugins = React.useMemo(
-      () =>
-        typeof document === "undefined"
-          ? []
-          : [
-              MinimapPlugin.create({
-                height: minimapHeight,
-                waveColor: minimapWaveColor,
-                progressColor: minimapProgressColor,
-                overlayColor: overlayColor,
-                insertPosition: "afterend",
-              }),
-            ],
-    [minimapHeight, minimapWaveColor, minimapProgressColor, overlayColor],
+    () =>
+      typeof document === "undefined"
+        ? []
+        : [
+            MinimapPlugin.create({
+              height: minimapHeight,
+              waveColor: resolvedMinimapWave,
+              progressColor: resolvedMinimapProgress,
+              overlayColor: overlayColor,
+              insertPosition: "afterend",
+            }),
+          ],
+    [minimapHeight, resolvedMinimapWave, resolvedMinimapProgress, overlayColor],
   );
-
-  // ── Event handlers ────────────────────────────────────────────────────────
-
-  const handleReady = React.useCallback(
-    (ws: WaveSurfer) => {
-      wavesurferRef.current = ws;
-      ws.setVolume(defaultVolume);
-      setDuration(ws.getDuration());
-      setIsReady(true);
-    },
-    [defaultVolume],
-  );
-
-  const handlePlay = React.useCallback(() => {
-    setIsPlaying(true);
-    onPlay?.();
-  }, [onPlay]);
-
-  const handlePause = React.useCallback(() => {
-    setIsPlaying(false);
-    onPause?.();
-  }, [onPause]);
-
-  const handleFinish = React.useCallback(
-    (_ws: WaveSurfer) => {
-      setIsPlaying(false);
-      onFinish?.();
-    },
-    [onFinish],
-  );
-
-  const handleTimeupdate = React.useCallback(
-    (ws: WaveSurfer) => {
-      const t = ws.getCurrentTime();
-      setCurrentTime(t);
-      onTimeUpdate?.(t, ws.getDuration());
-    },
-    [onTimeUpdate],
-  );
-
-  const handleSeeking = React.useCallback((ws: WaveSurfer) => {
-    setCurrentTime(ws.getCurrentTime());
-  }, []);
-
-  const handleDestroy = React.useCallback(() => {
-    wavesurferRef.current = null;
-    setIsReady(false);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-  }, []);
 
   // ── Controls ──────────────────────────────────────────────────────────────
 
-  const togglePlay = React.useCallback(
-    () => wavesurferRef.current?.playPause(),
+  const handleSeek = ([v]: number[]) => player.seek(v);
+  const handleVolume = ([v]: number[]) => player.setVolume(v);
+
+  // ── Zoom ──────────────────────────────────────────────────────────────────
+  // Slider changes are coalesced to one `ws.zoom()` call per animation frame;
+  // the slider position (`zoom` state) updates immediately.
+  const zoomFrame = React.useRef<number | null>(null);
+  const pendingZoom = React.useRef(defaultZoom);
+
+  const applyZoom = (value: number) => {
+    pendingZoom.current = value;
+    if (zoomFrame.current !== null) return;
+    zoomFrame.current = requestAnimationFrame(() => {
+      zoomFrame.current = null;
+      player.wavesurfer.current?.zoom(pendingZoom.current);
+    });
+  };
+
+  React.useEffect(
+    () => () => {
+      if (zoomFrame.current !== null) cancelAnimationFrame(zoomFrame.current);
+    },
     [],
   );
 
-  const restart = React.useCallback(() => {
-    if (!wavesurferRef.current || !isReady) return;
-    wavesurferRef.current.setTime(0);
-    wavesurferRef.current.play();
-  }, [isReady]);
-
-  const handleVolume = React.useCallback((v: number[]) => {
-    const value = v[0];
-    setVolume(value);
-    setIsMuted(value === 0);
-    wavesurferRef.current?.setVolume(value);
-  }, []);
-
-  const toggleMute = React.useCallback(() => {
-    if (!wavesurferRef.current) return;
-    const next = !isMuted;
-    setIsMuted(next);
-    wavesurferRef.current.setVolume(next ? 0 : volume);
-  }, [isMuted, volume]);
-
-  const handleSeek = React.useCallback(
-    ([v]: number[]) => {
-      if (!wavesurferRef.current || !isReady) return;
-      wavesurferRef.current.seekTo(v);
-    },
-    [isReady],
-  );
-
-  // ── Zoom ──────────────────────────────────────────────────────────────────
-  const handleZoom = React.useCallback((v: number[]) => {
-    const value = v[0];
+  const handleZoom = ([value]: number[]) => {
     setZoom(value);
-    wavesurferRef.current?.zoom(value);
-  }, []);
+    applyZoom(value);
+  };
 
-  const zoomIn = React.useCallback(() => {
+  const zoomIn = () => {
     const next = Math.min(zoom * 1.5, maxZoom);
     setZoom(next);
-    wavesurferRef.current?.zoom(next);
-  }, [zoom, maxZoom]);
+    player.wavesurfer.current?.zoom(next);
+  };
 
-  const zoomOut = React.useCallback(() => {
+  const zoomOut = () => {
     const next = Math.max(zoom / 1.5, minZoom);
     setZoom(next);
-    wavesurferRef.current?.zoom(next);
-  }, [zoom, minZoom]);
-
-  // ── Derived ───────────────────────────────────────────────────────────────
-  const progress = duration > 0 ? currentTime / duration : 0;
+    player.wavesurfer.current?.zoom(next);
+  };
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -250,14 +194,6 @@ export function WaveMinimap({
 
         {/* Waveform + minimap */}
         <div className="relative w-full rounded-sm overflow-hidden border border-border">
-          {!isReady && (
-            <div
-              className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-[2px]"
-              style={{ minHeight: waveHeight }}
-            >
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            </div>
-          )}
           <WavesurferPlayer
             url={src}
             waveColor={waveColor}
@@ -271,13 +207,7 @@ export function WaveMinimap({
             dragToSeek
             hideScrollbar={false}
             plugins={plugins}
-            onReady={handleReady}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onFinish={handleFinish}
-            onTimeupdate={handleTimeupdate}
-            onSeeking={handleSeeking}
-            onDestroy={handleDestroy}
+            {...player.handlers}
           />
         </div>
 
@@ -294,6 +224,7 @@ export function WaveMinimap({
             step={0.001}
             disabled={!isReady}
             onValueChange={handleSeek}
+            aria-label="Seek"
           />
           <span className="text-[11px] tabular-nums text-muted-foreground w-10 shrink-0">
             {formatTime(duration)}
@@ -309,7 +240,7 @@ export function WaveMinimap({
               variant="ghost"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
               disabled={!isReady}
-              onClick={restart}
+              onClick={player.restart}
               aria-label="Restart"
             >
               <RotateCcw size={15} />
@@ -319,7 +250,7 @@ export function WaveMinimap({
               variant="secondary"
               className="h-9 w-9"
               disabled={!isReady}
-              onClick={togglePlay}
+              onClick={player.togglePlay}
               aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? <Pause size={17} /> : <Play size={17} />}
@@ -365,7 +296,7 @@ export function WaveMinimap({
               size="icon"
               variant="ghost"
               className="h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
-              onClick={toggleMute}
+              onClick={player.toggleMute}
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
               {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}

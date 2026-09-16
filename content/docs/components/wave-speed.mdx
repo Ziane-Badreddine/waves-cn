@@ -128,23 +128,27 @@ Narrow the speed range for a more focused control, e.g. podcast listening speeds
 
 <ComponentPreviewWrapper name="wave-speed-custom-wave" />
 
-
 ## API Reference
-
-### WaveSpeed
 
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| `url` | `string` | — | Wave file URL to load. |
-| `waveColor` | `string` | `var(--muted-foreground)` | Wave bar color. Accepts CSS vars, hex, hsl, oklch. |
-| `progressColor` | `string` | `var(--primary)` | Progress bar color. Same formats as `waveColor`. |
-| `waveHeight` | `number` | `64` | Wave canvas height in px. |
-| `barWidth` | `number` | `3` | Bar width in px. |
-| `barGap` | `number` | `2` | Gap between bars in px. |
-| `barRadius` | `number` | `2` | Bar border radius in px. |
+| `src` | `string` | — | **(Required)** Audio URL. Changing it recreates the wavesurfer instance. |
+| `url` | `string` | — | **Deprecated.** Alias of `src`, kept for v1 compatibility. |
+| `title` | `string` | — | Track title displayed above the waveform. |
 | `minSpeed` | `number` | `0.25` | Minimum playback speed. |
 | `maxSpeed` | `number` | `4` | Maximum playback speed. |
 | `defaultSpeed` | `number` | `1` | Initial playback speed. |
 | `step` | `number` | `0.25` | Slider step increment. |
-| `className` | `string` | — | Root element class. |
-| `style` | `CSSProperties` | — | Root element inline style. |
+| `onPlay` | `() => void` | — | Fired when playback starts. |
+| `onPause` | `() => void` | — | Fired when playback pauses. |
+| `onFinish` | `() => void` | — | Fired when the track ends. |
+| `onTimeUpdate` | `(currentTime: number, duration: number) => void` | — | Fired on every playback tick. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Waveform bar color. Accepts any CSS value including `var(--*)` tokens. |
+| `progressColor` | `string` | `var(--primary)` | Progress overlay color. Same formats as `waveColor`. |
+| `waveHeight` | `number` | `64` | Waveform canvas height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Border radius of each bar. |
+| `audioHeight` | `number` | — | **Deprecated.** Alias of `waveHeight`. |
+| `className` | `string` | — | Extra classes on the root element. |
+| `style` | `CSSProperties` | — | Inline style on the root element. |

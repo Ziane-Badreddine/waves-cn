@@ -18,6 +18,8 @@ waves-cn is fully compatible with every official wavesurfer.js plugin. There are
 
 Pass a **memoized** array to the `plugins` prop. The player and hook use array reference equality to decide whether to recreate the instance — a new array on every render will destroy and recreate the waveform on every render.
 
+The instances you pass are **templates**. wavesurfer.js destroys plugins together with the instance, so waves-cn clones each template every time it (re)creates the instance. Put plugin option props in the `useMemo` deps to have option changes applied, and look the live plugin up after `ready` with `ws.getActivePlugins()` rather than holding on to the template.
+
 ### With `WavesurferPlayer`
 
 ```tsx
@@ -78,7 +80,6 @@ import WavesurferPlayer from "@/lib/wave-cn"
 import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js"
 
 <WavesurferPlayer
-  url=""
   onReady={(ws) => {
     ws.registerPlugin(
       RecordPlugin.create({ scrollingWaveform: true })
@@ -96,13 +97,17 @@ import RecordPlugin from "wavesurfer.js/dist/plugins/record.esm.js"
 
 export function MyRecorder() {
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const { wavesurfer } = useWavesurfer({ container: containerRef, url: "" })
+  const { wavesurfer } = useWavesurfer({ container: containerRef })
 
   useEffect(() => {
     if (!wavesurfer) return
-    wavesurfer.registerPlugin(
+    const record = wavesurfer.registerPlugin(
       RecordPlugin.create({ scrollingWaveform: true })
     )
+    return () => {
+      record.stopMic()
+      record.destroy()
+    }
   }, [wavesurfer])
 
   return <div ref={containerRef} />
@@ -113,17 +118,23 @@ export function MyRecorder() {
 
 ## Subscribing to plugin events
 
-Plugin events are accessed imperatively via `wavesurfer.on()` or through the plugin instance itself. Subscribe inside `onReady` or `useEffect`:
+Plugin events are accessed imperatively via `wavesurfer.on()` or through the plugin instance itself. Subscribe inside a `useEffect` so the listener is removed when the instance is recreated. With `WavesurferPlayer`, grab the instance in `onReady`, store it in state, and subscribe in an effect:
 
 ```tsx
+const [ws, setWs] = useState<WaveSurfer | null>(null)
+
+useEffect(() => {
+  if (!ws) return
+  return ws.on("zoom", (minPxPerSec) => {
+    console.log("zoom level:", minPxPerSec)
+  })
+}, [ws])
+
 <WavesurferPlayer
   url="/coastline.mp3"
   plugins={plugins}
-  onReady={(ws) => {
-    ws.on("zoom", (minPxPerSec) => {
-      console.log("zoom level:", minPxPerSec)
-    })
-  }}
+  onReady={(instance) => setWs(instance)}
+  onDestroy={() => setWs(null)}
 />
 ```
 

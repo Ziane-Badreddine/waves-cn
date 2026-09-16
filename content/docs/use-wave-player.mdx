@@ -1,0 +1,121 @@
+---
+title: useWavePlayer
+description: Player state and controls shared by every waves-cn component. Build your own player UI on top of WavesurferPlayer in a few lines.
+---
+
+## Overview
+
+`useWavePlayer` holds the state every audio player needs (`isReady`, `isPlaying`, `currentTime`, `duration`, `volume`, `isMuted`) and exposes the matching actions (`togglePlay`, `seek`, `setVolume`, …). It returns a `handlers` object that you spread onto `<WavesurferPlayer>` so the hook stays in sync with the instance.
+
+All eleven waves-cn components are built on it. Use it when you want your own layout but not your own event plumbing.
+
+## Usage
+
+```tsx
+import WavesurferPlayer, { formatTime, useWavePlayer } from "@/lib/wave-cn"
+import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider"
+
+export function MyPlayer({ src }: { src: string }) {
+  const player = useWavePlayer({ defaultVolume: 0.8 })
+
+  return (
+    <div className="space-y-3">
+      <WavesurferPlayer url={src} dragToSeek {...player.handlers} />
+
+      <div className="flex items-center gap-2">
+        <span className="tabular-nums text-xs">{formatTime(player.currentTime)}</span>
+        <Slider
+          aria-label="Seek"
+          value={[player.progress]}
+          max={1}
+          step={0.001}
+          disabled={!player.isReady}
+          onValueChange={([v]) => player.seek(v)}
+        />
+        <span className="tabular-nums text-xs">{formatTime(player.duration)}</span>
+      </div>
+
+      <Button onClick={player.togglePlay} disabled={!player.isReady}>
+        {player.isPlaying ? "Pause" : "Play"}
+      </Button>
+    </div>
+  )
+}
+```
+
+## Reaching the instance
+
+`player.wavesurfer` is a ref to the live `WaveSurfer` instance (null until `ready`). Use it for anything the hook does not cover:
+
+```tsx
+player.wavesurfer.current?.setPlaybackRate(1.5, true)
+player.wavesurfer.current?.skip(5)
+```
+
+For plugin instances, pass `onReady` and look the plugin up there:
+
+```tsx
+import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js"
+
+const [regions, setRegions] = useState<InstanceType<typeof RegionsPlugin> | null>(null)
+
+const player = useWavePlayer({
+  onReady: (ws) => {
+    const live = ws.getActivePlugins().find((p) => p instanceof RegionsPlugin)
+    setRegions((live as InstanceType<typeof RegionsPlugin>) ?? null)
+  },
+})
+
+useEffect(() => {
+  if (!regions) return
+  const unsub = regions.on("region-created", (r) => console.log(r))
+  return () => unsub()
+}, [regions])
+```
+
+Register listeners inside a `useEffect` keyed on the plugin instance, never inside `onReady` itself, so they are removed when the instance is recreated.
+
+## API Reference
+
+### Options
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `defaultVolume` | `number` | `1` | Initial volume, 0–1. Applied on `ready`. |
+| `autoPlay` | `boolean` | `false` | Start playback as soon as the audio is decoded. |
+| `onReady` | `(ws: WaveSurfer) => void` | — | Called once per instance after decode. |
+| `onPlay` | `() => void` | — | |
+| `onPause` | `() => void` | — | |
+| `onFinish` | `() => void` | — | |
+| `onTimeUpdate` | `(currentTime: number, duration: number) => void` | — | Called on every playback tick. |
+
+Callbacks are read through a ref, so inline functions are fine and never cause re-subscription.
+
+### Returns
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| `wavesurfer` | `RefObject<WaveSurfer \| null>` | The live instance. |
+| `isReady` | `boolean` | `true` after the `ready` event. |
+| `isPlaying` | `boolean` | |
+| `currentTime` | `number` | Seconds. |
+| `duration` | `number` | Seconds. |
+| `progress` | `number` | `currentTime / duration`, 0–1. |
+| `volume` | `number` | 0–1. |
+| `isMuted` | `boolean` | |
+| `play()` / `pause()` / `togglePlay()` | `() => void` | |
+| `restart()` | `() => void` | Seek to 0 and play. |
+| `seek(fraction)` | `(fraction: number) => void` | Seek to a 0–1 fraction of the duration. |
+| `seekTo(seconds)` | `(seconds: number) => void` | Seek to an absolute time. |
+| `setVolume(v)` | `(v: number) => void` | Sets volume and unmutes. |
+| `toggleMute()` | `() => void` | Uses `wavesurfer.setMuted`, so `volume` is preserved. |
+| `handlers` | `WavePlayerHandlers` | Spread onto `<WavesurferPlayer>`. Stable identity. |
+
+## Helpers exported alongside
+
+| Export | Signature | Description |
+| ------ | --------- | ----------- |
+| `formatTime` | `(seconds: number) => string` | `m:ss`. Non-finite or negative input renders `0:00`. |
+| `useCssVar` | `(value: string) => string` | Resolves `var(--token)` to its computed color for canvas or SVG use, and re-resolves on theme change. Non-`var()` values pass through. |
+| `WAVESURFER_DEFAULTS` | `Partial<WaveSurferOptions>` | See [WAVESURFER_DEFAULTS](/docs/wave-defaults). |

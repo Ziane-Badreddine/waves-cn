@@ -1,26 +1,31 @@
 "use client";
 
-import { useState, useCallback, useRef, type CSSProperties } from "react";
+import { useState, useId, type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";
-import WavesurferPlayer from "@/lib/wave-cn";
-import type WaveSurfer from "wavesurfer.js";
+import WavesurferPlayer, { useWavePlayer } from "@/lib/wave-cn";
 
 /**
  * Props for the WaveSpeed component
  */
 export type WaveSpeedProps = {
-  /** Audio file URL to load */
-  url: string;
+  /** Audio source URL */
+  src?: string;
+  /** @deprecated use `src` */
+  url?: string;
+  /** Optional title shown above the waveform */
+  title?: string;
   /** Audio bar color. Accepts any CSS value including var(--*) tokens @default "var(--muted-foreground)" */
   waveColor?: string;
   /** Progress bar color. Accepts any CSS value including var(--*) tokens @default "var(--primary)" */
   progressColor?: string;
-  /** Audio canvas height in px @default 64 */
+  /** Waveform height in px @default 64 */
+  waveHeight?: number;
+  /** @deprecated use `waveHeight` */
   audioHeight?: number;
   /** Bar width in px @default 3 */
   barWidth?: number;
@@ -36,6 +41,14 @@ export type WaveSpeedProps = {
   defaultSpeed?: number;
   /** Slider step increment @default 0.25 */
   step?: number;
+  /** Called when playback starts */
+  onPlay?: () => void;
+  /** Called when playback pauses */
+  onPause?: () => void;
+  /** Called when playback finishes */
+  onFinish?: () => void;
+  /** Called with current time on every audio process tick */
+  onTimeUpdate?: (currentTime: number, duration: number) => void;
   /** Root element class */
   className?: string;
   style?: CSSProperties;
@@ -45,9 +58,12 @@ export type WaveSpeedProps = {
  * Audio player with variable playback speed control
  */
 export function WaveSpeed({
+  src,
   url,
+  title,
   waveColor,
   progressColor,
+  waveHeight,
   audioHeight,
   barWidth,
   barGap,
@@ -56,85 +72,78 @@ export function WaveSpeed({
   maxSpeed = 4,
   defaultSpeed = 1,
   step = 0.25,
+  onPlay,
+  onPause,
+  onFinish,
+  onTimeUpdate,
   className,
   style,
 }: WaveSpeedProps) {
-  const wavesurferRef = useRef<WaveSurfer | null>(null);
+  const source = src ?? url;
+  const height = waveHeight ?? audioHeight;
 
-  const [isReady, setIsReady] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const player = useWavePlayer({ onPlay, onPause, onFinish, onTimeUpdate });
+  const pitchId = useId();
+
   const [speed, setSpeed] = useState(defaultSpeed);
   const [preservePitch, setPreservePitch] = useState(true);
 
-  const togglePlay = useCallback(() => wavesurferRef.current?.playPause(), []);
+  const handleSpeedChange = ([value]: number[]) => {
+    setSpeed(value);
+    player.wavesurfer.current?.setPlaybackRate(value, preservePitch);
+  };
 
-  const handleSpeedChange = useCallback(
-    ([value]: number[]) => {
-      setSpeed(value);
-      wavesurferRef.current?.setPlaybackRate(value, preservePitch);
-    },
-    [preservePitch],
-  );
-
-  const handlePreservePitch = useCallback(
-    (checked: boolean) => {
-      setPreservePitch(checked);
-      wavesurferRef.current?.setPlaybackRate(speed, checked);
-    },
-    [speed],
-  );
+  const handlePreservePitch = (checked: boolean) => {
+    setPreservePitch(checked);
+    player.wavesurfer.current?.setPlaybackRate(speed, checked);
+  };
 
   return (
     <div className={cn("w-full space-y-4", className)} style={style}>
+      {title && (
+        <p className="text-sm font-medium text-foreground truncate">{title}</p>
+      )}
+
       {/* WavesurferPlayer renders the container div and wires up all events */}
       <div className="w-full rounded-md overflow-hidden bg-muted/40">
         <WavesurferPlayer
-          url={url}
+          url={source}
           waveColor={waveColor}
           progressColor={progressColor}
-          height={audioHeight}
+          height={height}
           barWidth={barWidth}
           barGap={barGap}
           barRadius={barRadius}
           dragToSeek
-          onReady={(ws) => {
-            wavesurferRef.current = ws;
-            setIsReady(true);
-          }}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onFinish={() => setIsPlaying(false)}
-          onDestroy={() => {
-            wavesurferRef.current = null;
-            setIsReady(false);
-          }}
+          {...player.handlers}
         />
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
         <Button
           size="icon"
-          onClick={togglePlay}
-          disabled={!isReady}
-          aria-label={isPlaying ? "Pause" : "Play"}
+          onClick={player.togglePlay}
+          disabled={!player.isReady}
+          aria-label={player.isPlaying ? "Pause" : "Play"}
         >
-          {isPlaying ? (
+          {player.isPlaying ? (
             <Pause className="size-4" />
           ) : (
             <Play className="size-4" />
           )}
         </Button>
 
-        <Button
-          variant="outline"
-          className="text-sm text-muted-foreground tabular-nums shrink-0 pointer-events-none"
+        <span
+          role="status"
+          aria-live="polite"
+          className="inline-flex h-9 items-center rounded-md border bg-background px-4 text-sm text-muted-foreground tabular-nums shrink-0"
         >
           Playback rate:{" "}
           <span className="font-medium text-foreground">
             {speed.toFixed(2)}
           </span>
           x
-        </Button>
+        </span>
 
         <div className="flex items-center gap-3 flex-1 min-w-48">
           <span className="text-sm text-muted-foreground shrink-0">
@@ -146,8 +155,9 @@ export function WaveSpeed({
             step={step}
             value={[speed]}
             onValueChange={handleSpeedChange}
-            disabled={!isReady}
+            disabled={!player.isReady}
             className="flex-1"
+            aria-label="Playback speed"
           />
           <span className="text-sm text-muted-foreground shrink-0">
             {maxSpeed}x
@@ -156,13 +166,13 @@ export function WaveSpeed({
 
         <div className="flex items-center gap-2">
           <Switch
-            id="preserve-pitch"
+            id={pitchId}
             checked={preservePitch}
             onCheckedChange={handlePreservePitch}
-            disabled={!isReady}
+            disabled={!player.isReady}
           />
           <Label
-            htmlFor="preserve-pitch"
+            htmlFor={pitchId}
             className="text-sm text-muted-foreground cursor-pointer"
           >
             Preserve pitch

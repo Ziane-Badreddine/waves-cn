@@ -63,7 +63,7 @@ Under the hood, rendering is powered by [wavesurfer.js](https://wavesurfer.xyz),
 | **Wave Envelope**    | Editable volume automation points over the waveform                          | Envelope          |
 | **Wave Video**       | Waveform synced to a video element                                           | –                 |
 
-All components depend on a shared core, `wave-cn`, which ships the `WavesurferPlayer` component, the `useWavesurfer` hook and the default option set. The CLI installs it automatically.
+All components depend on a shared core, `wave-cn`, which ships the `WavesurferPlayer` component, the `useWavePlayer` and `useWavesurfer` hooks, `formatTime`, `useCssVar` and the default option set. The CLI installs it automatically, together with the shadcn primitives each component uses.
 
 ## Quick Start
 
@@ -75,7 +75,13 @@ All components depend on a shared core, `wave-cn`, which ships the `WavesurferPl
 
 ### 2. Register the registry
 
-Add the `@waves-cn` namespace to your `components.json` once:
+Declare the `@waves-cn` namespace once per project, with the CLI:
+
+```bash
+npx shadcn@latest registry add @waves-cn=https://waves-cn.vercel.app/r/{name}.json
+```
+
+or by editing `components.json`:
 
 ```json
 {
@@ -110,18 +116,22 @@ Full guide, including manual installation: [waves-cn.vercel.app/docs/installatio
 If you need something the prebuilt components do not cover, the core is yours too:
 
 ```tsx
-import WavesurferPlayer, { useWavesurfer } from "@/lib/wave-cn";
+import WavesurferPlayer, { useWavePlayer, useWavesurfer } from "@/lib/wave-cn";
 
-// Declarative
-<WavesurferPlayer url="/track.mp3" height={80} onReady={(ws) => ws.play()} />;
+// Declarative player with shared state + controls
+const player = useWavePlayer({ defaultVolume: 0.8 });
+<WavesurferPlayer url="/track.mp3" height={80} {...player.handlers} />;
+<button onClick={player.togglePlay}>{player.isPlaying ? "Pause" : "Play"}</button>;
 
-// Imperative
+// Imperative, you own the container
 const containerRef = useRef<HTMLDivElement>(null);
 const { wavesurfer, isReady, isPlaying, currentTime } = useWavesurfer({
   container: containerRef,
   url: "/track.mp3",
 });
 ```
+
+Only `url`, `media`, `plugins`, `peaks`, `duration`, `sampleRate` and `backend` recreate the instance. Every other option is applied in place, so cosmetic changes never re-decode the audio. Pass `peaks` + `duration` to render instantly from precomputed data.
 
 Wave, progress and cursor colors resolve from your CSS variables, so dark mode and brand themes apply without extra work.
 

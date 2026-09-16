@@ -135,31 +135,36 @@ Pass `topTimeline={false}` to render the waveform and zoom controls without any 
 
 ## API Reference
 
-### WaveTimeline 
-
 | Prop | Type | Default | Description |
-|---|---|---|---|
-| `url` | `string` | — | **(Required)** Wave file URL to load. |
-| `waveColor` | `string` | `var(--muted-foreground)` | Wave bar color. Accepts any CSS value including `var(--*)` tokens. |
-| `progressColor` | `string` | `var(--primary)` | Progress bar color. Accepts any CSS value including `var(--*)` tokens. |
-| `waveHeight` | `number` | `80` | Wave canvas height in px. |
+| ---- | ---- | ------- | ----------- |
+| `src` | `string` | — | **(Required)** Audio URL. Changing it recreates the wavesurfer instance. |
+| `title` | `string` | — | Track title displayed above the waveform. |
+| `defaultVolume` | `number` | `0.8` | Initial volume `0`–`1`. |
+| `defaultZoom` | `number` | `50` | Initial zoom level in px/s. |
+| `minZoom` | `number` | `10` | Minimum zoom level for the slider and buttons. |
+| `maxZoom` | `number` | `500` | Maximum zoom level for the slider and buttons. |
+| `topTimeline` | `TimelineOptions | false` | `{}` | Top ruler config. Pass `false` to hide. |
+| `bottomTimeline` | `TimelineOptions | false` | `false` | Bottom ruler config. Pass `{}` or options to show. |
+| `onPlay` | `() => void` | — | Fired when playback starts. |
+| `onPause` | `() => void` | — | Fired when playback pauses. |
+| `onFinish` | `() => void` | — | Fired when the track ends. |
+| `onTimeUpdate` | `(currentTime: number, duration: number) => void` | — | Fired on every playback tick. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Waveform bar color. Accepts any CSS value including `var(--*)` tokens. |
+| `progressColor` | `string` | `var(--primary)` | Progress overlay color. Same formats as `waveColor`. |
+| `waveHeight` | `number` | `80` | Waveform canvas height in px. |
 | `barWidth` | `number` | `2` | Bar width in px. |
 | `barGap` | `number` | `1` | Gap between bars in px. |
-| `barRadius` | `number` | `2` | Bar border radius in px. |
-| `defaultZoom` | `number` | `50` | Initial zoom level in pixels per second. |
-| `minZoom` | `number` | `10` | Minimum zoom level. |
-| `maxZoom` | `number` | `500` | Maximum zoom level. |
-| `topTimeline` | `TimelineOptions \| false` | `{}` | Top timeline config. Pass `false` to hide. |
-| `bottomTimeline` | `TimelineOptions \| false` | `false` | Bottom timeline config. Pass `{}` or options to show. |
-| `className` | `string` | — | Root element class. |
-| `style` | `CSSProperties` | — | Root element inline style. |
+| `barRadius` | `number` | `2` | Border radius of each bar. |
+| `className` | `string` | — | Extra classes on the outer `<Card>`. |
 
 ### TimelineOptions
 
 | Option | Type | Default (top) | Default (bottom) | Description |
-|---|---|---|---|---|
-| `height` | `number` | `20` | `14` | Height of the timeline bar in px. |
-| `timeInterval` | `number` | `0.5` | `0.1` | Seconds between each tick mark. |
-| `primaryLabelInterval` | `number` | `5` | `1` | Seconds between labeled ticks. |
-| `secondaryLabelInterval` | `number` | `1` | `undefined` | Seconds between secondary labeled ticks. |
-| `fontSize` | `string` | `"11px"` | `"10px"` | CSS font size for labels. |
+| ------ | ---- | ------------- | ---------------- | ----------- |
+| `height` | `number` | `20` | `14` | Height of the ruler in px. |
+| `timeInterval` | `number` | `0.5` | `0.1` | Seconds between tick marks. |
+| `primaryLabelInterval` | `number` | `5` | `1` | Seconds between primary labels. |
+| `secondaryLabelInterval` | `number` | `1` | — | Seconds between secondary labels. |
+| `fontSize` | `string` | `"11px"` | `"10px"` | CSS font size of the labels. |
+
+Changing any timeline option recreates the wavesurfer instance, so treat these as configuration rather than live state.

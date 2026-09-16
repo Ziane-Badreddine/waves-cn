@@ -9,7 +9,9 @@
       "title": "Wave Core",
       "description": "Core hook, player and shared defaults powering all waves-cn components. Built on wavesurfer.js.",
       "type": "registry:lib",
-      "dependencies": ["wavesurfer.js"],
+      "dependencies": [
+        "wavesurfer.js"
+      ],
       "files": [
         {
           "type": "registry:lib",
@@ -22,8 +24,16 @@
       "title": "Wave Player",
       "description": "Full-featured wave player with play/pause, volume control, seek bar and optional title.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button",
+        "card",
+        "slider"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -37,8 +47,14 @@
       "title": "Wave Recorder",
       "description": "Voice message recorder with live waveform, pause/resume, discard and auto-stop.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -52,8 +68,17 @@
       "title": "Wave Speed",
       "description": "wave player with continuous playback speed control and preserve-pitch toggle.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button",
+        "slider",
+        "switch",
+        "label"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -67,8 +92,16 @@
       "title": "Wave Zoom",
       "description": "wave player with mouse-wheel zoom via wavesurfer.js ZoomPlugin.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button",
+        "switch",
+        "label"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -82,8 +115,14 @@
       "title": "Wave Video",
       "description": "Waveform player synced to a video element via the wavesurfer.js media prop.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -97,8 +136,16 @@
       "title": "Wave Timeline",
       "description": "wave player with timeline ruler, zoom slider and volume control powered by wavesurfer.js TimelinePlugin.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button",
+        "card",
+        "slider"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -112,8 +159,16 @@
       "title": "Wave Regions",
       "description": "Wave player with interactive region markers for audio segments.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button",
+        "card",
+        "slider"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -127,8 +182,16 @@
       "title": "Wave Minimap",
       "description": "Wave player with a smaller overview minimap.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button",
+        "card",
+        "slider"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -142,8 +205,16 @@
       "title": "Wave Spectrogram",
       "description": "Wave player paired with a frequency spectrogram.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button",
+        "card",
+        "slider"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -157,8 +228,16 @@
       "title": "Wave Hover",
       "description": "Wave player with a hover cursor and time tooltip.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button",
+        "card",
+        "slider"
+      ],
       "files": [
         {
           "type": "registry:component",
@@ -172,8 +251,16 @@
       "title": "Wave Envelope",
       "description": "Wave player with interactive volume automation points.",
       "type": "registry:component",
-      "dependencies": ["wavesurfer.js", "lucide-react"],
-      "registryDependencies": ["@waves-cn/wave-cn"],
+      "dependencies": [
+        "wavesurfer.js",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@waves-cn/wave-cn",
+        "button",
+        "card",
+        "slider"
+      ],
       "files": [
         {
           "type": "registry:component",

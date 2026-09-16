@@ -119,3 +119,28 @@ import { WaveHover } from "@/components/waves-cn/wave-hover"
 ### Custom Colors
 
 <ComponentPreviewWrapper name="wave-hover-custom" />
+
+## API Reference
+
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `src` | `string` | — | **(Required)** Audio URL. Changing it recreates the wavesurfer instance. |
+| `title` | `string` | — | Track title displayed above the waveform. |
+| `defaultVolume` | `number` | `0.8` | Initial volume `0`–`1`. |
+| `lineColor` | `string` | `var(--primary)` | Hover cursor line color. |
+| `lineWidth` | `number \| string` | `1` | Hover cursor line width in px. |
+| `labelBackground` | `string` | `var(--primary)` | Time label background color. |
+| `labelColor` | `string` | `var(--primary-foreground)` | Time label text color. |
+| `labelSize` | `string` | `"11px"` | Time label font size. |
+| `autoPlay` | `boolean` | `false` | Start playing as soon as the audio is decoded. |
+| `onPlay` | `() => void` | — | Fired when playback starts. |
+| `onPause` | `() => void` | — | Fired when playback pauses. |
+| `onFinish` | `() => void` | — | Fired when the track ends. |
+| `onTimeUpdate` | `(currentTime: number, duration: number) => void` | — | Fired on every playback tick. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Waveform bar color. Accepts any CSS value including `var(--*)` tokens. |
+| `progressColor` | `string` | `var(--primary)` | Progress overlay color. Same formats as `waveColor`. |
+| `waveHeight` | `number` | `64` | Waveform canvas height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Border radius of each bar. |
+| `className` | `string` | — | Extra classes on the outer `<Card>`. |

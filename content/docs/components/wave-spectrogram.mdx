@@ -121,3 +121,29 @@ import { WaveSpectrogram } from "@/components/waves-cn/wave-spectrogram"
 By default, `fftSamples` is `512`. You can increase this to `1024` or `2048` for a higher resolution spectrogram.
 
 <ComponentPreviewWrapper name="wave-spectrogram-hires" />
+
+## API Reference
+
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `src` | `string` | — | **(Required)** Audio URL. Changing it recreates the wavesurfer instance. |
+| `title` | `string` | — | Track title displayed above the waveform. |
+| `defaultVolume` | `number` | `0.8` | Initial volume `0`–`1`. |
+| `spectrogramHeight` | `number` | `128` | Height of the spectrogram strip in px. |
+| `fftSamples` | `256 \| 512 \| 1024 \| 2048` | `512` | FFT window size. Higher values give more frequency detail and cost more CPU at decode time. |
+| `showLabels` | `boolean` | `true` | Render the frequency axis labels. |
+| `frequencyMin` | `number` | `0` | Lowest frequency (Hz) rendered. |
+| `frequencyMax` | `number` | `sampleRate / 2` | Highest frequency (Hz) rendered. Lower it (e.g. `8000`) for speech to save CPU. |
+| `onPlay` | `() => void` | — | Fired when playback starts. |
+| `onPause` | `() => void` | — | Fired when playback pauses. |
+| `onFinish` | `() => void` | — | Fired when the track ends. |
+| `onTimeUpdate` | `(currentTime: number, duration: number) => void` | — | Fired on every playback tick. |
+| `waveColor` | `string` | `var(--muted-foreground)` | Waveform bar color. Accepts any CSS value including `var(--*)` tokens. |
+| `progressColor` | `string` | `var(--primary)` | Progress overlay color. Same formats as `waveColor`. |
+| `waveHeight` | `number` | `64` | Waveform canvas height in px. |
+| `barWidth` | `number` | `3` | Bar width in px. |
+| `barGap` | `number` | `2` | Gap between bars in px. |
+| `barRadius` | `number` | `2` | Border radius of each bar. |
+| `className` | `string` | — | Extra classes on the outer `<Card>`. |
+
+The spectrogram is computed synchronously when the audio is decoded. For long files prefer a smaller `fftSamples` or a capped `frequencyMax`.

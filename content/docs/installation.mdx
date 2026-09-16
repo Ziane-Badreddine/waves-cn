@@ -3,47 +3,15 @@ title: Installation
 description: Add waves-cn components to your project using the shadcn/ui registry.
 ---
 
-
-## Quick Start
-
-waves-cn is a trusted registry for shadcn/ui. You can start adding components right away!
-
-<Tabs items={["pnpm", "npm", "yarn", "bun"]}>
-  <Tab value="pnpm">
-    ```bash
-    pnpm dlx shadcn@latest add @waves-cn/wave-player
-    ```
-  </Tab>
-  <Tab value="npm">
-    ```bash
-    npx shadcn@latest add @waves-cn/wave-player
-    ```
-  </Tab>
-  <Tab value="yarn">
-    ```bash
-    yarn dlx shadcn@latest add @waves-cn/wave-player
-    ```
-  </Tab>
-  <Tab value="bun">
-    ```bash
-    bunx --bun shadcn@latest add @waves-cn/wave-player
-    ```
-  </Tab>
-</Tabs>
-
-This will add the waves-cn registry to your `components.json`:
-
-```json
-{
-  "registries": {
-    "@waves-cn": "https://waves-cn.vercel.app/r/{name}.json"
-  }
-}
-```
-
 ## Prerequisites
 
-Before adding any component, make sure you have shadcn/ui initialized in your project:
+waves-cn components are plain shadcn/ui components. You need:
+
+- React 18 or newer
+- Tailwind CSS v4
+- shadcn/ui initialised in the project (`components.json` present)
+
+If you have not set up shadcn/ui yet:
 
 <Tabs items={["pnpm", "npm", "yarn", "bun"]}>
   <Tab value="pnpm">
@@ -68,7 +36,98 @@ Before adding any component, make sure you have shadcn/ui initialized in your pr
   </Tab>
 </Tabs>
 
-## Need Help?
+## 1. Register the registry
 
-- [GitHub Repository](https://github.com/Ziane-Badreddine/waves-cn)
+The shadcn CLI only resolves `@waves-cn/*` names once the namespace is declared in your `components.json`. Do this once per project, either with the CLI:
+
+<Tabs items={["pnpm", "npm", "yarn", "bun"]}>
+  <Tab value="pnpm">
+    ```bash
+    pnpm dlx shadcn@latest registry add @waves-cn=https://waves-cn.vercel.app/r/{name}.json
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npx shadcn@latest registry add @waves-cn=https://waves-cn.vercel.app/r/{name}.json
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn dlx shadcn@latest registry add @waves-cn=https://waves-cn.vercel.app/r/{name}.json
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bunx --bun shadcn@latest registry add @waves-cn=https://waves-cn.vercel.app/r/{name}.json
+    ```
+  </Tab>
+</Tabs>
+
+or by editing `components.json` by hand:
+
+```json title="components.json"
+{
+  "registries": {
+    "@waves-cn": "https://waves-cn.vercel.app/r/{name}.json"
+  }
+}
+```
+
+## 2. Add a component
+
+<Tabs items={["pnpm", "npm", "yarn", "bun"]}>
+  <Tab value="pnpm">
+    ```bash
+    pnpm dlx shadcn@latest add @waves-cn/wave-player
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npx shadcn@latest add @waves-cn/wave-player
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn dlx shadcn@latest add @waves-cn/wave-player
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bunx --bun shadcn@latest add @waves-cn/wave-player
+    ```
+  </Tab>
+</Tabs>
+
+The CLI installs:
+
+- the component at `components/waves-cn/wave-player.tsx`
+- the shared core at `lib/wave-cn.tsx` (`WavesurferPlayer`, `useWavePlayer`, `useWavesurfer`, `formatTime`, `useCssVar`)
+- the shadcn primitives it uses (`button`, `card`, `slider`, …) if they are not already in your project
+- the `wavesurfer.js` and `lucide-react` npm packages
+
+Every component is listed on its docs page with the exact command. Replace `wave-player` with any of `wave-recorder`, `wave-regions`, `wave-timeline`, `wave-minimap`, `wave-spectrogram`, `wave-speed`, `wave-zoom`, `wave-hover`, `wave-envelope`, `wave-video`.
+
+## 3. Use it
+
+```tsx
+import WavePlayer from "@/components/waves-cn/wave-player";
+
+export default function Page() {
+  return <WavePlayer src="/track.mp3" title="My track" />;
+}
+```
+
+## Manual installation
+
+Each component page has a **Manual** tab with the full source of the component and of `lib/wave-cn.tsx`. Copy both, then install the runtime dependencies:
+
+```bash
+npm install wavesurfer.js lucide-react
+```
+
+and make sure the shadcn primitives the component imports (`button`, `card`, `slider`, `switch`, `label`) exist under `components/ui/`.
+
+## Need help?
+
+- [GitHub repository](https://github.com/Ziane-Badreddine/waves-cn)
 - [Introduction](/docs)

@@ -7,9 +7,9 @@ export default function WaveMinimapCustomDemo() {
         src="/coastline.mp3"
         title="Custom Minimap"
         minimapHeight={40}
-        minimapWaveColor="rgba(59,130,246,0.3)"
-        minimapProgressColor="rgba(59,130,246,0.8)"
-        overlayColor="rgba(0,0,0,0.1)"
+        minimapWaveColor="var(--chart-2)"
+        minimapProgressColor="var(--chart-1)"
+        overlayColor="color-mix(in oklab, var(--foreground) 10%, transparent)"
       />
     </div>
   );
